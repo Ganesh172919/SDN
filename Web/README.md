@@ -1,0 +1,34 @@
+# SELF-X Dashboard Authentication
+
+The dashboard uses server-side authentication. Credentials are configured through process environment variables; passwords are stored only as PBKDF2-HMAC-SHA256 hashes.
+
+## Configure the demo account
+
+1. Generate a password hash without writing the password to source control:
+
+   ```powershell
+   $env:SELFX_AUTH_USERNAME = "demo"
+   $env:SELFX_AUTH_PASSWORD_HASH = (python Web/server.py --hash-password)
+   ```
+
+2. Keep those environment variables in the process environment or in a local `.env` file managed by your shell/deployment tooling. `.env` is ignored by Git. Copy `.env.example` as a reference; the Python standard-library server does not automatically load `.env` files.
+
+3. Start the dashboard:
+
+   ```powershell
+   python Web/server.py
+   ```
+
+4. Open `http://localhost:5000/login` and sign in with the configured username and password.
+
+For HTTPS deployments, set `SELFX_AUTH_SECURE_COOKIE=1`. The default `0` is for local HTTP development only. Sessions are held in memory and expire after `SELFX_AUTH_SESSION_TTL` seconds of inactivity; restarting the server invalidates all sessions.
+
+## Authentication behavior
+
+- `/login` is public and receives a CSRF cookie.
+- `/` and `/index.html` require an authenticated session.
+- `/api/status`, `/api/memory`, `/api/ablation`, `/api/ryu/*`, and action endpoints require an authenticated session.
+- `GET /api/ryu/*` is available for authenticated read-only inspection; all Ryu POST writes return HTTP 409.
+- `/api/auth/session` reports the current user.
+- `POST /api/auth/logout` requires the session CSRF token in `X-CSRF-Token`.
+- Direct network-control helpers remain disabled and return HTTP 409. Authentication does not enable Ryu/OpenFlow actions.

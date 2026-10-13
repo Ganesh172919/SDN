@@ -163,6 +163,7 @@ class DashboardApp {
     this.agent = new AgentManager();
     this.simulator = new SDNSimulator(this);
     this.initAppMode();
+    this.initAuthControls();
 
     // Initial UI render
     this.updateUI();
@@ -286,6 +287,43 @@ class DashboardApp {
 
   playSound(type) {
     if (this.audio) this.audio.play(type);
+  }
+
+  initAuthControls() {
+    const userElement = document.getElementById('authUser');
+    const logoutButton = document.getElementById('btnLogout');
+    if (logoutButton) {
+      logoutButton.addEventListener('click', async () => {
+        logoutButton.disabled = true;
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'X-CSRF-Token': this.readCookie('sfx_csrf') },
+          credentials: 'same-origin'
+        });
+        window.location.assign('/login');
+      });
+    }
+
+    fetch('/api/auth/session', { cache: 'no-store', credentials: 'same-origin' })
+      .then((response) => {
+        if (response.status === 401) {
+          window.location.assign('/login');
+          return null;
+        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        if (data && userElement) userElement.textContent = data.username;
+      })
+      .catch(() => {
+        if (userElement) userElement.textContent = 'SESSION ERROR';
+      });
+  }
+
+  readCookie(name) {
+    const entry = document.cookie.split('; ').find((item) => item.startsWith(`${name}=`));
+    return entry ? decodeURIComponent(entry.slice(name.length + 1)) : '';
   }
 
   initClock() {
