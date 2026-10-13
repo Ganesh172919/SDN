@@ -137,6 +137,9 @@ class CyberAudioEngine {
 class DashboardApp {
   constructor() {
     this.audio = new CyberAudioEngine();
+    this.appMode = 'simulation';
+    this.liveStatus = null;
+    this.liveStatusTimer = null;
 
     this.sparklineHistory = {
       latency: [24, 22, 19, 15, 11, 7.5, 5.8, 5.2],
@@ -159,6 +162,7 @@ class DashboardApp {
     this.charts = new TelemetryChartsManager();
     this.agent = new AgentManager();
     this.simulator = new SDNSimulator(this);
+    this.initAppMode();
 
     // Initial UI render
     this.updateUI();
@@ -168,6 +172,116 @@ class DashboardApp {
 
     // Check for live Ryu backend connection
     this.checkLiveBackend();
+  }
+
+  isSimulationMode() {
+    return this.appMode === 'simulation';
+  }
+
+  initAppMode() {
+    document.querySelectorAll('.app-mode-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        this.setAppMode(button.dataset.appMode);
+      });
+    });
+    this.setAppMode('simulation', false);
+  }
+
+  setAppMode(mode, notify = true) {
+    if (!['simulation', 'live'].includes(mode)) return;
+
+    this.appMode = mode;
+    document.querySelectorAll('.app-mode-btn').forEach((button) => {
+      button.classList.toggle('active', button.dataset.appMode === mode);
+      button.setAttribute('aria-pressed', button.dataset.appMode === mode ? 'true' : 'false');
+    });
+
+    const simulation = mode === 'simulation';
+    const banner = document.getElementById('modeStateBanner');
+    const title = document.getElementById('modeStateTitle');
+    const message = document.getElementById('modeStateMessage');
+    const pill = document.getElementById('connectionStatusPill');
+    const pillText = document.getElementById('connectionStatusText');
+
+    if (banner && title && message) {
+      banner.className = `mode-state-banner ${simulation ? 'simulation-state' : 'loading-state'}`;
+      title.textContent = simulation ? 'Simulation mode' : 'Live network mode';
+      message.textContent = simulation
+        ? 'Generated telemetry and actions are local to this browser.'
+        : 'Loading controller status. No simulated values are used in this mode.';
+    }
+
+    if (pill && pillText) {
+      pill.classList.toggle('simulating', simulation);
+      pill.classList.remove('live', 'error');
+      pillText.textContent = simulation ? 'SIMULATION MODE - GENERATED DATA' : 'LIVE NETWORK - CONNECTING';
+    }
+
+    this.setSimulationControlsEnabled(simulation);
+    if (this.simulator) this.simulator.setPlaying(simulation);
+    if (this.agent && this.agent.setLiveMode) this.agent.setLiveMode(!simulation);
+    if (this.charts && this.charts.setLiveMode) this.charts.setLiveMode(!simulation);
+
+    if (simulation) {
+      if (this.liveStatusTimer) {
+        clearInterval(this.liveStatusTimer);
+        this.liveStatusTimer = null;
+      }
+      this.updateUI();
+      if (notify) this.showToast('Simulation Mode', 'Generated telemetry is active; no network requests are issued.', 'info');
+    } else {
+      this.renderLiveUnavailable();
+      this.fetchLiveStatus();
+      if (this.liveStatusTimer) clearInterval(this.liveStatusTimer);
+      this.liveStatusTimer = setInterval(() => this.fetchLiveStatus(), 10000);
+      if (notify) this.showToast('Live Network Mode', 'Only successful backend responses will be displayed.', 'info');
+    }
+  }
+
+  setSimulationControlsEnabled(enabled) {
+    const ids = [
+      'btnBurstElephant', 'btnSteadyFlow', 'btnTriggerReroute',
+      'btnTriggerRateLimit', 'btnStepAgent', 'btnTogglePlay', 'btnResetSimulation'
+    ];
+    ids.forEach((id) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      element.disabled = !enabled;
+      element.classList.toggle('simulation-only', true);
+      element.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+    });
+    document.querySelectorAll('.mode-btn').forEach((button) => {
+      button.disabled = !enabled;
+      button.classList.toggle('simulation-only', true);
+    });
+  }
+
+  renderLiveUnavailable() {
+    ['metricLatency', 'metricThroughput', 'metricLoss', 'metricLinkUtil', 'metricReward'].forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = '--';
+    });
+    const safety = document.getElementById('metricSafetyStatus');
+    if (safety) safety.textContent = 'N/A';
+    if (this.charts && this.charts.clear) this.charts.clear();
+  }
+
+  setLiveState(state, message, title = 'Live network mode') {
+    const banner = document.getElementById('modeStateBanner');
+    const titleElement = document.getElementById('modeStateTitle');
+    const messageElement = document.getElementById('modeStateMessage');
+    const pill = document.getElementById('connectionStatusPill');
+    const pillText = document.getElementById('connectionStatusText');
+    if (banner) banner.className = `mode-state-banner ${state}-state`;
+    if (titleElement) titleElement.textContent = title;
+    if (messageElement) messageElement.textContent = message;
+    if (pill) {
+      pill.classList.remove('simulating', 'live', 'error');
+      pill.classList.add(state === 'connected' ? 'live' : state === 'error' ? 'error' : 'simulating');
+    }
+    if (pillText) pillText.textContent = state === 'connected'
+      ? 'LIVE NETWORK - CONTROLLER CONNECTED'
+      : state === 'error' ? 'LIVE NETWORK - DISCONNECTED' : 'LIVE NETWORK - LOADING';
   }
 
   playSound(type) {
@@ -389,9 +503,10 @@ class DashboardApp {
     const btnBurst = document.getElementById('btnBurstElephant');
     if (btnBurst) {
       btnBurst.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('burst');
         this.simulator.injectElephantBurst();
-        this.showToast('Elephant Burst (12M)', 'Injected 12 Mbps elephant flow (h2 ➔ h8). Saturated primary link.', 'warn');
+        this.showToast('Simulated Elephant Burst (12M)', 'Updated the local simulation only; no traffic was started.', 'warn');
       });
     }
 
@@ -399,10 +514,11 @@ class DashboardApp {
     const btnSteady = document.getElementById('btnSteadyFlow');
     if (btnSteady) {
       btnSteady.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('click');
         this.simulator.toggleSteadyTraffic();
         const active = this.simulator.isSteadyActive;
-        this.showToast('Steady Traffic', `Steady flow h1 ➔ h7 @ 3 Mbps is now ${active ? 'ACTIVE' : 'PAUSED'}.`, 'info');
+        this.showToast('Simulated Steady Traffic', `Local steady-flow state is now ${active ? 'ACTIVE' : 'PAUSED'}. No traffic was started.`, 'info');
       });
     }
 
@@ -410,9 +526,10 @@ class DashboardApp {
     const btnReroute = document.getElementById('btnTriggerReroute');
     if (btnReroute) {
       btnReroute.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('reroute');
         this.simulator.manualReroute();
-        this.showToast('Manual Reroute', 'Flow rerouted to s2-s3 secondary port 4.', 'success');
+        this.showToast('Simulated Reroute', 'Updated the local simulation only; no network rule was sent.', 'info');
       });
     }
 
@@ -420,9 +537,10 @@ class DashboardApp {
     const btnRateLimit = document.getElementById('btnTriggerRateLimit');
     if (btnRateLimit) {
       btnRateLimit.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('click');
         this.simulator.manualRateLimit();
-        this.showToast('Rate Limit Applied', 'OpenFlow 1.3 meter table throttling elephant flow to 8 Mbps.', 'info');
+        this.showToast('Simulated Rate Limit', 'Updated the local simulation only; no meter was sent.', 'info');
       });
     }
 
@@ -430,9 +548,10 @@ class DashboardApp {
     const btnStep = document.getElementById('btnStepAgent');
     if (btnStep) {
       btnStep.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('step');
         this.simulator.step();
-        this.showToast('Single Step Executed', `Stepped agent cycle to #${this.simulator.cycle}.`, 'info');
+        this.showToast('Simulated Step', `Advanced the local simulation to cycle #${this.simulator.cycle}.`, 'info');
       });
     }
 
@@ -441,6 +560,7 @@ class DashboardApp {
     const playPauseText = document.getElementById('playPauseText');
     if (btnPlayPause) {
       btnPlayPause.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         const isPlaying = !this.simulator.isPlaying;
         this.simulator.setPlaying(isPlaying);
         this.playSound('click');
@@ -461,9 +581,10 @@ class DashboardApp {
     const btnReset = document.getElementById('btnResetSimulation');
     if (btnReset) {
       btnReset.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         this.playSound('click');
         this.simulator.reset();
-        this.showToast('State Reset', 'Network flows, agent memory counters, and cycles reset.', 'warn');
+        this.showToast('Simulation Reset', 'Local simulation state, memory view, and cycle counters reset.', 'warn');
       });
     }
 
@@ -471,12 +592,13 @@ class DashboardApp {
     const modeBtns = document.querySelectorAll('.mode-btn');
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!this.isSimulationMode()) return;
         modeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const mode = btn.getAttribute('data-mode');
         this.playSound('click');
         this.simulator.setMode(mode);
-        this.showToast(`Condition ${mode} Activated`, `Switched ablation evaluation profile to ${mode}.`, 'success');
+        this.showToast(`Condition ${mode} Activated`, `Switched simulation profile to ${mode}.`, 'success');
       });
     });
   }
@@ -493,8 +615,8 @@ class DashboardApp {
     }
 
     if (this.modalOverlay) {
-      this.modalOverlay.addEventListener('click', (e) => {
-        if (e.target === this.modalOverlay) {
+      this.modalOverlay.addEventListener('click', (event) => {
+        if (event.target === this.modalOverlay) {
           this.modalOverlay.classList.remove('open');
         }
       });
@@ -502,14 +624,6 @@ class DashboardApp {
   }
 
   openShortcutsModal() {
-    if (!this.modalOverlay) return;
-
-    const modalTitle = document.getElementById('modalTitle');
-    const modalSubtitle = document.getElementById('modalSubtitle');
-    const modalBody = document.getElementById('modalBody');
-
-    if (modalTitle) modalTitle.textContent = 'Control Deck Hotkeys & Keyboard Shortcuts';
-    if (modalSubtitle) modalSubtitle.textContent = 'Real-time telemetry and SDN simulation rapid controls';
 
     if (modalBody) {
       modalBody.innerHTML = `
@@ -757,6 +871,10 @@ class DashboardApp {
   }
 
   updateUI() {
+    if (!this.isSimulationMode()) {
+      this.renderLiveUnavailable();
+      return;
+    }
     const m = this.simulator.metrics;
 
     // Push into sliding histories (keep last 12 points)
@@ -826,33 +944,29 @@ class DashboardApp {
     }
   }
 
-  async checkLiveBackend() {
+  async fetchLiveStatus() {
+    if (this.isSimulationMode()) return;
+    this.setLiveState('loading', 'Requesting controller health from GET /api/status.');
     try {
-      const res = await fetch('/api/status');
-      if (res.ok) {
-        const data = await res.json();
-        const pill = document.getElementById('connectionStatusPill');
-        const text = document.getElementById('connectionStatusText');
-
-        if (data.ryu_controller === 'connected') {
-          if (pill && text) {
-            pill.classList.remove('simulating');
-            pill.classList.add('live');
-            const swCount = data.connected_switches ? data.connected_switches.length : 4;
-            text.textContent = `LIVE RYU CONTROLLER (PORT 8080 • ${swCount} SWITCHES)`;
-            this.playSound('success');
-            this.showToast('Ryu Connected', `Live OpenFlow ofctl_rest detected at ${data.ryu_base_url}.`, 'success');
-          }
-        } else {
-          if (pill && text) {
-            pill.classList.add('simulating');
-            text.textContent = 'SIMULATION TESTBED ACTIVE';
-          }
-        }
+      const res = await fetch('/api/status', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      this.liveStatus = data;
+      if (data.ryu_controller !== 'connected') {
+        this.setLiveState('error', 'Controller is disconnected. Live metrics remain unavailable.', 'Live network disconnected');
+        return;
       }
+      const switchCount = Array.isArray(data.connected_switches) ? data.connected_switches.length : 0;
+      this.setLiveState('connected', `Controller response received; ${switchCount} connected switch record(s). Metric cards remain empty because no live metric endpoint is exposed.`, 'Live network connected');
+      this.playSound('success');
     } catch (e) {
-      // In simulation mode (fully functional standalone)
+      this.liveStatus = null;
+      this.setLiveState('error', `Live status request failed: ${e.message}.`, 'Live network error');
     }
+  }
+
+  checkLiveBackend() {
+    // The selected mode remains simulation until the user explicitly opts in.
   }
 }
 

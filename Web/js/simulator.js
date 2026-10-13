@@ -79,24 +79,24 @@ class SDNSimulator {
     this.isRerouted = !this.isRerouted;
     if (this.app.topology) this.app.topology.setElephantRerouted(this.isRerouted);
     this.recomputeMetrics();
-    if (this.app.agent) {
-      this.app.agent.addLog(
-        'act',
-        'Manual Reroute Executed',
-        `Flow h2 -> h8 switched to ${this.isRerouted ? 'Secondary Port 4 (12ms)' : 'Primary Port 3 (5ms)'}`
-      );
-    }
+        if (this.app.agent) {
+          this.app.agent.addLog(
+            'act',
+            'Simulated Flow-Mod',
+            `Local simulation switched h2 -> h8 to secondary port 4; no OpenFlow rule was installed.`
+          );
+        }
   }
 
   manualRateLimit() {
     this.isRateLimited = !this.isRateLimited;
     this.recomputeMetrics();
     if (this.app.agent) {
-      this.app.agent.addLog(
-        'act',
-        'Meter Rate-Limiting Toggled',
-        `OpenFlow 1.3 Meter table ceiling set to ${this.isRateLimited ? '6 Mbps' : 'Unlimited (15 Mbps)'}`
-      );
+          this.app.agent.addLog(
+            'act',
+            'Simulated Meter',
+            `Local meter state set to ${this.isRateLimited ? '6 Mbps' : 'unlimited'}; no OpenFlow meter was sent.`
+          );
     }
   }
 
@@ -173,12 +173,12 @@ class SDNSimulator {
         this.isRerouted = true;
         if (topo) topo.setElephantRerouted(true);
         if (agent) {
-          agent.addLog('act', 'Flow-Mod Installed', 'Installed OpenFlow 1.3 rule on switch s2: match(in_port=2, ip_dst=10.0.0.8) -> OUTPUT:4 (Secondary link).');
+          agent.addLog('act', 'Simulated Flow-Mod', 'Local simulation switched h2 -> h8 to secondary port 4; no OpenFlow rule was installed.');
         }
       } else {
         this.isRateLimited = true;
         if (agent) {
-          agent.addLog('act', 'Meter Table Applied', 'Configured meter band ceiling to 6144 kbps on switch s2.');
+          agent.addLog('act', 'Simulated Meter', 'Local simulation applied a 6144 kbps ceiling; no meter was installed.');
         }
       }
 

@@ -74,6 +74,11 @@ class MiniLineChart {
     this.render();
   }
 
+  clear() {
+    this.data = [];
+    if (this.ctx) this.ctx.clearRect(0, 0, this.width, this.height);
+  }
+
   render() {
     if (!this.ctx || !this.data || this.data.length === 0) return;
 
@@ -274,6 +279,16 @@ class TelemetryChartsManager {
         chart.setupDPI();
         chart.render();
       }
+    });
+  }
+
+  setLiveMode(enabled) {
+    if (enabled) this.clear();
+  }
+
+  clear() {
+    [this.chartLatency, this.chartThroughput, this.chartLoss, this.chartReward].forEach(chart => {
+      if (chart) chart.clear();
     });
   }
 

@@ -6,6 +6,7 @@
 
 class AgentManager {
   constructor() {
+    this.liveMode = false;
     this.currentPhase = 'reflect';
     this.memoryEntries = this.generateInitialMemory();
     this.currentFilter = 'all';
@@ -21,6 +22,18 @@ class AgentManager {
     this.setPhase(this.currentPhase);
     this.fetchLiveMemory();
     setInterval(() => this.fetchLiveMemory(), 10000);
+  }
+
+  setLiveMode(enabled) {
+    this.liveMode = enabled;
+    if (enabled) {
+      this.memoryEntries = [];
+      this.renderMemoryGrid();
+      this.fetchLiveMemory();
+    } else if (this.memoryEntries.length === 0) {
+      this.memoryEntries = this.generateInitialMemory();
+      this.renderMemoryGrid();
+    }
   }
 
   initDOM() {
@@ -348,6 +361,9 @@ class AgentManager {
   }
 
   async fetchLiveMemory() {
+    if (!this.liveMode && window.app && window.app.appMode === 'live') {
+      this.liveMode = true;
+    }
     try {
       const res = await fetch('/api/memory');
       if (res.ok) {
@@ -375,10 +391,16 @@ class AgentManager {
             };
           });
           this.applyFilters();
+        } else if (this.liveMode) {
+          this.memoryEntries = [];
+          this.renderMemoryGrid();
         }
       }
     } catch (e) {
-      // Backend offline or running in standalone simulation
+      if (this.liveMode) {
+        this.memoryEntries = [];
+        this.renderMemoryGrid();
+      }
     }
   }
 
@@ -408,6 +430,16 @@ class AgentManager {
 
     if (this.memoryCountBadge) {
       this.memoryCountBadge.textContent = entries.length;
+    }
+
+    if (entries.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = this.liveMode
+        ? 'No live memory records were returned by GET /api/memory.'
+        : 'No simulation memory records are available.';
+      this.memoryGrid.appendChild(empty);
+      return;
     }
 
     entries.forEach(mem => {

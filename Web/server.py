@@ -4,11 +4,16 @@ server.py - Full-Stack REST Bridge & Web Server for SELF-X SDN Flow Manager
 Connects the web dashboard directly to your live Mininet OpenFlow testbed,
 Ryu REST Controller (ofctl_rest), LangGraph agent memory, and evaluation logs.
 
-Features:
-- Proxies all GET/POST Ryu ofctl_rest API calls (switches, flows, ports, flow-mod, meters) with CORS headers.
-- Dynamically reads real episodic memory bank records from `agent_memory.json` or `eval/logs/A2_memory.json`.
-- Dynamically reads and parses real evaluation ablation logs (A0.csv, A1.csv, A2.csv).
-- Fallback simulation telemetry when Ryu/Mininet is offline, enabling zero-friction development.
+Read-only endpoint contract used by the dashboard:
+- GET /api/status -> {status, ryu_controller, ryu_base_url, connected_switches, project, course, team}
+- GET /api/memory -> {success, is_live_project, source, count, entries} when memory exists,
+    otherwise {success: false, is_live_project: false, message}.
+- GET /api/ablation -> {success, conditions}, where conditions contains any available
+    A0/A1/A2 CSV rows.
+- GET/POST /api/ryu/<path> -> a proxied Ryu response, or HTTP 502 when unavailable.
+
+The dashboard's direct action helpers are intentionally disabled in this phase. They
+return HTTP 409 and do not issue OpenFlow writes. Simulation actions are browser-local.
 """
 
 import os
@@ -219,76 +224,24 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             }).encode('utf-8'))
 
     def handle_action_reroute(self):
-        # Sends OpenFlow 1.3 Flow-Mod rule to switch s2 (dpid=2) to steer elephant traffic to Port 4
-        flow_rule = {
-            "dpid": 2,
-            "cookie": 0,
-            "table_id": 0,
-            "priority": 200,
-            "match": {
-                "in_port": 2,
-                "eth_type": 2048,
-                "ipv4_dst": "10.0.0.8"
-            },
-            "actions": [
-                {"type": "OUTPUT", "port": 4}
-            ]
-        }
-        target_url = f"{RYU_BASE_URL}/stats/flowentry/add"
-        try:
-            req = urllib.request.Request(
-                target_url,
-                data=json.dumps(flow_rule).encode('utf-8'),
-                headers={'Content-Type': 'application/json'},
-                method='POST'
-            )
-            with urllib.request.urlopen(req, timeout=2.0) as resp:
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "message": "Flow reroute installed on live Ryu controller (Port 4)."}).encode('utf-8'))
-        except Exception as e:
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "success": False,
-                "simulated": True,
-                "message": f"Ryu controller offline ({e}). Applied reroute in simulated engine."
-            }).encode('utf-8'))
+        self.send_response(409)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({
+            "success": False,
+            "simulated": False,
+            "error": "live network actions are disabled during Web Phase 1"
+        }).encode('utf-8'))
 
     def handle_action_rate_limit(self):
-        # Sends OpenFlow 1.3 Meter entry to switch s2 to cap bandwidth to 6144 kbps
-        meter_rule = {
-            "dpid": 2,
-            "meter_id": 1,
-            "flags": ["KBPS"],
-            "bands": [
-                {"type": "DROP", "rate": 6144, "burst_size": 0}
-            ]
-        }
-        target_url = f"{RYU_BASE_URL}/stats/meterentry/add"
-        try:
-            req = urllib.request.Request(
-                target_url,
-                data=json.dumps(meter_rule).encode('utf-8'),
-                headers={'Content-Type': 'application/json'},
-                method='POST'
-            )
-            with urllib.request.urlopen(req, timeout=2.0) as resp:
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "message": "OpenFlow meter rule installed on live Ryu controller (6 Mbps ceiling)."}).encode('utf-8'))
-        except Exception as e:
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "success": False,
-                "simulated": True,
-                "message": f"Ryu controller offline ({e}). Applied rate-limit in simulated engine."
-            }).encode('utf-8'))
+        self.send_response(409)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({
+            "success": False,
+            "simulated": False,
+            "error": "live network actions are disabled during Web Phase 1"
+        }).encode('utf-8'))
 
 def run_server():
     socketserver.TCPServer.allow_reuse_address = True

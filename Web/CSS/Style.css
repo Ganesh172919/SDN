@@ -372,6 +372,111 @@ body::before {
   animation: pulseDotRing 2s infinite ease-out;
 }
 
+.status-pill.live {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--emerald);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.12);
+}
+
+.status-pill.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.app-mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.mode-label {
+  padding: 0 0.35rem;
+  color: var(--text-muted);
+  font: 700 0.6rem var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.app-mode-btn {
+  padding: 0.32rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font: 700 0.62rem var(--font-mono);
+}
+
+.app-mode-btn:hover,
+.app-mode-btn.active {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: rgba(0, 242, 254, 0.1);
+}
+
+.app-mode-btn[data-app-mode="live"].active {
+  color: var(--emerald);
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.mode-state-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.1rem;
+  padding: 0.45rem 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+}
+
+.mode-state-banner strong {
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.mode-state-banner.live-state strong {
+  color: var(--emerald);
+}
+
+.mode-state-banner.error-state strong {
+  color: #f87171;
+}
+
+.mode-state-banner.loading-state strong {
+  color: var(--amber);
+}
+
+.simulation-only:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+  filter: grayscale(0.7);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  border: 1px dashed var(--border-card);
+  color: var(--text-muted);
+  text-align: center;
+  font: 0.75rem var(--font-mono);
+}
+
+@media (max-width: 1100px) {
+  .app-mode-switcher {
+    order: 5;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @keyframes pulseDotRing {
   0% { transform: translateY(-50%) scale(1); opacity: 0.9; }
   100% { transform: translateY(-50%) scale(3.2); opacity: 0; }

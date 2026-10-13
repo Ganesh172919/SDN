@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="CSS/Style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300f2fe'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
 </head>
 <body>
@@ -59,6 +59,12 @@
         <span id="connectionStatusText">SIMULATION TESTBED ACTIVE</span>
       </div>
 
+      <div class="app-mode-switcher" role="group" aria-label="Application mode">
+        <span class="mode-label">APP MODE</span>
+        <button class="app-mode-btn active" id="btnAppModeSimulation" data-app-mode="simulation" type="button">SIMULATION</button>
+        <button class="app-mode-btn" id="btnAppModeLive" data-app-mode="live" type="button">LIVE NETWORK</button>
+      </div>
+
       <div class="cycle-monitor-card">
         <div class="cycle-monitor-header">
           <span class="cycle-label">AGENT CYCLE</span>
@@ -77,6 +83,11 @@
       </div>
     </div>
   </header>
+
+  <div class="mode-state-banner simulation-state" id="modeStateBanner" role="status" aria-live="polite">
+    <strong id="modeStateTitle">Simulation mode</strong>
+    <span id="modeStateMessage">Generated telemetry and actions are local to this browser.</span>
+  </div>
 
   <!-- Interactive Control & Experiment Action Deck -->
   <section class="quick-controls">
