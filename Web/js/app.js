@@ -505,6 +505,8 @@ class DashboardApp {
       'memory': 'tab-memory',
       'charts': 'tab-charts',
       'chart': 'tab-charts',
+      'insights': 'tab-insights',
+      'visualizations': 'tab-insights',
       'ablation': 'tab-ablation',
       'benchmarks': 'tab-ablation',
       'safety': 'tab-safety',

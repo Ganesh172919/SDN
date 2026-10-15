@@ -2086,6 +2086,100 @@ body::before {
   display: block;
 }
 
+/* ========================================================================
+   Project visualizations
+   ======================================================================== */
+.project-viz-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.project-viz-provenance {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 560px;
+  padding: 0.7rem 0.85rem;
+  border-left: 2px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: rgba(245, 158, 11, 0.07);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.project-viz-provenance strong {
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+}
+
+.project-viz-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.3rem;
+}
+
+.project-viz-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.project-viz-card.project-viz-wide {
+  grid-column: 1 / -1;
+}
+
+.project-viz-caption {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+.project-viz-caption h3 {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.project-viz-caption p {
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.project-viz-tag {
+  flex: 0 0 auto;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid rgba(0, 242, 254, 0.18);
+  border-radius: var(--radius-full);
+  background: rgba(0, 242, 254, 0.07);
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+}
+
+.project-viz-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: #fafaf7;
+}
+
+@media (max-width: 990px) {
+  .project-viz-header { flex-direction: column; }
+  .project-viz-provenance { max-width: none; }
+  .project-viz-grid { grid-template-columns: 1fr; }
+  .project-viz-card.project-viz-wide { grid-column: auto; }
+}
+
 /* ==========================================================================
    VIEW 5: Ablation Benchmarks
    ========================================================================== */

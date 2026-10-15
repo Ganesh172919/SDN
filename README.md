@@ -101,14 +101,17 @@ Web/                              # Authenticated dashboard and standard-library
 ├── js/                           # UI, simulation, charts, agent view, topology view
 └── tests/test_auth.py            # Authentication integration tests
 
+visualizations/                   # Reproducible graphs, system overview, data, and documentation
+
 PS_01_Problem_Statement.pdf       # v1.0 problem statement
 SELF-X_Problem_Statement_v2_Revised.docx  # v2.0 authoritative specification
 README.md                         # Project documentation and roadmap
 ```
 
-No generated experiment logs, plots, datasets, or saved result files are currently
-present in the repository. Do not treat dashboard demo values or README examples as
-experimental evidence.
+No saved live experiment logs or measured result datasets are currently present
+in the repository. The generated diagrams and seeded slow-loop simulator plots in
+`visualizations/` are reproducible project aids, not live testbed evidence. Do not
+treat dashboard demo values or simulator output as measured experimental results.
 
 ---
 

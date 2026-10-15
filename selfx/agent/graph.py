@@ -183,7 +183,8 @@ def build_graph(deps: AgentDeps):
 
     def wait(state: GraphState) -> dict:
         deps.wait_fn(deps.interval_sec)
-        return {}
+        # Emit a state field so the node remains valid with strict LangGraph updates.
+        return {"cycle": state["cycle"]}
 
     def observe_after(state: GraphState) -> dict:
         raw_after = deps.get_state_fn()
@@ -237,7 +238,8 @@ def build_graph(deps: AgentDeps):
             reward=state["reward"],
             reflection=state["reflection"],
         )
-        return {}
+        # LangGraph requires each node to emit at least one state field.
+        return {"reflection": state["reflection"]}
 
     graph.add_node("observe", observe)
     graph.add_node("decide", decide)

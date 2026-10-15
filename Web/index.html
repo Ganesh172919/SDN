@@ -322,6 +322,11 @@
         <span>Real-Time Charts</span>
       </button>
 
+      <button class="tab-btn" data-tab="tab-insights">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3V3zm5 10 3.2-3.2 2.6 2.6L19 7.8V11h2V4h-7v2h3.6l-3.8 3.8-2.6-2.6L6.6 12.4 8 13z"/></svg>
+        <span>Project Visualizations</span>
+      </button>
+
       <button class="tab-btn" data-tab="tab-ablation">
         <svg class="tab-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
         <span>Ablation Benchmarks</span>
@@ -785,6 +790,73 @@
             <canvas id="chartReward" width="540" height="220"></canvas>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4B: PROJECT VISUALIZATIONS -->
+    <div class="tab-pane" id="tab-insights">
+      <div class="project-viz-header">
+        <div class="panel-title-group">
+          <h2>Project Visualizations</h2>
+          <p>System overview, simulator results, network models, roadmap, and MVP safety limits.</p>
+        </div>
+        <div class="project-viz-provenance" role="note">
+          <strong>SIMULATED DATA</strong>
+          <span>Performance comparison: seeded slow-loop fluid simulator, default profile, 30 one-minute windows, seed 1729, deterministic mock governance. It is not live Mininet/Ryu telemetry.</span>
+        </div>
+      </div>
+
+      <div class="project-viz-grid">
+        <figure class="chart-card project-viz-card project-viz-wide">
+          <figcaption class="project-viz-caption">
+            <div>
+              <h3>SELF-X system overview</h3>
+              <p>Current MVP, isolated slow-loop simulator prototype, and dashboard data boundaries.</p>
+            </div>
+          </figcaption>
+          <img src="assets/visualizations/system-overview.png" alt="System diagram showing the current safety-gated MVP loop connected to the Ryu and Mininet testbed, a separate slow-loop simulator prototype, and the authenticated dashboard's local-simulation and read-only-live modes." loading="lazy">
+        </figure>
+
+        <figure class="chart-card project-viz-card project-viz-wide">
+          <figcaption class="project-viz-caption">
+            <div>
+              <h3>Slow-loop simulation comparison</h3>
+              <p>Governed mock policy compared with a frozen initial policy on the same seeded profile.</p>
+            </div>
+            <span class="project-viz-tag">30 MINUTES</span>
+          </figcaption>
+          <img src="assets/visualizations/simulation-performance.png" alt="Four time-series plots comparing mean latency, p95 latency, delivered throughput, and packet loss for governed mock control and the frozen initial policy over 30 simulated minutes." loading="lazy">
+        </figure>
+
+        <figure class="chart-card project-viz-card">
+          <figcaption class="project-viz-caption">
+            <div>
+              <h3>Network models</h3>
+              <p>The MVP testbed and slow-loop path abstraction are shown separately.</p>
+            </div>
+          </figcaption>
+          <img src="assets/visualizations/topology-models.png" alt="Diagram of the four-switch, eight-host MVP testbed beside the slow-loop simulator's separate two-path abstraction." loading="lazy">
+        </figure>
+
+        <figure class="chart-card project-viz-card">
+          <figcaption class="project-viz-caption">
+            <div>
+              <h3>Implementation roadmap</h3>
+              <p>Phase statuses summarized from the repository README.</p>
+            </div>
+          </figcaption>
+          <img src="assets/visualizations/implementation-status.png" alt="Seven roadmap phases: one complete, three partial, and three planned." loading="lazy">
+        </figure>
+
+        <figure class="chart-card project-viz-card project-viz-wide">
+          <figcaption class="project-viz-caption">
+            <div>
+              <h3>MVP safety guardrails</h3>
+              <p>Configured drop, projected utilization, and rate-limit bounds.</p>
+            </div>
+          </figcaption>
+          <img src="assets/visualizations/safety-guardrails.png" alt="Safety thresholds: maximum 20 percent flow traffic drop, maximum 90 percent projected link utilization, and a minimum rate limit of 512 kilobits per second." loading="lazy">
+        </figure>
       </div>
     </div>
 
