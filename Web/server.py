@@ -4,113 +4,59 @@ server.py - Full-Stack REST Bridge & Web Server for SELF-X SDN Flow Manager
 Connects the web dashboard directly to your live Mininet OpenFlow testbed,
 Ryu REST Controller (ofctl_rest), LangGraph agent memory, and evaluation logs.
 
-Read-only endpoint contract used by the dashboard:
-- GET /login -> server-rendered login page with a CSRF token.
-- POST /api/auth/login -> form login; returns {success, redirect} or an error.
-- GET /api/auth/session -> authenticated user or HTTP 401.
-- POST /api/auth/logout -> invalidates the session; requires X-CSRF-Token.
-- GET /api/status -> {status, ryu_controller, ryu_base_url, connected_switches, project, course, team}
+Read-only endpoint contract used by the public dashboard:
+        - GET /login -> redirects to the public dashboard; the old login flow is retired.
+        - GET /api/status -> {status, ryu_controller, connected_switches, project, course, team}
 - GET /api/memory -> {success, is_live_project, source, count, entries} when memory exists,
     otherwise {success: false, is_live_project: false, message}.
 - GET /api/ablation -> {success, conditions}, where conditions contains any available
     A0/A1/A2 CSV rows.
-- GET /api/ryu/<path> -> a proxied Ryu response, or HTTP 502 when unavailable.
+- GET /api/results -> validated saved-run metadata summaries.
+- GET /api/results/<run_id>/summary -> one validated run summary.
+- GET /api/results/<run_id>/metrics -> validated metric time series.
+- GET /api/results/<run_id>/trace -> validated safe diagnostic trace, when present.
 
-The dashboard's direct action helpers are intentionally disabled in this phase. They
-return HTTP 409 and do not issue OpenFlow writes. Simulation actions are browser-local.
+Network-control helpers remain disabled and return HTTP 409. Arbitrary Ryu proxy
+    access is not exposed publicly. Raw Ryu proxy access is not exposed publicly.
+    Simulation actions are browser-local.
 """
 
 import os
-import sys
 import json
 import csv
-import base64
-import hashlib
 import http.server
-import hmac
-import secrets
+import re
 import socketserver
-import time
-from dataclasses import dataclass
-from getpass import getpass
+from pathlib import Path
 import urllib.request
 import urllib.error
 from urllib.parse import parse_qs, urlsplit
+
+try:
+    from selfx.eval.result_schema import (
+        ResultValidationError,
+        validate_metric_record,
+        validate_run_metadata,
+        validate_summary,
+        validate_trace_record,
+    )
+    from selfx.eval.result_writer import read_run
+except ImportError:
+    from eval.result_schema import (
+        ResultValidationError,
+        validate_metric_record,
+        validate_run_metadata,
+        validate_summary,
+        validate_trace_record,
+    )
+    from eval.result_writer import read_run
 
 PORT = int(os.environ.get("SDN_WEB_PORT", 5000))
 RYU_BASE_URL = os.environ.get("RYU_REST_BASE", "http://127.0.0.1:8080")
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(WEB_DIR)
-AUTH_USERNAME = os.environ.get("SELFX_AUTH_USERNAME", "")
-AUTH_PASSWORD_HASH = os.environ.get("SELFX_AUTH_PASSWORD_HASH", "")
-AUTH_SESSION_TTL = int(os.environ.get("SELFX_AUTH_SESSION_TTL", "1800"))
-AUTH_SECURE_COOKIE = os.environ.get("SELFX_AUTH_SECURE_COOKIE", "0") == "1"
-SESSION_COOKIE = "sfx_session"
-CSRF_COOKIE = "sfx_csrf"
-PBKDF2_ITERATIONS = 310_000
-
-
-@dataclass
-class Session:
-    username: str
-    csrf_token: str
-    created_at: float
-    last_seen: float
-
-
-SESSIONS = {}
-
-
-def hash_password(password, salt=None):
-    salt = salt or secrets.token_hex(16)
-    digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt.encode("ascii"), PBKDF2_ITERATIONS
-    )
-    return f"pbkdf2_sha256${PBKDF2_ITERATIONS}${salt}${digest.hex()}"
-
-
-DUMMY_PASSWORD_HASH = hash_password("invalid-credential")
-
-
-def verify_password(password, encoded):
-    try:
-        algorithm, iterations, salt, expected = encoded.split("$", 3)
-        if algorithm != "pbkdf2_sha256":
-            return False
-        digest = hashlib.pbkdf2_hmac(
-            "sha256", password.encode("utf-8"), salt.encode("ascii"), int(iterations)
-        ).hex()
-        return hmac.compare_digest(digest, expected)
-    except (TypeError, ValueError):
-        return False
-
-
-def credentials_valid(username, password):
-    stored_hash = AUTH_PASSWORD_HASH or DUMMY_PASSWORD_HASH
-    username_matches = hmac.compare_digest(username, AUTH_USERNAME or "disabled")
-    password_matches = verify_password(password, stored_hash)
-    return bool(AUTH_USERNAME and AUTH_PASSWORD_HASH) and username_matches and password_matches
-
-
-def cookie_value(cookie_header, name):
-    if not cookie_header:
-        return ""
-    for item in cookie_header.split(";"):
-        key, separator, value = item.strip().partition("=")
-        if separator and key == name:
-            return value
-    return ""
-
-
-def cookie_header(name, value, max_age=None, http_only=False):
-    parts = [f"{name}={value}", "Path=/", "SameSite=Lax"]
-    if max_age is not None:
-        parts.append(f"Max-Age={max_age}")
-    if http_only:
-        parts.append("HttpOnly")
-    if AUTH_SECURE_COOKIE:
-        parts.append("Secure")
-    return "; ".join(parts)
+RESULTS_ROOT = Path(os.environ.get("SELFX_RESULTS_ROOT", Path(PROJECT_ROOT) / "results")).resolve()
+RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -130,17 +76,10 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlsplit(self.path).path
         if path == '/login':
-            self.handle_login_page()
+            self.redirect_public_dashboard()
             return
-        if path == '/api/auth/session':
-            self.handle_session()
-            return
-        if path == '/api/auth/csrf':
-            self.handle_csrf()
-            return
-        if path.startswith('/api/') and not self.require_auth(api=True):
-            return
-        if path in ('/', '/index.html') and not self.require_auth(api=False):
+        if path.startswith('/api/auth/'):
+            self.send_json(404, {"error": "authentication is disabled for the public website"})
             return
 
         # API: Real-time System Status & Ryu Controller Health
@@ -158,9 +97,19 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_ablation()
             return
 
-        # API: Proxy Ryu ofctl_rest GET endpoints
+        if path == '/api/results':
+            self.handle_results_index()
+            return
+        if path == '/api/results/compare':
+            self.handle_results_compare()
+            return
+        if path.startswith('/api/results/'):
+            self.handle_result_resource(path)
+            return
+
+        # Raw Ryu telemetry is private and is no longer proxied publicly.
         if path.startswith('/api/ryu/'):
-            self.handle_ryu_proxy(method='GET')
+            self.send_json(404, {"error": "raw controller proxy is not public"})
             return
 
         # Default static web files
@@ -168,19 +117,13 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         path = urlsplit(self.path).path
-        if path == '/api/auth/login':
-            self.handle_login()
-            return
-        if path == '/api/auth/logout':
-            if self.require_auth(api=True) and self.require_csrf():
-                self.handle_logout()
-            return
-        if path.startswith('/api/') and not self.require_auth(api=True):
+        if path.startswith('/api/auth/'):
+            self.send_json(404, {"error": "authentication is disabled for the public website"})
             return
 
-        # Ryu writes remain disabled during Phase 2.
+        # Raw Ryu writes remain disabled and are not proxied.
         if path.startswith('/api/ryu/'):
-            self.handle_disabled_control()
+            self.handle_disabled_control("raw controller proxy is not public")
             return
 
         # API: Direct Flow Reroute Helper
@@ -207,99 +150,10 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(payload).encode('utf-8'))
 
-    def require_auth(self, api):
-        session_id = cookie_value(self.headers.get('Cookie'), SESSION_COOKIE)
-        session = SESSIONS.get(session_id)
-        if not session or time.time() - session.last_seen > AUTH_SESSION_TTL:
-            if session_id:
-                SESSIONS.pop(session_id, None)
-            if api:
-                self.send_json(401, {"error": "authentication required"})
-            else:
-                self.send_response(303)
-                self.send_header('Location', '/login')
-                self.end_headers()
-            return False
-        session.last_seen = time.time()
-        self.session = session
-        return True
-
-    def require_csrf(self):
-        submitted = self.headers.get('X-CSRF-Token', '')
-        if not submitted:
-            submitted = self.form_value('csrf_token')
-        valid = bool(getattr(self, 'session', None)) and hmac.compare_digest(
-            submitted, self.session.csrf_token
-        )
-        if not valid:
-            self.send_json(403, {"error": "CSRF validation failed"})
-        return valid
-
-    def read_form(self):
-        length = min(int(self.headers.get('Content-Length', 0)), 64 * 1024)
-        body = self.rfile.read(length).decode('utf-8', errors='replace') if length else ''
-        return {key: values[0] for key, values in parse_qs(body).items()}
-
-    def form_value(self, name):
-        if not hasattr(self, '_form_data'):
-            self._form_data = self.read_form()
-        return self._form_data.get(name, '')
-
-    def handle_login_page(self):
-        token = cookie_value(self.headers.get('Cookie'), CSRF_COOKIE) or secrets.token_urlsafe(32)
-        try:
-            with open(os.path.join(WEB_DIR, 'login.html'), 'r', encoding='utf-8') as file:
-                page = file.read().replace('{{CSRF_TOKEN}}', token)
-        except OSError:
-            self.send_error(500, 'login page unavailable')
-            return
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html; charset=utf-8')
-        self.send_header('Set-Cookie', cookie_header(CSRF_COOKIE, token))
+    def redirect_public_dashboard(self):
+        self.send_response(302)
+        self.send_header('Location', '/')
         self.end_headers()
-        self.wfile.write(page.encode('utf-8'))
-
-    def handle_login(self):
-        form = self.read_form()
-        csrf = form.get('csrf_token', '')
-        csrf_cookie = cookie_value(self.headers.get('Cookie'), CSRF_COOKIE)
-        username = form.get('username', '')
-        password = form.get('password', '')
-        if not csrf or not csrf_cookie or not hmac.compare_digest(csrf, csrf_cookie):
-            self.send_json(403, {"error": "CSRF validation failed"})
-            return
-        if not credentials_valid(username, password):
-            self.send_json(401, {"error": "invalid credentials"})
-            return
-
-        now = time.time()
-        session_id = secrets.token_urlsafe(32)
-        session = Session(username, secrets.token_urlsafe(32), now, now)
-        SESSIONS[session_id] = session
-        self.send_json(200, {"success": True, "redirect": "/"}, {
-            'Set-Cookie': [
-                cookie_header(SESSION_COOKIE, session_id, http_only=True),
-                cookie_header(CSRF_COOKIE, session.csrf_token),
-            ]
-        })
-
-    def handle_logout(self):
-        session_id = cookie_value(self.headers.get('Cookie'), SESSION_COOKIE)
-        SESSIONS.pop(session_id, None)
-        self.send_json(200, {"success": True}, {
-            'Set-Cookie': cookie_header(SESSION_COOKIE, '', max_age=0, http_only=True)
-        })
-
-    def handle_session(self):
-        if not self.require_auth(api=True):
-            return
-        self.send_json(200, {"authenticated": True, "username": self.session.username})
-
-    def handle_csrf(self):
-        token = cookie_value(self.headers.get('Cookie'), CSRF_COOKIE) or secrets.token_urlsafe(32)
-        self.send_json(200, {"csrf_token": token}, {
-            'Set-Cookie': cookie_header(CSRF_COOKIE, token)
-        })
 
     def handle_status(self):
         ryu_online = False
@@ -317,7 +171,6 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         data = {
             "status": "online",
             "ryu_controller": "connected" if ryu_online else "offline",
-            "ryu_base_url": RYU_BASE_URL,
             "connected_switches": switches,
             "project": "SELF-X SDN Agent",
             "course": "EC466 Software Defined Networks",
@@ -357,7 +210,7 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 "success": True,
                 "is_live_project": True,
-                "source": source_path,
+                        "source": "local_memory_file",
                 "count": len(found_data),
                 "entries": found_data
             }).encode('utf-8'))
@@ -401,52 +254,150 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "conditions": results
         }).encode('utf-8'))
 
-    def handle_ryu_proxy(self, method='GET'):
-        subpath = self.path[len('/api/ryu/'):]
-        target_url = f"{RYU_BASE_URL}/{subpath}"
+    def _run_path(self, run_id):
+        if not isinstance(run_id, str) or not RUN_ID_RE.fullmatch(run_id):
+            self.send_json(404, {"error": "result run not found"})
+            return None
+        candidate = (RESULTS_ROOT / run_id).resolve()
+        if candidate.parent != RESULTS_ROOT or not candidate.is_dir():
+            self.send_json(404, {"error": "result run not found"})
+            return None
+        return candidate
 
+    @staticmethod
+    def _public_metadata(metadata):
+        public = dict(metadata)
+        public["artifacts"] = sorted(public.get("artifacts", {}).keys())
+        return public
+
+    def _load_run(self, run_id):
+        run_path = self._run_path(run_id)
+        if run_path is None:
+            return None
         try:
-            req_data = None
-            headers = {'User-Agent': 'SDN-Dashboard'}
+            result = read_run(run_path)
+        except (OSError, ValueError, json.JSONDecodeError, ResultValidationError):
+            self.send_json(422, {"error": "result run is malformed or invalid"})
+            return None
+        if result["run"].get("run_id") != run_id:
+            self.send_json(422, {"error": "result run identity is invalid"})
+            return None
+        return result
 
-            if method == 'POST':
-                content_length = int(self.headers.get('Content-Length', 0))
-                if content_length > 0:
-                    req_data = self.rfile.read(content_length)
-                headers['Content-Type'] = self.headers.get('Content-Type', 'application/json')
+    def handle_results_index(self):
+        results = []
+        invalid_count = 0
+        if RESULTS_ROOT.is_dir():
+            for child in sorted(RESULTS_ROOT.iterdir()):
+                if not child.is_dir() or not RUN_ID_RE.fullmatch(child.name):
+                    continue
+                try:
+                    result = read_run(child)
+                except (OSError, ValueError, json.JSONDecodeError, ResultValidationError):
+                    invalid_count += 1
+                    continue
+                metadata = result["run"]
+                results.append({
+                    "run_id": metadata["run_id"],
+                    "created_at_utc": metadata["created_at_utc"],
+                    "status": metadata["status"],
+                    "provenance": metadata["provenance"],
+                    "experiment": metadata["experiment"],
+                    "topology": metadata["topology"],
+                    "workload": metadata["workload"],
+                    "seed": metadata["seed"],
+                    "duration_seconds": metadata["duration_seconds"],
+                    "metric_count": len(result["metrics"]),
+                    "has_summary": "summary" in result,
+                    "has_trace": "trace.jsonl" in metadata.get("artifacts", {}),
+                })
+        self.send_json(200, {
+            "schema_version": "selfx.result.v1",
+            "count": len(results),
+            "invalid_count": invalid_count,
+            "results": results,
+        })
 
-            req = urllib.request.Request(target_url, data=req_data, headers=headers, method=method)
-            with urllib.request.urlopen(req, timeout=3.0) as resp:
-                content = resp.read()
-                self.send_response(resp.status)
-                self.send_header('Content-Type', resp.headers.get('Content-Type', 'application/json'))
-                self.end_headers()
-                self.wfile.write(content)
-        except urllib.error.HTTPError as e:
-            self.send_response(e.code)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
-        except Exception as e:
-            self.send_response(502)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "error": f"Failed to connect to Ryu at {target_url}: {e}",
-                "hint": "Start Ryu controller: ryu-manager ryu.app.ofctl_rest ryu.app.simple_switch_13"
-            }).encode('utf-8'))
+    def handle_results_compare(self):
+        values = parse_qs(urlsplit(self.path).query).get("run_ids", [])
+        run_ids = [value for item in values for value in item.split(",") if value]
+        if not run_ids or len(run_ids) > 6:
+            self.send_json(400, {"error": "run_ids must contain between one and six run IDs"})
+            return
+        compared = []
+        for run_id in run_ids:
+            result = self._load_run(run_id)
+            if result is None:
+                return
+            if result["run"]["status"] != "completed" or "summary" not in result:
+                self.send_json(409, {"error": "all comparison runs must be completed with summaries"})
+                return
+            compared.append({
+                "run": self._public_metadata(result["run"]),
+                "summary": result["summary"],
+            })
+        self.send_json(200, {"run_ids": run_ids, "results": compared})
+
+    def handle_result_resource(self, path):
+        parts = path[len("/api/results/"):].split("/")
+        if len(parts) == 1 and parts[0]:
+            return self.handle_result_summary(parts[0])
+        if len(parts) == 2 and parts[0] and parts[1] in {"summary", "metrics", "trace"}:
+            handler = getattr(self, f"handle_result_{parts[1]}")
+            return handler(parts[0])
+        self.send_json(404, {"error": "result route not found"})
+
+    def handle_result_summary(self, run_id):
+        result = self._load_run(run_id)
+        if result is None:
+            return
+        metadata = result["run"]
+        if metadata["status"] == "failed":
+            self.send_json(409, {"error": "result run failed", "run": self._public_metadata(metadata)})
+            return
+        if "summary" not in result:
+            self.send_json(409, {"error": "result run is incomplete", "run": self._public_metadata(metadata)})
+            return
+        self.send_json(200, {"run": self._public_metadata(metadata), "summary": result["summary"]})
+
+    def handle_result_metrics(self, run_id):
+        result = self._load_run(run_id)
+        if result is None:
+            return
+        self.send_json(200, {"run": self._public_metadata(result["run"]), "metrics": result["metrics"]})
+
+    def handle_result_trace(self, run_id):
+        result = self._load_run(run_id)
+        if result is None:
+            return
+        trace = []
+        trace_path = result["run"].get("artifacts", {}).get("trace")
+        if trace_path:
+            path = (Path(RESULTS_ROOT) / run_id / trace_path).resolve()
+            if path.parent != (Path(RESULTS_ROOT) / run_id).resolve() or not path.is_file():
+                self.send_json(422, {"error": "result trace is unavailable"})
+                return
+            try:
+                with path.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        if line.strip():
+                            trace.append(validate_trace_record(json.loads(line)))
+            except (OSError, ValueError, json.JSONDecodeError, ResultValidationError):
+                self.send_json(422, {"error": "result trace is malformed or unsafe"})
+                return
+        self.send_json(200, {"run_id": run_id, "provenance": result["run"]["provenance"], "trace": trace})
 
     def handle_action_reroute(self):
         self.handle_disabled_control()
 
-    def handle_disabled_control(self):
+    def handle_disabled_control(self, message="network-changing actions are disabled for the public website"):
         self.send_response(409)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps({
             "success": False,
             "simulated": False,
-            "error": "live network actions are disabled during Web Phase 1"
+            "error": message
         }).encode('utf-8'))
 
     def handle_action_rate_limit(self):
@@ -474,7 +425,4 @@ def run_server():
             httpd.shutdown()
 
 if __name__ == "__main__":
-    if "--hash-password" in sys.argv:
-        print(hash_password(getpass("Password to hash: ")))
-    else:
-        run_server()
+    run_server()

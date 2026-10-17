@@ -7,11 +7,11 @@
 
 ## 📌 Project Overview
 
-This repository contains the current SELF-X project tracks and dashboard foundation. The implemented MVP is a single-agent LangGraph flow-management loop in `selfx/`; the `slow-loop/` directory contains a simulator-only governance and queue-control prototype; and `Web/` contains the authenticated dashboard with explicit Simulation and Live Network modes. The complete v2.0 target is a two-timescale system in which an LLM orchestrator and five specialists govern a fast Lyapunov drift-plus-penalty (DPP) controller. That final architecture is not yet integrated or fully implemented.
+This repository contains the current SELF-X project tracks and dashboard foundation. The implemented MVP is a single-agent LangGraph flow-management loop in `selfx/`; the `slow-loop/` directory contains a simulator-only governance and queue-control prototype; and `Web/` contains the public dashboard with explicit Simulation and Live Network modes. The complete v2.0 target is a two-timescale system in which an LLM orchestrator and five specialists govern a fast Lyapunov drift-plus-penalty (DPP) controller. That final architecture is not yet integrated or fully implemented.
 
 ### Core Capabilities
-- **Dashboard foundation**: The Web dashboard has Simulation Mode and Live Network Mode. Simulation data is labeled and is never presented as live telemetry; Live Network Mode shows only the current authenticated backend status and leaves unavailable metrics empty.
-- **Dashboard authentication**: The server protects the dashboard and APIs with PBKDF2 password verification, expiring HTTP-only sessions, logout, and CSRF protection. Direct network-changing actions remain disabled.
+- **Dashboard foundation**: The Web dashboard has Simulation Mode and Live Network Mode. Simulation data is labeled and is never presented as live telemetry; Live Network Mode shows only public controller status and leaves unavailable metrics empty.
+- **Public results APIs**: The standard-library server exposes validated saved-run metadata, summaries, metrics, and safe diagnostic traces. Direct network-changing actions and raw Ryu proxy access remain disabled.
 - **Single-agent MVP**: `selfx/` contains a LangGraph state machine implementing `observe` -> `decide` -> `act` -> `wait` -> `observe_after` -> `compute_reward` -> `reflect` -> `memorize`.
 - **Strict MVP 3-action space**:
   1. `reroute`: Dynamically re-routes elephant flows onto alternate, uncongested switch ports.
@@ -93,13 +93,12 @@ slow-loop/                        # Governance and DPP-like simulator prototype
 ├── tests/                        # Unit tests for the simulator/governor track
 └── run_benchmark.py              # Mock benchmark entry point
 
-Web/                              # Authenticated dashboard and standard-library server
-├── server.py                     # Login, sessions, CSRF, status, memory, ablation, Ryu GET proxy
-├── login.html                    # Login page
+Web/                              # Public dashboard and standard-library server
+├── server.py                     # Status, memory, ablation, validated results, disabled writes
 ├── index.html                    # Dashboard
 ├── CSS/Style.css                 # Dashboard and login styling
 ├── js/                           # UI, simulation, charts, agent view, topology view
-└── tests/test_auth.py            # Authentication integration tests
+└── tests/test_public_api.py      # Public access and results API tests
 
 visualizations/                   # Reproducible graphs, system overview, data, and documentation
 
@@ -117,7 +116,7 @@ treat dashboard demo values or simulator output as measured experimental results
 
 ## ⚙️ Prerequisites & Environment Setup
 
-The live testbed targets Linux or **Windows Subsystem for Linux (WSL2)** with Ubuntu 22.04 LTS. The dashboard and its authentication tests run on a normal Python installation and do not require Mininet, Ryu, or third-party Python packages.
+The live testbed targets Linux or **Windows Subsystem for Linux (WSL2)** with Ubuntu 22.04 LTS. The dashboard and its public API tests run on a normal Python installation and do not require Mininet, Ryu, or third-party Python packages.
 
 ### 1. System Packages
 ```bash
@@ -149,7 +148,7 @@ missing patch command.
 ryu-manager --version
 ```
 
-### 4. API Key and Dashboard Authentication Configuration
+### 4. API Key and Dashboard Configuration
 The `selfx/` MVP can integrate with Anthropic Claude via `ChatAnthropic`. Configure
 the key locally only when running that MVP; never place it in this README or commit
 it. The current MVP does not implement the deterministic no-key fallback claimed by
@@ -158,38 +157,29 @@ the older root README.
 export ANTHROPIC_API_KEY="your-anthropic-api-key"
 ```
 
-The Web dashboard requires a locally configured username and PBKDF2 password hash.
-Use `.env.example` as a placeholder reference and generate the hash interactively:
-```powershell
-$env:SELFX_AUTH_USERNAME = "demo"
-$env:SELFX_AUTH_PASSWORD_HASH = (python Web/server.py --hash-password)
-```
-
-The server does not automatically load `.env` files. Set environment variables in
-the shell or deployment environment. `.env` is ignored by Git; real passwords,
-hashes, and session values must remain local.
+The public Web dashboard has no login requirement. `SDN_WEB_PORT`, `RYU_REST_BASE`,
+and `SELFX_RESULTS_ROOT` are optional environment settings; the server does not
+automatically load `.env` files.
 
 ---
 
 ## 🚀 Step-by-Step Reproduction Guide
 
-### Dashboard: Run the Authenticated Web UI
-From the repository root, configure the local demo account as described above and
-start the standard-library server:
+### Dashboard: Run the Public Web UI
+From the repository root, start the standard-library server:
 ```powershell
 python Web/server.py
 ```
 
-Open `http://localhost:5000/login`. The dashboard starts in Simulation Mode. Live
-Network Mode only reports the authenticated `/api/status` response; it does not
-invent live metrics when the controller is unavailable. Dashboard authentication
+Open `http://localhost:5000/`. The dashboard starts in Simulation Mode. Live
+Network Mode only reports the public `/api/status` response; it does not invent
+live metrics when the controller is unavailable. Public dashboard and result API
 tests are run with:
 ```powershell
-python -m unittest discover -s Web/tests -p "test_auth.py" -v
+python -m unittest discover -s Web/tests -v
 ```
-The login page, dashboard, protected APIs, session logout, and CSRF checks are
-implemented. Direct network-changing action endpoints and Ryu POST proxy writes
-remain disabled and return HTTP 409.
+Saved result routes are read-only and validated. Direct network-changing action
+endpoints and raw Ryu proxy writes remain disabled.
 
 ### Phase 0: Verify REST API Reconnaissance
 The live-testbed reconnaissance belongs to the `selfx/` MVP. Run it only on a
@@ -314,7 +304,7 @@ Generated outputs are written under `selfx/eval/logs/` and `selfx/eval/plots/`:
 
 | Criteria | Target | Verification Method |
 | :--- | :--- | :--- |
-| **Dashboard authentication** | Login, protected dashboard/API, logout, expiry, and CSRF checks work | `python -m unittest discover -s Web/tests -p "test_auth.py" -v` |
+| **Dashboard public access** | Dashboard and approved result APIs are accessible without login and reject malformed/path-traversal runs | `python -m unittest discover -s Web/tests -v` |
 | **Dashboard safety** | Simulation values are not presented as live; network-changing Web actions remain disabled | Select both dashboard modes and verify live failure states; authenticated write regression test returns HTTP 409 |
 | **MVP stability** | $\ge 10$ minutes unattended without crashing | `selfx/eval/run_ablation.py --duration 600` on a configured Linux/WSL testbed; result currently unverified |
 | **MVP self-improvement** | A2 rolling reward trend improves over A1 | Compare saved `selfx/eval/plots/reward_trend.png`; no result files are currently present |
@@ -345,12 +335,12 @@ acceptance evidence is saved and reviewable. The v2.0 target must not be inferre
 from simulator output, dashboard demo values, or source filenames alone.
 
 ### Phase 1 - Repository and dashboard foundation (complete)
-- **Objective:** Preserve the existing dashboard while making simulation/live state explicit and protecting access.
+- **Objective:** Preserve the existing dashboard while making simulation/live state explicit and protecting network actions.
 - **Directories/files:** `Web/`, `.gitignore`, `.env.example`.
 - **Dependencies:** Python standard library.
-- **Deliverables:** Authenticated login page, PBKDF2 credential verification, expiring HTTP-only sessions, CSRF protection, logout, mode safeguards, and disabled network-changing Web actions.
-- **Acceptance:** `Web/tests/test_auth.py` passes; `git diff --check` is clean; browser verification confirms simulation values are labeled and live failures remain empty/disconnected.
-- **Status:** Complete in commit `3c4ae3a`; review and maintenance continue.
+- **Deliverables:** Public dashboard, explicit mode safeguards, validated saved-result APIs, and disabled network-changing Web actions.
+- **Acceptance:** `Web/tests/test_public_api.py` passes; `git diff --check` is clean; browser verification confirms simulation values are labeled and live failures remain empty/disconnected.
+- **Status:** Public access/result API transition implemented; review and maintenance continue.
 
 ### Phase 2 - Integration foundation (planned)
 - **Objective:** Define stable interfaces among the dashboard, backend/API, Ryu/ONOS controller, telemetry, agentic layer, and fast controller.

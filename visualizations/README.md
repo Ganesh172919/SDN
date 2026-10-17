@@ -39,7 +39,7 @@ The script writes PNG, CSV, and JSON outputs here, then copies the generated PNG
 
 ## Website
 
-Start the authenticated Web app as described in [`Web/README.md`](../Web/README.md), sign in, and open **Project Visualizations** (URL hash `#insights`). The page shows the generated system overview and four supporting figures. Browser-local simulation values and live controller status remain distinct modes.
+Start the public Web app as described in [`Web/README.md`](../Web/README.md) and open **Project Visualizations** (URL hash `#insights`). The page shows the generated system overview and four supporting figures. Browser-local simulation values and live controller status remain distinct modes.
 
 ## Test suites
 
@@ -68,7 +68,7 @@ The visualization generator itself is exercised by running the regeneration comm
 
 Run on 2026-10-15 with Python 3.13.7:
 
-- Web authentication suite: 7 tests passed.
+- Web public API suite: public-access and saved-result API tests.
 - `selfx` core checks: all checks passed.
 - `selfx` LangGraph cycle checks: all 3 passed.
 - Slow-loop suite: 14 tests passed.
