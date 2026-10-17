@@ -162,6 +162,9 @@ class DashboardApp {
     this.charts = new TelemetryChartsManager();
     this.agent = new AgentManager();
     this.simulator = new SDNSimulator(this);
+    if (typeof ExperimentResultsManager !== 'undefined') {
+      this.results = new ExperimentResultsManager(this);
+    }
     this.initAppMode();
 
     // Initial UI render
@@ -453,6 +456,9 @@ class DashboardApp {
     } else if (targetId === 'tab-charts' && this.charts) {
       this.charts.renderAll();
       setTimeout(() => this.charts.renderAll(), 60);
+    } else if (targetId === 'tab-ablation' && this.results) {
+      this.results.onTabActivated();
+      setTimeout(() => this.results.onTabActivated(), 60);
     }
   }
 

@@ -325,6 +325,7 @@
       <button class="tab-btn" data-tab="tab-ablation">
         <svg class="tab-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
         <span>Ablation Benchmarks</span>
+        <span class="tab-badge" id="resultsCountBadge" style="display:none;">0</span>
       </button>
 
       <button class="tab-btn" data-tab="tab-safety">
@@ -855,161 +856,294 @@
       </div>
     </div>
 
-    <!-- VIEW 5: ABLATION BENCHMARKS -->
+    <!-- VIEW 5: ABLATION BENCHMARKS & EXPERIMENT RESULTS -->
     <div class="tab-pane" id="tab-ablation">
-      <div class="ablation-summary">
-        <!-- Card A0 -->
-        <div class="ablation-card a0-card">
-          <div class="ablation-card-header">
-            <span class="ablation-tag tag-a0">CONDITION A0</span>
-            <span class="baseline-pill">CONTROL BASELINE</span>
+      <!-- Section Header -->
+      <div class="results-view-header">
+        <div class="panel-title-group">
+          <div class="panel-badge-row">
+            <span class="live-indicator-dot"></span>
+            <span class="tag-openflow">Public Read-Only API</span>
+            <span class="tag-dpid">GET /api/results &bull; A0 / A1 / A2 Archive</span>
           </div>
-          <h3>Static Ryu L2 Baseline</h3>
-          <p>Default Ryu OpenFlow forwarding tables, zero adaptive rerouting or rate-limiting.</p>
-          
-          <div class="ablation-bars-list">
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Avg Latency</span><span class="bad-text">26.8 ms</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-bad" style="width: 89%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Agg Throughput</span><span>9.1 Mbps</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-neutral" style="width: 60%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Packet Loss</span><span class="bad-text">8.4 %</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-bad" style="width: 84%;"></div></div>
-            </div>
-          </div>
-          <div class="ablation-footer-status">
-            <span>Bottleneck Status:</span>
-            <span class="status-warning">Severe Queue Backlog</span>
-          </div>
+          <h2>Ablation Benchmarks &amp; Saved Experiment Results</h2>
+          <p>Validated evaluation bundles loaded from <code>/api/results</code>. Displays verified run metadata, time series metrics, and condition comparisons.</p>
         </div>
 
-        <!-- Card A1 -->
-        <div class="ablation-card a1-card">
-          <div class="ablation-card-header">
-            <span class="ablation-tag tag-a1">CONDITION A1</span>
-            <span class="baseline-pill">ABLATION 1</span>
-          </div>
-          <h3>Zero-Shot LLM Agent</h3>
-          <p>Active LLM controller, but memory is wiped clean every cycle without reflection.</p>
-          
-          <div class="ablation-bars-list">
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Avg Latency</span><span>15.2 ms (-43.2%)</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-neutral" style="width: 50%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Agg Throughput</span><span>11.4 Mbps (+25.3%)</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-good" style="width: 76%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Packet Loss</span><span>2.1 %</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-neutral" style="width: 21%;"></div></div>
-            </div>
-          </div>
-          <div class="ablation-footer-status">
-            <span>Adaptation Time:</span>
-            <span class="status-neutral">Suboptimal Retries</span>
-          </div>
-        </div>
-
-        <!-- Card A2 (Winner) -->
-        <div class="ablation-card winner a2-card">
-          <div class="winner-glow"></div>
-          <div class="ablation-card-header">
-            <span class="ablation-tag tag-a2">CONDITION A2</span>
-            <span class="winner-trophy-pill">★ BEST PERFORMER</span>
-          </div>
-          <h3>SELF-X Self-Improving Agent</h3>
-          <p>Full LangGraph loop with few-shot memory bank and post-action verbal reflection.</p>
-          
-          <div class="ablation-bars-list">
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Avg Latency</span><span class="good-text">5.8 ms (-78.3%)</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-winner" style="width: 19%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Agg Throughput</span><span class="good-text">12.9 Mbps (+41.7%)</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-winner" style="width: 86%;"></div></div>
-            </div>
-            <div class="ablation-bar-item">
-              <div class="bar-label-row"><span>Packet Loss</span><span class="good-text">0.2 % (-97.6%)</span></div>
-              <div class="ablation-bar-track"><div class="ablation-bar-fill fill-winner" style="width: 2%;"></div></div>
-            </div>
-          </div>
-          <div class="ablation-footer-status">
-            <span>Statistical Significance:</span>
-            <span class="status-pass">Paired t-test: p = 0.0031 &lt; 0.05</span>
-          </div>
+        <div class="results-header-actions">
+          <button class="results-refresh-btn" id="btnRefreshResults" type="button" title="Query /api/results for newly saved experiment bundles">
+            <span>🔄</span>
+            <span>Refresh Results</span>
+          </button>
         </div>
       </div>
 
-      <!-- Evaluation Matrix Table -->
-      <div class="ablation-table-card">
-        <div class="card-title-row">
-          <div class="card-icon-chip purple">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <!-- Data Integrity Notice -->
+      <div class="results-data-notice" role="note">
+        <strong>DATA INTEGRITY NOTICE:</strong> Metrics shown here reflect actual saved experiment bundles loaded from read-only <code>/api/results</code> endpoints. When no saved experiment bundles exist, no claims of target latency reduction, backlog bounds, or generalization requirements are made. Incomplete or failed runs are clearly flagged and never presented as successful.
+      </div>
+
+      <!-- State 1: Loading State -->
+      <div class="results-state-box" id="resultsLoadingState" style="display: none;">
+        <div class="loading-spinner"></div>
+        <h3>Loading Saved Experiment Results...</h3>
+        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.4rem;">Querying GET /api/results for validated evaluation bundles.</p>
+      </div>
+
+      <!-- State 2: Error State -->
+      <div class="results-state-box error-box" id="resultsErrorState" style="display: none;">
+        <div class="empty-icon-circle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <h3 style="color: #f87171;">Unable to Load Experiment Results</h3>
+        <p id="resultsErrorMessage" style="color: var(--text-secondary); font-size: 0.82rem; margin-top: 0.4rem;">An unexpected error occurred while contacting /api/results.</p>
+        <button class="results-refresh-btn" id="btnRetryResults" type="button" style="margin: 1.2rem auto 0;">
+          <span>Retry Request</span>
+        </button>
+      </div>
+
+      <!-- State 3: Empty State -->
+      <div class="results-empty-card" id="resultsEmptyState">
+        <div class="empty-icon-circle">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H9V5h6v2z"/></svg>
+        </div>
+        <h3>No saved experiment results yet</h3>
+        <p>No valid experiment result bundles were found in the results archive. Results will appear here after an evaluation run produces a valid result bundle (run.json, metrics.jsonl, and summary.json).</p>
+        <div class="empty-guide-box">
+          <span class="empty-guide-title">How results are generated on a Linux Mininet testbed:</span>
+          <code>sudo python -m selfx.eval.run_ablation</code>
+          <span class="empty-guide-desc">The evaluation harness runs conditions A0 (Static Ryu), A1 (Zero-Shot Agent), and A2 (SELF-X Agent) over identical traffic seeds and records structured result bundles to the results archive.</span>
+        </div>
+      </div>
+
+      <!-- State 4: Populated State -->
+      <div id="resultsPopulatedState" style="display: none;">
+        <!-- Runs Selector & Filter Toolbar -->
+        <div class="panel-header" style="margin-bottom: 0.6rem;">
+          <div class="panel-title-group">
+            <h3 style="font-size: 1rem;">Saved Experiment Runs</h3>
+            <p style="font-size: 0.74rem; color: var(--text-secondary);">Select a run to inspect detailed metrics, time series progression, and diagnostic traces.</p>
           </div>
-          <h3>Quantitative Course Acceptance Matrix (EC466 SDN)</h3>
         </div>
 
-        <table class="table-custom">
-          <thead>
-            <tr>
-              <th>Evaluation Metric</th>
-              <th>A0 (Static Baseline)</th>
-              <th>A1 (Zero-Shot Agent)</th>
-              <th>A2 (SELF-X Agent)</th>
-              <th>A2 vs A0 Improvement</th>
-              <th>Course Acceptance Criterion</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Average End-to-End Latency</strong></td>
-              <td>26.8 ms</td>
-              <td>15.2 ms</td>
-              <td><span class="cell-winner">5.8 ms</span></td>
-              <td><span class="improvement-badge">-78.3%</span></td>
-              <td><span class="badge-state ok">&ge; 20% Reduction (PASSED)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Network Throughput</strong></td>
-              <td>9.1 Mbps</td>
-              <td>11.4 Mbps</td>
-              <td><span class="cell-winner">12.9 Mbps</span></td>
-              <td><span class="improvement-badge">+41.7%</span></td>
-              <td><span class="badge-state ok">Maintains &gt; 10 Mbps (PASSED)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Packet Loss Percentage</strong></td>
-              <td>8.4%</td>
-              <td>2.1%</td>
-              <td><span class="cell-winner">0.2%</span></td>
-              <td><span class="improvement-badge">-97.6%</span></td>
-              <td><span class="badge-state ok">Loss &lt; 1% under load (PASSED)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Unattended Run Stability</strong></td>
-              <td>10.0 mins</td>
-              <td>10.0 mins</td>
-              <td><span class="cell-winner">10.0 mins</span></td>
-              <td><span class="improvement-badge">100% Stable</span></td>
-              <td><span class="badge-state ok">&ge; 10 mins without crash (PASSED)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Safety Invariant Violations</strong></td>
-              <td>N/A</td>
-              <td>0</td>
-              <td><span class="cell-winner">0</span></td>
-              <td><span class="improvement-badge">Zero Violations</span></td>
-              <td><span class="badge-state ok">Fail-closed invariant holds (PASSED)</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="results-filter-bar">
+          <button class="results-filter-pill active" data-filter="all" type="button">All Stages</button>
+          <button class="results-filter-pill" data-filter="A0" type="button">A0: Static</button>
+          <button class="results-filter-pill" data-filter="A1" type="button">A1: Zero-Shot</button>
+          <button class="results-filter-pill" data-filter="A2" type="button">A2: SELF-X</button>
+        </div>
+
+        <div class="results-runs-list" id="resultsRunsList">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Section A: Completed A0/A1/A2 Condition Comparison -->
+        <div class="panel-header" style="margin-top: 1.5rem; margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="tag-openflow">Comparative Benchmarks</span>
+              <span class="tag-dpid">GET /api/results/compare</span>
+            </div>
+            <h3>A0 vs A1 vs A2 Condition Comparison</h3>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Side-by-side comparison of completed evaluation runs with finalized summaries.</p>
+          </div>
+        </div>
+
+        <div class="comparison-notice-box" id="resultsComparisonNotice" style="display: none;"></div>
+
+        <div class="ablation-summary" id="resultsComparisonCards">
+          <!-- Dynamic A0, A1, A2 summary cards -->
+        </div>
+
+        <!-- Quantitative Acceptance Matrix Table -->
+        <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
+          <div class="card-title-row">
+            <div class="card-icon-chip purple">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+            <h3>Quantitative Course Acceptance Matrix (EC466 SDN)</h3>
+          </div>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Evaluation Metric</th>
+                <th>A0 (Static Baseline)</th>
+                <th>A1 (Zero-Shot Agent)</th>
+                <th>A2 (SELF-X Agent)</th>
+                <th>A2 vs A0 Improvement</th>
+                <th>Course Acceptance Criterion</th>
+              </tr>
+            </thead>
+            <tbody id="resultsComparisonTableBody">
+              <!-- Populated dynamically from actual comparison data -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section B: Selected Run Detail & Metric Time Series -->
+        <div class="selected-run-panel" id="selectedRunDetail">
+          <div class="panel-header" style="margin-bottom: 1rem;">
+            <div class="panel-title-group">
+              <div class="panel-badge-row">
+                <span id="detailStage" class="ablation-tag tag-a2">STAGE A2</span>
+                <span id="detailStatus" class="badge-state ok">COMPLETED</span>
+                <span id="detailProvenance" class="provenance-pill prov-live">PROVENANCE: LIVE</span>
+              </div>
+              <h3 style="font-family: var(--font-mono); font-size: 1.05rem;" id="detailRunId">--</h3>
+            </div>
+          </div>
+
+          <!-- Error notice if run failed or incomplete -->
+          <div class="run-error-notice" id="detailErrorNotice" style="display: none;">
+            <span>⚠️</span>
+            <span id="detailErrorMessage">Run did not complete successfully</span>
+          </div>
+
+          <!-- Metadata Grid -->
+          <div class="run-meta-grid">
+            <div class="run-meta-item">
+              <span class="run-meta-label">Created At (UTC)</span>
+              <span class="run-meta-val" id="detailCreated">--</span>
+            </div>
+            <div class="run-meta-item">
+              <span class="run-meta-label">Duration</span>
+              <span class="run-meta-val" id="detailDuration">--</span>
+            </div>
+            <div class="run-meta-item">
+              <span class="run-meta-label">Git Commit</span>
+              <span class="run-meta-val" id="detailGitCommit">--</span>
+            </div>
+            <div class="run-meta-item">
+              <span class="run-meta-label">Topology</span>
+              <span class="run-meta-val" id="detailTopology">--</span>
+            </div>
+            <div class="run-meta-item">
+              <span class="run-meta-label">Workload</span>
+              <span class="run-meta-val" id="detailWorkload">--</span>
+            </div>
+          </div>
+
+          <!-- Run Summary KPI Strip -->
+          <div class="run-kpis-strip">
+            <div class="metric-card accent-cyan" id="resKpiLatency">
+              <div class="metric-header"><span class="metric-title">Mean Latency</span></div>
+              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">ms</span></div>
+            </div>
+            <div class="metric-card accent-emerald" id="resKpiThroughput">
+              <div class="metric-header"><span class="metric-title">Mean Throughput</span></div>
+              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">kbps</span></div>
+            </div>
+            <div class="metric-card accent-crimson" id="resKpiLoss">
+              <div class="metric-header"><span class="metric-title">Packet Loss Rate</span></div>
+              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">%</span></div>
+            </div>
+            <div class="metric-card accent-purple" id="resKpiReward">
+              <div class="metric-header"><span class="metric-title">Mean Reward</span></div>
+              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit"></span></div>
+            </div>
+          </div>
+
+          <!-- Time Series Line Charts -->
+          <div class="panel-header" style="margin-bottom: 0.8rem;">
+            <div class="panel-title-group">
+              <h4>Metric Time Series Progression</h4>
+              <p style="font-size: 0.74rem; color: var(--text-secondary);">Sampled control loop progression from <code>metrics.jsonl</code>. Unavailable metrics are omitted, not plotted as zero.</p>
+            </div>
+          </div>
+
+          <div class="run-charts-grid">
+            <!-- Chart 1: Latency -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-wrap">
+                  <h4>End-to-End Latency</h4>
+                  <span class="chart-sub">Ping probe latency (ms)</span>
+                </div>
+                <div class="chart-kpi-badge cyan">
+                  <span class="kpi-val" id="chartRunLatencyVal">--</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="runChartLatency" width="540" height="200"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Throughput -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-wrap">
+                  <h4>Network Throughput</h4>
+                  <span class="chart-sub">OpenFlow port byte rate (kbps)</span>
+                </div>
+                <div class="chart-kpi-badge emerald">
+                  <span class="kpi-val" id="chartRunThroughputVal">--</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="runChartThroughput" width="540" height="200"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 3: Loss -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-wrap">
+                  <h4>Packet Loss Rate</h4>
+                  <span class="chart-sub">Dropped packet percentage (%)</span>
+                </div>
+                <div class="chart-kpi-badge crimson">
+                  <span class="kpi-val" id="chartRunLossVal">--</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="runChartLoss" width="540" height="200"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 4: Reward -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title-wrap">
+                  <h4>Cycle Reward Progression</h4>
+                  <span class="chart-sub">Multi-objective reward score</span>
+                </div>
+                <div class="chart-kpi-badge purple">
+                  <span class="kpi-val" id="chartRunRewardVal">--</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas id="runChartReward" width="540" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagnostic Trace Section -->
+          <div id="resultsTraceSection" style="display: none; margin-top: 1.5rem;">
+            <div class="panel-header" style="margin-bottom: 0.6rem;">
+              <div class="panel-title-group">
+                <h4>Diagnostic Trace Events</h4>
+                <p style="font-size: 0.74rem; color: var(--text-secondary);">Safe event trace records from <code>trace.jsonl</code> (<span id="resultsTraceCountBadge">0</span> events recorded)</p>
+              </div>
+            </div>
+            <div class="trace-log-panel">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Seq</th>
+                    <th>Timestamp (UTC)</th>
+                    <th>Event</th>
+                    <th>Action</th>
+                    <th>Safety Gate</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsTraceTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1190,6 +1324,7 @@
   <script src="js/charts.js"></script>
   <script src="js/agent.js"></script>
   <script src="js/simulator.js"></script>
+  <script src="js/results.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -25,6 +25,18 @@ The server does not load `.env` files automatically. `SDN_WEB_PORT` and
 - `/api/results/<run_id>/summary` returns one validated summary.
 - `/api/results/<run_id>/metrics` returns validated metric time series.
 - `/api/results/<run_id>/trace` returns validated diagnostic traces when available.
+- `/api/results/compare?run_ids=<id1>,<id2>` returns comparative summaries for completed evaluation runs.
 - `/api/ryu/*` is not exposed publicly.
 - Direct network-control helpers return HTTP 409.
 - Missing, malformed, failed, and incomplete result runs return explicit errors.
+
+## Saved Experiment Results Integration (Phase 4)
+
+The **Ablation Benchmarks** tab connects directly to the public read-only `/api/results` APIs:
+
+- **Empty Archive State**: When no saved result bundles exist in the results archive, the dashboard renders an explicit empty state banner explaining that results appear after evaluation runs produce valid result bundles (`run.json`, `metrics.jsonl`, `summary.json`). No ungrounded performance claims or acceptance criteria are displayed.
+- **Run Browser & Filtering**: Saved runs can be filtered by stage (A0, A1, A2). Each run clearly displays run identity, stage, status (`COMPLETED`, `FAILED`, `RUNNING`), and provenance (`live`, `recorded_testbed`, `simulation`).
+- **Data Integrity & Provenance**: Experimental results are never confused with browser-side simulation telemetry. Failed or incomplete runs are never presented as successful. Missing metrics are preserved as `Unavailable` rather than plotted or reported as zero.
+- **Time Series Progression**: Validated metric samples from `metrics.jsonl` are plotted on Canvas time-series charts (latency, throughput, loss, reward) with auto-scaling and DPI handling.
+- **Comparative Evaluation**: Completed A0, A1, and A2 runs are compared using `/api/results/compare`. Percentage improvements and course acceptance criteria are only calculated from verified experimental data.
+- **Manual Refresh**: Users can trigger a real-time refresh from `/api/results` via the "Refresh Results" button.

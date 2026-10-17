@@ -27,10 +27,17 @@ import csv
 import http.server
 import re
 import socketserver
+import sys
 from pathlib import Path
 import urllib.request
 import urllib.error
 from urllib.parse import parse_qs, urlsplit
+
+WEB_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(WEB_DIR)
+for _path in (PROJECT_ROOT, os.path.join(PROJECT_ROOT, "selfx")):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
 
 try:
     from selfx.eval.result_schema import (
@@ -42,19 +49,18 @@ try:
     )
     from selfx.eval.result_writer import read_run
 except ImportError:
-    from eval.result_schema import (
-        ResultValidationError,
-        validate_metric_record,
-        validate_run_metadata,
-        validate_summary,
-        validate_trace_record,
-    )
-    from eval.result_writer import read_run
+    import importlib
+    _schema = importlib.import_module("eval.result_schema")
+    _writer = importlib.import_module("eval.result_writer")
+    ResultValidationError = _schema.ResultValidationError
+    validate_metric_record = _schema.validate_metric_record
+    validate_run_metadata = _schema.validate_run_metadata
+    validate_summary = _schema.validate_summary
+    validate_trace_record = _schema.validate_trace_record
+    read_run = _writer.read_run
 
 PORT = int(os.environ.get("SDN_WEB_PORT", 5000))
 RYU_BASE_URL = os.environ.get("RYU_REST_BASE", "http://127.0.0.1:8080")
-WEB_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(WEB_DIR)
 RESULTS_ROOT = Path(os.environ.get("SELFX_RESULTS_ROOT", Path(PROJECT_ROOT) / "results")).resolve()
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
@@ -116,6 +122,13 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        try:
+            length = int(self.headers.get('Content-Length', 0) or 0)
+            if length > 0:
+                self.rfile.read(min(length, 1048576))
+        except Exception:
+            pass
+
         path = urlsplit(self.path).path
         if path.startswith('/api/auth/'):
             self.send_json(404, {"error": "authentication is disabled for the public website"})
