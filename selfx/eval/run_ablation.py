@@ -39,6 +39,10 @@ import latency_probe
 from agent import metrics
 from agent.graph import AgentDeps, build_graph, run_cycle
 from agent.memory import MemoryStore
+try:
+    from .result_integration import ExperimentResultRecorder, DEFAULT_RESULTS_ROOT, utc_now
+except ImportError:
+    from eval.result_integration import ExperimentResultRecorder, DEFAULT_RESULTS_ROOT, utc_now
 
 
 def _make_llm():
@@ -58,12 +62,14 @@ def _clear_all_flows(dpids):
             pass
 
 
-def _run_condition(condition: str, run_duration_sec: int, out_dir: str) -> str:
+def _run_condition(condition: str, run_duration_sec: int, out_dir: str, results_dir: str = str(DEFAULT_RESULTS_ROOT)) -> str:
     os.makedirs(out_dir, exist_ok=True)
     csv_path = os.path.join(out_dir, f"{condition}.csv")
+    result_recorder = ExperimentResultRecorder(condition, run_duration_sec, results_dir)
 
-    net = topo.build_net()
+    net = None
     try:
+        net = topo.build_net()
         time.sleep(2)  # let OVS<->Ryu handshake settle
         dpids = ryu_client.get_switches()
         _clear_all_flows(dpids)
@@ -111,43 +117,59 @@ def _run_condition(condition: str, run_duration_sec: int, out_dir: str) -> str:
                 tp_after, loss_after = metrics.network_throughput_and_loss(
                     raw_before, raw_after, config.CONTROL_LOOP_INTERVAL_SEC
                 )
-                rows.append(
-                    {
-                        "cycle": cycle,
-                        "latency_ms": lat_after,
-                        "throughput_kbps": tp_after,
-                        "loss_pct": loss_after,
-                        "reward": "",
-                        "installed_action": "",
-                    }
-                )
+                row = {
+                    "cycle": cycle,
+                    "latency_ms": lat_after,
+                    "throughput_kbps": tp_after,
+                    "loss_pct": loss_after,
+                    "reward": "",
+                    "installed_action": "",
+                    "window_start_utc": utc_now(),
+                }
+                rows.append(row)
+                result_recorder.record(row, {"condition": condition, "controller": "simple_switch_13"})
                 raw_prev = raw_before
             else:
                 result = run_cycle(agent_app, cycle, raw_prev)
-                rows.append(
+                row = {
+                    "cycle": cycle,
+                    "latency_ms": result["metrics_after"]["latency_ms"],
+                    "throughput_kbps": result["metrics_after"]["throughput_kbps"],
+                    "loss_pct": result["metrics_after"]["loss_pct"],
+                    "reward": result["reward"],
+                    "installed_action": result["installed_action"],
+                    "requested_action": result["decision"]["action"],
+                    "window_start_utc": utc_now(),
+                }
+                rows.append(row)
+                result_recorder.record(
+                    row,
                     {
-                        "cycle": cycle,
-                        "latency_ms": result["metrics_after"]["latency_ms"],
-                        "throughput_kbps": result["metrics_after"]["throughput_kbps"],
-                        "loss_pct": result["metrics_after"]["loss_pct"],
-                        "reward": result["reward"],
-                        "installed_action": result["installed_action"],
-                    }
+                        "condition": condition,
+                        "decision": result["decision"],
+                        "safety_result": result["safety_result"],
+                    },
                 )
                 raw_prev = result["raw_state_before"]
 
             print(f"[{condition}] cycle {cycle}/{num_cycles} -> {rows[-1]}")
 
         with open(csv_path, "w", newline="") as f:
+            fieldnames = ["cycle", "latency_ms", "throughput_kbps", "loss_pct",
+                          "reward", "installed_action"]
             writer = csv.DictWriter(
-                f, fieldnames=["cycle", "latency_ms", "throughput_kbps", "loss_pct",
-                               "reward", "installed_action"]
+                f, fieldnames=fieldnames
             )
             writer.writeheader()
-            writer.writerows(rows)
+            writer.writerows({field: row.get(field, "") for field in fieldnames} for row in rows)
+        result_recorder.complete()
 
+    except Exception as exc:
+        result_recorder.fail(exc)
+        raise
     finally:
-        net.stop()
+        if net is not None:
+            net.stop()
 
     return csv_path
 
@@ -157,12 +179,13 @@ def main():
     parser.add_argument("--duration", type=int, default=config.RUN_DURATION_SEC,
                          help="seconds per condition (default: %(default)s)")
     parser.add_argument("--out-dir", default=config.EVAL_LOG_DIR)
+    parser.add_argument("--results-dir", default=str(DEFAULT_RESULTS_ROOT))
     parser.add_argument("--conditions", nargs="+", default=list(config.CONDITIONS))
     args = parser.parse_args()
 
     for condition in args.conditions:
         print(f"=== Running condition {condition} for {args.duration}s ===")
-        path = _run_condition(condition, args.duration, args.out_dir)
+        path = _run_condition(condition, args.duration, args.out_dir, args.results_dir)
         print(f"=== {condition} done -> {path} ===")
 
 
