@@ -1,0 +1,946 @@
+[
+  {
+    "cycle": 0,
+    "timestamp": "2026-10-20T07:34:40.819399+00:00",
+    "state_summary": {
+      "latency_ms": 8.0,
+      "throughput_kbps": 4982.8,
+      "loss_pct": 0.0,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 942.6
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 2844.1,
+          "util_pct": 28.441000000000003
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2138.7,
+          "util_pct": 21.387
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 1.9015,
+        "alternate_background_mbps": 2.1387,
+        "elephant_mbps": 0.9426,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.19014999999999999,
+        0.21387,
+        0.09426,
+        0.0,
+        0.0,
+        0.28441
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Network utilization across ports is low (under 30%) with zero packet loss, indicating a healthy state requiring no intervention."
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op maintained optimal network performance with zero loss and low latency since port utilization was already well within safe limits.",
+    "context_v3": [
+      0.19014999999999999,
+      0.21387,
+      0.09426,
+      -0.71559,
+      -0.59187,
+      -0.734442,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 1,
+    "timestamp": "2026-10-20T07:34:49.071266+00:00",
+    "state_summary": {
+      "latency_ms": 51.905887,
+      "throughput_kbps": 11086.9,
+      "loss_pct": 13.801048,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6945.599999999999
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11891.1,
+          "util_pct": 118.911
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1086.9,
+          "util_pct": 10.869
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.9455,
+        "alternate_background_mbps": 1.0869,
+        "elephant_mbps": 6.9456,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.49455,
+        0.10869,
+        0.69456,
+        0.0,
+        0.0,
+        1.18911
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Port 2 is congested (118.9% utilization) with 13.8% packet loss, so rerouting the elephant flow to alternate port 3."
+    },
+    "reward": 0.6405455760000002,
+    "reflection": "Rerouting the elephant flow from the congested port 2 to port 3 successfully eliminated packet loss, reduced latency from 51.9 ms to 8.0 ms, and improved throughput.",
+    "context_v3": [
+      0.49455,
+      0.10869,
+      0.69456,
+      0.1891099999999999,
+      -0.09675000000000011,
+      0.050197999999999965,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 2,
+    "timestamp": "2026-10-20T07:34:57.543202+00:00",
+    "state_summary": {
+      "latency_ms": 38.305566,
+      "throughput_kbps": 16053.0,
+      "loss_pct": 9.780945,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5998.0
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11851.2,
+          "util_pct": 118.512
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 6053.0,
+          "util_pct": 60.53
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.8532,
+        "alternate_background_mbps": 6.053,
+        "elephant_mbps": 5.998,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.5853200000000001,
+        0.6053,
+        0.5998,
+        0.0,
+        0.0,
+        1.18512
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op during port congestion yielded neutral results with unchanged latency and packet loss, suggesting that passive waiting is insufficient when links exceed capacity.",
+    "context_v3": [
+      0.5853200000000001,
+      0.6053,
+      0.5998,
+      0.18511999999999995,
+      0.3050999999999998,
+      0.0651600000000001,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 3,
+    "timestamp": "2026-10-20T07:35:06.013496+00:00",
+    "state_summary": {
+      "latency_ms": 8.735643,
+      "throughput_kbps": 8005.6,
+      "loss_pct": 0.0,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3009.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 6990.2,
+          "util_pct": 69.902
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 915.4,
+          "util_pct": 9.154
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 3.9803,
+        "alternate_background_mbps": 0.9154,
+        "elephant_mbps": 3.0099,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.39803,
+        0.09154,
+        0.30099,
+        1.0,
+        0.0,
+        0.69902
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Network utilization is within acceptable levels (69.9% on primary port) with zero packet loss, so no intervention is needed."
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op when link utilization was safely below capacity at 69.9% successfully maintained zero packet loss and stable latency, confirming that non-intervention was the correct choice.",
+    "context_v3": [
+      0.39803,
+      0.09154,
+      0.30099,
+      -0.30098,
+      -0.5074700000000001,
+      -0.361178,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 4,
+    "timestamp": "2026-10-20T07:35:14.428507+00:00",
+    "state_summary": {
+      "latency_ms": 35.739302,
+      "throughput_kbps": 17136.6,
+      "loss_pct": 5.038262,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6937.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11014.5,
+          "util_pct": 110.145
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 7136.599999999999,
+          "util_pct": 71.366
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.0766,
+        "alternate_background_mbps": 7.1366,
+        "elephant_mbps": 6.9379,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.40766,
+        0.71366,
+        0.69379,
+        0.0,
+        0.0,
+        1.10145
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Failing to execute the planned reroute on the congested port left packet loss and high latency unchanged at over 5% and 35ms.",
+    "context_v3": [
+      0.40766,
+      0.71366,
+      0.69379,
+      0.10145000000000004,
+      0.5074499999999998,
+      -0.0373079999999999,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 5,
+    "timestamp": "2026-10-20T07:35:22.727411+00:00",
+    "state_summary": {
+      "latency_ms": 37.292527,
+      "throughput_kbps": 17069.2,
+      "loss_pct": 26.028905,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 8975.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 16006.3,
+          "util_pct": 160.063
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 7069.200000000001,
+          "util_pct": 70.69200000000001
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.0304,
+        "alternate_background_mbps": 7.0692,
+        "elephant_mbps": 8.9759,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.70304,
+        0.70692,
+        0.8975899999999999,
+        1.0,
+        0.0,
+        1.60063
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op instead of executing the planned reroute to port 3 left the network in a severely congested state with 26% packet loss, proving that proactive rerouting is necessary when port utilization exceeds 160%.",
+    "context_v3": [
+      0.70304,
+      0.70692,
+      0.8975899999999999,
+      0.6006299999999998,
+      0.7045099999999999,
+      0.42111199999999993,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 6,
+    "timestamp": "2026-10-20T07:35:31.113756+00:00",
+    "state_summary": {
+      "latency_ms": 8.20236,
+      "throughput_kbps": 5082.8,
+      "loss_pct": 0.0,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 942.6
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 2844.1,
+          "util_pct": 28.441000000000003
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2138.7,
+          "util_pct": 21.387
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 1.9015,
+        "alternate_background_mbps": 2.1387,
+        "elephant_mbps": 0.9426,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.19014999999999999,
+        0.21387,
+        0.09426,
+        1.0,
+        0.0,
+        0.28441
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Network utilization is low across all ports (under 30%) with zero packet loss, indicating a healthy state requiring no intervention."
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op was correct because the network remained stable with zero packet loss and low port utilization, confirming that intervention was unnecessary.",
+    "context_v3": [
+      0.19014999999999999,
+      0.21387,
+      0.09426,
+      -0.71559,
+      -0.59187,
+      -0.734442,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 7,
+    "timestamp": "2026-10-20T07:35:39.429283+00:00",
+    "state_summary": {
+      "latency_ms": 51.905887,
+      "throughput_kbps": 11086.9,
+      "loss_pct": 13.801048,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6945.599999999999
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11891.1,
+          "util_pct": 118.911
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1086.9,
+          "util_pct": 10.869
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.9455,
+        "alternate_background_mbps": 1.0869,
+        "elephant_mbps": 6.9456,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.49455,
+        0.10869,
+        0.69456,
+        0.0,
+        0.0,
+        1.18911
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Port 2 is heavily congested at 118.9% utilization with 13.8% loss, so rerouting the flow to alternate port 3."
+    },
+    "reward": 0.6405455760000002,
+    "reflection": "Rerouting the congested elephant flow from overloaded port 2 to underutilized port 3 successfully eliminated packet loss and drastically reduced latency from 51.9ms to 8.0ms.",
+    "context_v3": [
+      0.49455,
+      0.10869,
+      0.69456,
+      0.1891099999999999,
+      -0.09675000000000011,
+      0.050197999999999965,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 8,
+    "timestamp": "2026-10-20T07:35:47.836686+00:00",
+    "state_summary": {
+      "latency_ms": 38.305566,
+      "throughput_kbps": 16053.0,
+      "loss_pct": 9.780945,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5998.0
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11851.2,
+          "util_pct": 118.512
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 6053.0,
+          "util_pct": 60.53
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.8532,
+        "alternate_background_mbps": 6.053,
+        "elephant_mbps": 5.998,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.5853200000000001,
+        0.6053,
+        0.5998,
+        0.0,
+        0.0,
+        1.18512
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op while port 2 remained severely overloaded at 118.5% utilization hurt performance by failing to alleviate persistent 9.8% packet loss.",
+    "context_v3": [
+      0.5853200000000001,
+      0.6053,
+      0.5998,
+      0.18511999999999995,
+      0.3050999999999998,
+      0.0651600000000001,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 9,
+    "timestamp": "2026-10-20T07:35:56.121105+00:00",
+    "state_summary": {
+      "latency_ms": 8.735643,
+      "throughput_kbps": 8005.6,
+      "loss_pct": 0.0,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3009.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 6990.2,
+          "util_pct": 69.902
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 915.4,
+          "util_pct": 9.154
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 3.9803,
+        "alternate_background_mbps": 0.9154,
+        "elephant_mbps": 3.0099,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.39803,
+        0.09154,
+        0.30099,
+        1.0,
+        0.0,
+        0.69902
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Network utilization on primary port 2 is moderate (69.9%) with zero packet loss, so no intervention is necessary."
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op when primary port utilization was moderate at 69.9% successfully maintained zero packet loss and stable performance, proving that intervention was unnecessary.",
+    "context_v3": [
+      0.39803,
+      0.09154,
+      0.30099,
+      -0.30098,
+      -0.5074700000000001,
+      -0.361178,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 10,
+    "timestamp": "2026-10-20T07:36:04.552789+00:00",
+    "state_summary": {
+      "latency_ms": 35.739302,
+      "throughput_kbps": 17136.6,
+      "loss_pct": 5.038262,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6937.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11014.5,
+          "util_pct": 110.145
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 7136.599999999999,
+          "util_pct": 71.366
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.0766,
+        "alternate_background_mbps": 7.1366,
+        "elephant_mbps": 6.9379,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.40766,
+        0.71366,
+        0.69379,
+        0.0,
+        0.0,
+        1.10145
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op instead of rerouting the congested elephant flow maintained high loss and latency, so I should execute the planned reroute to port 3 next time to relieve the overloaded port 2.",
+    "context_v3": [
+      0.40766,
+      0.71366,
+      0.69379,
+      0.10145000000000004,
+      0.5074499999999998,
+      -0.0373079999999999,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "cycle": 11,
+    "timestamp": "2026-10-20T07:36:13.153587+00:00",
+    "state_summary": {
+      "latency_ms": 37.292527,
+      "throughput_kbps": 17069.2,
+      "loss_pct": 26.028905,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 8975.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 16006.3,
+          "util_pct": 160.063
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 7069.200000000001,
+          "util_pct": 70.69200000000001
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.0304,
+        "alternate_background_mbps": 7.0692,
+        "elephant_mbps": 8.9759,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.70304,
+        0.70692,
+        0.8975899999999999,
+        1.0,
+        0.0,
+        1.60063
+      ]
+    },
+    "action": "no_op",
+    "params": {
+      "action": "no_op",
+      "target_dpid": null,
+      "target_flow_match": null,
+      "reroute_out_port": null,
+      "rate_limit_kbps": null,
+      "rationale": "Safety veto"
+    },
+    "reward": 0.0,
+    "reflection": "Choosing no_op instead of executing the planned reroute to port 3 left the severe 26% packet loss and 160% port utilization completely unmitigated, proving that failing to act under heavy congestion leads to stagnant performance.",
+    "context_v3": [
+      0.70304,
+      0.70692,
+      0.8975899999999999,
+      0.6006299999999998,
+      0.7045099999999999,
+      0.42111199999999993,
+      1.0,
+      0.0
+    ]
+  }
+]

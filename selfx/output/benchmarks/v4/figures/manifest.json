@@ -1,0 +1,135 @@
+{
+  "source_sha256": {
+    "output/benchmarks/v4/summary.json": "a3555e6de2de533fc972d734c9fb062d84fe9c80dc45ec524cb07d5a8352a68b",
+    "output/benchmarks/v4/metrics.csv": "5aa5990960ec7e38f5fce0614e0adf71cdae49361100008799c0be2da50e7045",
+    "output/runtime_validation.json": "caaa1dcd010743539de4a6850bed0211d086e3cc617dffe5483bc22350a692c3",
+    "output/benchmarks/v4/free_model_checks.json": "f19e5f2a6a569ee5c0f22dc67d8851adae29491007a68c3738576274aa69a3a9",
+    "output/benchmarks/v4/latency_gemini_pooled/summary.json": "d26ea0af5cec069014324758ae2d4bcbcc6c328592ac195557e1b9575ab8fbfa",
+    "output/benchmarks/v4/latency_gemini_pooled/metrics.csv": "0af172b8cbd895aa03c031039137cd6c63325785e9b45315f104fd1269927be5",
+    "output/benchmarks/v4/latency_gemini_pooled/trace.jsonl": "a0be9330011f105e0130ba4476da4b66b8e95d36e52c415e7b87201d4fbd2833",
+    "output/benchmarks/v4/latency_openrouter_pooled/summary.json": "0ad4f6de12f119c07242fcb952d343f6f555f1ac4ce922691b2ba9617dbe2c4e",
+    "output/benchmarks/v4/latency_openrouter_pooled/metrics.csv": "3b403b38c8f92ee993fe982592100e0e48581218c5d208fb23dde7db8abee1a2",
+    "output/benchmarks/v4/latency_openrouter_pooled/trace.jsonl": "f3fce9f6154e3093b35912ab2bb2361cfc582bcb8ba58b1b12acade1c33fac0c"
+  },
+  "figures": [
+    {
+      "id": "traffic_scenarios",
+      "title": "Generated traffic on eight held-out scenarios",
+      "caption": "One seed shown (1900). 10 paired seeds \u00d7 120 windows \u00d7 8 scenarios; capacities 10 Mbps per path. Demand traces are synthetic and hash-verified.",
+      "png": "output/benchmarks/v4/figures/traffic_scenarios.png",
+      "svg": "output/benchmarks/v4/figures/traffic_scenarios.svg"
+    },
+    {
+      "id": "scenario_latency_matrix",
+      "title": "Modeled delay by scenario and controller",
+      "caption": "86,400 controller windows, 9,600 unique workload windows. Queue-based fluid delay; no packet RTT or physical-network measurements.",
+      "png": "output/benchmarks/v4/figures/scenario_latency_matrix.png",
+      "svg": "output/benchmarks/v4/figures/scenario_latency_matrix.svg"
+    },
+    {
+      "id": "paired_memory_effect",
+      "title": "A4 versus H1: loss improves, delay has a tradeoff",
+      "caption": "A4 minus H1 with paired 95% seed bootstrap intervals (4,000 draws). Negative favors A4. Improvements over H1 include capacity-aware meter logic, not only memory.",
+      "png": "output/benchmarks/v4/figures/paired_memory_effect.png",
+      "svg": "output/benchmarks/v4/figures/paired_memory_effect.svg"
+    },
+    {
+      "id": "guard_ablation",
+      "title": "Matched H2 ablation isolates episodic parameter selection",
+      "caption": "H2 shares the capacity-aware meter and uses a fixed 0.1 Mbps headroom. A4 explores 0, 0.1 and 0.3 Mbps, then selects using observed prior reward. Cold-start exploration stays in results.",
+      "png": "output/benchmarks/v4/figures/guard_ablation.png",
+      "svg": "output/benchmarks/v4/figures/guard_ablation.svg"
+    },
+    {
+      "id": "metric_tradeoffs",
+      "title": "Delay, loss and delivered goodput together",
+      "caption": "Equal weight per scenario and seed. All loss includes deliberate meter drops and buffer overflow. H1 and previous v3 A4 match; H2 and A4 differ in parameter selection.",
+      "png": "output/benchmarks/v4/figures/metric_tradeoffs.png",
+      "svg": "output/benchmarks/v4/figures/metric_tradeoffs.svg"
+    },
+    {
+      "id": "distribution_ecdf",
+      "title": "Distribution of modeled window outcomes",
+      "caption": "9,600 windows per controller, including overload, transitions and cold start. Individual windows within a seed are dependent; these curves are descriptive.",
+      "png": "output/benchmarks/v4/figures/distribution_ecdf.png",
+      "svg": "output/benchmarks/v4/figures/distribution_ecdf.svg"
+    },
+    {
+      "id": "actions_and_vetoes",
+      "title": "Installed actions and independent safety checks",
+      "caption": "The unchanged safety limits enforce exact target/route, alternate utilization \u226490%, rate reduction \u226420% and minimum meter 512 kbps.",
+      "png": "output/benchmarks/v4/figures/actions_and_vetoes.png",
+      "svg": "output/benchmarks/v4/figures/actions_and_vetoes.svg"
+    },
+    {
+      "id": "queue_shift_heatmap",
+      "title": "Queue response through a traffic distribution shift",
+      "caption": "Seed 1900 shown. Queues carry between windows; changing a rule does not erase queued traffic. Each intervention expires after five virtual seconds.",
+      "png": "output/benchmarks/v4/figures/queue_shift_heatmap.png",
+      "svg": "output/benchmarks/v4/figures/queue_shift_heatmap.svg"
+    },
+    {
+      "id": "offline_control_overhead",
+      "title": "Actual local computation in the isolated .venv",
+      "caption": "Per-window time includes selection, safety, fluid outcome, reward and memory update. Final batched memory flush excluded. Local timings depend on this machine and concurrent load.",
+      "png": "output/benchmarks/v4/figures/offline_control_overhead.png",
+      "svg": "output/benchmarks/v4/figures/offline_control_overhead.svg"
+    },
+    {
+      "id": "api_latency_compare",
+      "title": "Measured provider integration with five-second traffic arrivals",
+      "caption": "Two fresh seeds, 24 windows per mode/provider. Observation idle time is separately recorded; all control work, pacing, process startup, cancellation and cleanup is included. Timeouts remain in metrics.",
+      "png": "output/benchmarks/v4/figures/api_latency_compare.png",
+      "svg": "output/benchmarks/v4/figures/api_latency_compare.svg"
+    },
+    {
+      "id": "api_call_origins",
+      "title": "Fresh suggestions, local reuse and fallbacks are separate",
+      "caption": "A provider timeout is a local client deadline, not a successful response. Admission deferrals start no request. No API work is silently moved outside the control interval.",
+      "png": "output/benchmarks/v4/figures/api_call_origins.png",
+      "svg": "output/benchmarks/v4/figures/api_call_origins.svg"
+    },
+    {
+      "id": "api_timeline",
+      "title": "Control tail latency with all windows retained",
+      "caption": "Modes use reversed order on the second seed to reduce order bias. Provider variability remains. A 3.8-second local wait budget leaves time for validation and measurement; it is not a hard real-time OS guarantee.",
+      "png": "output/benchmarks/v4/figures/api_timeline.png",
+      "svg": "output/benchmarks/v4/figures/api_timeline.svg"
+    },
+    {
+      "id": "free_model_availability",
+      "title": "Availability of every discovered zero-price OpenRouter model",
+      "caption": "1/17 healthy-network schema checks valid. Zero bar marks unavailable/error, not zero latency. Availability check is separate from network-control quality or provider ranking.",
+      "png": "output/benchmarks/v4/figures/free_model_availability.png",
+      "svg": "output/benchmarks/v4/figures/free_model_availability.svg"
+    },
+    {
+      "id": "memory_sensitivity",
+      "title": "Meter parameters retain more traffic than the fixed 80% rule",
+      "caption": "H2 uses a capacity-fitting meter with 0.1 Mbps headroom. A4 varies headroom through bounded prior-outcome exploration. The safety floor clips all candidates at at least 80% of elephant demand.",
+      "png": "output/benchmarks/v4/figures/memory_sensitivity.png",
+      "svg": "output/benchmarks/v4/figures/memory_sensitivity.svg"
+    },
+    {
+      "id": "memory_learning",
+      "title": "Memory learning includes its cold-start exploration cost",
+      "caption": "Primary evaluation, all eight scenarios and ten seeds. Higher reward is better. H2 is the matched no-memory ablation; an A4 advantage over H1 alone cannot prove an extra memory benefit.",
+      "png": "output/benchmarks/v4/figures/memory_learning.png",
+      "svg": "output/benchmarks/v4/figures/memory_learning.svg"
+    },
+    {
+      "id": "rule_lifecycle",
+      "title": "Complete simulated rule changes: port, meter and expiry",
+      "caption": "Saved real-provider and fallback decisions drive a simulated OpenFlow table. Exact match, cookie, instructions, meter cap, prior-rule expiry and final default restoration are recorded. No physical switch is contacted.",
+      "png": "output/benchmarks/v4/figures/rule_lifecycle.png",
+      "svg": "output/benchmarks/v4/figures/rule_lifecycle.svg"
+    },
+    {
+      "id": "loss_breakdown",
+      "title": "Loss accounting keeps deliberate drops visible",
+      "caption": "Pooled volume loss differs from the arithmetic mean of window loss reported in primary tables. Conservation: prior queues + offered = delivered + all dropped + final queues.",
+      "png": "output/benchmarks/v4/figures/loss_breakdown.png",
+      "svg": "output/benchmarks/v4/figures/loss_breakdown.svg"
+    }
+  ]
+}

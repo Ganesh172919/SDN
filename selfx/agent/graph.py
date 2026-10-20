@@ -19,6 +19,7 @@ rate calculations always have a "before" snapshot.
 from __future__ import annotations
 
 import json
+import hashlib
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional, TypedDict
@@ -63,6 +64,9 @@ class AgentDeps:
     wait_fn: Callable[[float], None] = time.sleep
     interval_sec: float = config.CONTROL_LOOP_INTERVAL_SEC
     link_capacity_kbps: float = config.LINK_BW_MBPS * 1000
+    # The supplied linear Mininet topology has no alternate loop-free route.
+    # A different testbed must explicitly supply validated per-flow egress ports.
+    allowed_reroute_ports_fn: Callable = field(default=lambda dpid, match: [])
 
 
 def _lookup_flow_rate(state_summary: dict, target_match: Optional[dict]) -> float:
@@ -88,7 +92,7 @@ def _lookup_port_current_kbps(state_summary: dict, dpid: Optional[int]) -> float
 
 
 def _meter_id_for(match: dict) -> int:
-    return (abs(hash(json.dumps(match, sort_keys=True))) % 4999) + 1
+    return (int(hashlib.sha256(json.dumps(match, sort_keys=True).encode()).hexdigest()[:8], 16) % 4999) + 1
 
 
 def build_graph(deps: AgentDeps):
@@ -104,7 +108,7 @@ def build_graph(deps: AgentDeps):
                 "latency_before_ms": lat_before}
 
     def decide(state: GraphState) -> dict:
-        few_shot = deps.memory.few_shot_examples()
+        few_shot = deps.memory.few_shot_examples(query=state["state_summary"])
         messages = prompts.build_decide_messages(state["state_summary"], few_shot)
         structured_llm = deps.llm.with_structured_output(DecisionOutput)
 
@@ -154,6 +158,24 @@ def build_graph(deps: AgentDeps):
         result = safety.check(ctx)
         installed_action = result.safe_action
 
+        if installed_action == "reroute" and decision.get("reroute_out_port") not in deps.allowed_reroute_ports_fn(decision.get("target_dpid"), decision.get("target_flow_match")):
+            result = safety.SafetyResult(False, "no validated alternate path for this flow", "no_op")
+            installed_action = "no_op"
+
+        forwarding = []
+        if installed_action == "rate_limit":
+            switch = state["raw_state_before"].get("switches", {}).get(str(decision.get("target_dpid")), {})
+            for flow in switch.get("flows", []):
+                if flow.get("match") == decision.get("target_flow_match"):
+                    for action in flow.get("actions", []):
+                        if isinstance(action, dict) and action.get("type") == "OUTPUT":
+                            forwarding.append(action)
+                        elif isinstance(action, str) and action.startswith("OUTPUT:") and action[7:].isdigit():
+                            forwarding.append({"type": "OUTPUT", "port": int(action[7:])})
+            if not forwarding:
+                result = safety.SafetyResult(False, "cannot preserve observed forwarding output", "no_op")
+                installed_action = "no_op"
+
         if installed_action == "reroute" and decision.get("target_dpid") is not None:
             deps.add_flow_fn(
                 decision["target_dpid"],
@@ -167,8 +189,9 @@ def build_graph(deps: AgentDeps):
             deps.add_flow_fn(
                 decision["target_dpid"],
                 decision["target_flow_match"],
-                [{"type": "METER", "meter_id": meter_id}],
+                [{"type": "METER", "meter_id": meter_id}] + forwarding,
                 priority=200,
+                hard_timeout=max(1, int(deps.interval_sec)),
             )
         # installed_action == "no_op" -> nothing to install
 
@@ -225,8 +248,8 @@ def build_graph(deps: AgentDeps):
         try:
             out = structured_llm.invoke(messages)
             reflection_text = out.reflection
-        except Exception as exc:
-            reflection_text = f"reflection call failed ({exc}); no additional insight recorded."
+        except Exception:
+            reflection_text = "Reflection provider unavailable; no additional insight recorded."
         return {"reflection": reflection_text}
 
     def memorize(state: GraphState) -> dict:

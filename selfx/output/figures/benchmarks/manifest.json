@@ -1,0 +1,2342 @@
+{
+  "schema": "selfx.visuals.v2",
+  "figures": [
+    {
+      "id": "scenario_latency_matrix",
+      "title": "Delay across six traffic scenarios",
+      "caption": "10 paired seeds \u00d7 120 windows \u00d7 8 controllers. Analytical simulation; lower delay is better. O1 is a myopic model reference.",
+      "png": "output\\figures\\benchmarks\\scenario_latency_matrix.png",
+      "svg": "output\\figures\\benchmarks\\scenario_latency_matrix.svg"
+    },
+    {
+      "id": "scenario_latency_intervals",
+      "title": "Seed uncertainty by scenario",
+      "caption": "95% percentile bootstrap intervals across seed means (4,000 resamples). Exploratory comparisons; no multiplicity correction.",
+      "png": "output\\figures\\benchmarks\\scenario_latency_intervals.png",
+      "svg": "output\\figures\\benchmarks\\scenario_latency_intervals.svg"
+    },
+    {
+      "id": "paired_memory_effect",
+      "title": "Memory effect and the guard ablation",
+      "caption": "Negative differences favor A3. Pairing uses identical scenario and seed. A3 versus H1 isolates memory after the common guard.",
+      "png": "output\\figures\\benchmarks\\paired_memory_effect.png",
+      "svg": "output\\figures\\benchmarks\\paired_memory_effect.svg"
+    },
+    {
+      "id": "distribution_ecdf",
+      "title": "Distributions across all evaluated windows",
+      "caption": "Equally sampled scenarios and seeds are pooled. These are distributions of model window means, not individual packet measurements.",
+      "png": "output\\figures\\benchmarks\\distribution_ecdf.png",
+      "svg": "output\\figures\\benchmarks\\distribution_ecdf.svg"
+    },
+    {
+      "id": "metric_tradeoffs",
+      "title": "Delay must be assessed with loss and goodput",
+      "caption": "Each point averages equally over six scenarios and ten seeds. Prefer lower delay and loss, with higher delivered goodput.",
+      "png": "output\\figures\\benchmarks\\metric_tradeoffs.png",
+      "svg": "output\\figures\\benchmarks\\metric_tradeoffs.svg"
+    },
+    {
+      "id": "actions_and_vetoes",
+      "title": "Guarded retrieval removes infeasible action reuse",
+      "caption": "A3 validates retrieval candidates against current demand. B2 is an ECMP-style hash with the same independent safety gate.",
+      "png": "output\\figures\\benchmarks\\actions_and_vetoes.png",
+      "svg": "output\\figures\\benchmarks\\actions_and_vetoes.svg"
+    },
+    {
+      "id": "queue_shift_heatmap",
+      "title": "Queue occupancy before and after a traffic shift",
+      "caption": "One illustrative trace (seed 1740); alternate background load increases halfway through. This figure is not an aggregate estimator.",
+      "png": "output\\figures\\benchmarks\\queue_shift_heatmap.png",
+      "svg": "output\\figures\\benchmarks\\queue_shift_heatmap.svg"
+    },
+    {
+      "id": "offline_control_overhead",
+      "title": "Measured offline control overhead",
+      "caption": "Machine-dependent timing from .venv. Includes observation, decision, validation and measurement; excludes final batched memory persistence.",
+      "png": "output\\figures\\benchmarks\\offline_control_overhead.png",
+      "svg": "output\\figures\\benchmarks\\offline_control_overhead.svg"
+    }
+  ],
+  "atlas": "output\\submission\\SELF_X_Benchmark_Atlas.pdf",
+  "chart_data": {
+    "overall": {
+      "A0": {
+        "latency_ms": 24.665957083194446,
+        "throughput_kbps": 12929.098555555556,
+        "loss_pct": 7.807750570833333,
+        "control_elapsed_ms": 0.051929194444444444,
+        "window_latency_p95_ms": 39.89665479916667,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 24.425844276388887,
+            "throughput_kbps": 12950.643333333333,
+            "loss_pct": 7.6768050875,
+            "control_elapsed_ms": 0.06356111111111111,
+            "window_latency_p95_ms": 39.66786183333333
+          },
+          "1741": {
+            "latency_ms": 24.549705941666666,
+            "throughput_kbps": 12840.44263888889,
+            "loss_pct": 7.874968541666666,
+            "control_elapsed_ms": 0.05610319444444444,
+            "window_latency_p95_ms": 40.13613724166667
+          },
+          "1742": {
+            "latency_ms": 23.80277680972222,
+            "throughput_kbps": 12996.200277777778,
+            "loss_pct": 7.482871147222222,
+            "control_elapsed_ms": 0.04898291666666667,
+            "window_latency_p95_ms": 39.51295065
+          },
+          "1743": {
+            "latency_ms": 25.17487587638889,
+            "throughput_kbps": 12996.849583333333,
+            "loss_pct": 7.9083862513888885,
+            "control_elapsed_ms": 0.055308333333333334,
+            "window_latency_p95_ms": 40.09224439166667
+          },
+          "1744": {
+            "latency_ms": 24.732414920833335,
+            "throughput_kbps": 12890.55486111111,
+            "loss_pct": 7.860162947222222,
+            "control_elapsed_ms": 0.04591902777777778,
+            "window_latency_p95_ms": 39.839133591666666
+          },
+          "1745": {
+            "latency_ms": 24.840528330555557,
+            "throughput_kbps": 12907.262083333333,
+            "loss_pct": 7.897104452777778,
+            "control_elapsed_ms": 0.05095402777777778,
+            "window_latency_p95_ms": 40.09519479166667
+          },
+          "1746": {
+            "latency_ms": 24.83171303611111,
+            "throughput_kbps": 12868.26125,
+            "loss_pct": 7.923500119444445,
+            "control_elapsed_ms": 0.049223055555555555,
+            "window_latency_p95_ms": 40.024460483333336
+          },
+          "1747": {
+            "latency_ms": 24.58827973611111,
+            "throughput_kbps": 12976.96986111111,
+            "loss_pct": 7.628886897222222,
+            "control_elapsed_ms": 0.04878361111111111,
+            "window_latency_p95_ms": 39.80901541666667
+          },
+          "1748": {
+            "latency_ms": 24.269802525,
+            "throughput_kbps": 12935.37125,
+            "loss_pct": 7.696288130555556,
+            "control_elapsed_ms": 0.04686055555555556,
+            "window_latency_p95_ms": 39.73684538333333
+          },
+          "1749": {
+            "latency_ms": 25.443629379166666,
+            "throughput_kbps": 12928.430416666666,
+            "loss_pct": 8.128532133333334,
+            "control_elapsed_ms": 0.05359611111111111,
+            "window_latency_p95_ms": 40.05270420833333
+          }
+        },
+        "decision_p95_ms": 0.0952
+      },
+      "B1": {
+        "latency_ms": 19.8293910975,
+        "throughput_kbps": 13040.720069444444,
+        "loss_pct": 6.940824220833333,
+        "control_elapsed_ms": 0.05246622222222222,
+        "window_latency_p95_ms": 34.12848501999999,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 19.910614702777778,
+            "throughput_kbps": 13050.123611111112,
+            "loss_pct": 6.905476227777778,
+            "control_elapsed_ms": 0.0629611111111111,
+            "window_latency_p95_ms": 36.075490875
+          },
+          "1741": {
+            "latency_ms": 19.87534638611111,
+            "throughput_kbps": 12955.025555555556,
+            "loss_pct": 6.9811671763888885,
+            "control_elapsed_ms": 0.054004722222222225,
+            "window_latency_p95_ms": 36.246303624999996
+          },
+          "1742": {
+            "latency_ms": 19.491689380555556,
+            "throughput_kbps": 13088.824027777777,
+            "loss_pct": 6.766212120833333,
+            "control_elapsed_ms": 0.049854305555555554,
+            "window_latency_p95_ms": 36.05850890833334
+          },
+          "1743": {
+            "latency_ms": 19.80667675138889,
+            "throughput_kbps": 13118.954861111111,
+            "loss_pct": 6.955945609722222,
+            "control_elapsed_ms": 0.05471291666666667,
+            "window_latency_p95_ms": 35.671964708333334
+          },
+          "1744": {
+            "latency_ms": 19.600339280555556,
+            "throughput_kbps": 13013.695,
+            "loss_pct": 6.904112518055555,
+            "control_elapsed_ms": 0.049737500000000004,
+            "window_latency_p95_ms": 36.0695336
+          },
+          "1745": {
+            "latency_ms": 19.564417168055556,
+            "throughput_kbps": 13033.929166666667,
+            "loss_pct": 6.9188872763888885,
+            "control_elapsed_ms": 0.046745833333333334,
+            "window_latency_p95_ms": 35.746564516666666
+          },
+          "1746": {
+            "latency_ms": 20.291765784722223,
+            "throughput_kbps": 12968.28388888889,
+            "loss_pct": 7.146022368055556,
+            "control_elapsed_ms": 0.052402083333333335,
+            "window_latency_p95_ms": 36.47001590833333
+          },
+          "1747": {
+            "latency_ms": 19.51667973611111,
+            "throughput_kbps": 13084.650555555556,
+            "loss_pct": 6.7828823375,
+            "control_elapsed_ms": 0.049688194444444445,
+            "window_latency_p95_ms": 29.377980341666646
+          },
+          "1748": {
+            "latency_ms": 19.871264127777778,
+            "throughput_kbps": 13042.355555555556,
+            "loss_pct": 6.8699320083333335,
+            "control_elapsed_ms": 0.04468305555555556,
+            "window_latency_p95_ms": 29.586764233333316
+          },
+          "1749": {
+            "latency_ms": 20.365117656944445,
+            "throughput_kbps": 13051.358472222222,
+            "loss_pct": 7.177604565277778,
+            "control_elapsed_ms": 0.059872499999999995,
+            "window_latency_p95_ms": 29.981723483333315
+          }
+        },
+        "decision_p95_ms": 0.0917
+      },
+      "B2": {
+        "latency_ms": 22.179604546388887,
+        "throughput_kbps": 12986.273666666666,
+        "loss_pct": 7.363473594861111,
+        "control_elapsed_ms": 0.06132113888888889,
+        "window_latency_p95_ms": 39.0280761375,
+        "vetoes": 1887,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 22.43244079861111,
+            "throughput_kbps": 12993.212361111111,
+            "loss_pct": 7.344003395833333,
+            "control_elapsed_ms": 0.06859555555555555,
+            "window_latency_p95_ms": 38.89423980833333
+          },
+          "1741": {
+            "latency_ms": 22.14606949722222,
+            "throughput_kbps": 12900.40625,
+            "loss_pct": 7.410920847222222,
+            "control_elapsed_ms": 0.06787263888888889,
+            "window_latency_p95_ms": 39.501149016666666
+          },
+          "1742": {
+            "latency_ms": 21.77560473611111,
+            "throughput_kbps": 13041.185,
+            "loss_pct": 7.131501463888889,
+            "control_elapsed_ms": 0.05814430555555555,
+            "window_latency_p95_ms": 38.7211284
+          },
+          "1743": {
+            "latency_ms": 22.007754952777777,
+            "throughput_kbps": 13063.075972222223,
+            "loss_pct": 7.387648255555555,
+            "control_elapsed_ms": 0.06894333333333333,
+            "window_latency_p95_ms": 38.62950841666667
+          },
+          "1744": {
+            "latency_ms": 21.74524297916667,
+            "throughput_kbps": 12964.479027777777,
+            "loss_pct": 7.290002523611111,
+            "control_elapsed_ms": 0.05603,
+            "window_latency_p95_ms": 38.93557439166666
+          },
+          "1745": {
+            "latency_ms": 22.05690486388889,
+            "throughput_kbps": 12984.564722222221,
+            "loss_pct": 7.306432838888889,
+            "control_elapsed_ms": 0.05145236111111111,
+            "window_latency_p95_ms": 39.021255100000005
+          },
+          "1746": {
+            "latency_ms": 22.78180615138889,
+            "throughput_kbps": 12912.464722222223,
+            "loss_pct": 7.5807574055555556,
+            "control_elapsed_ms": 0.05356486111111111,
+            "window_latency_p95_ms": 39.601482925
+          },
+          "1747": {
+            "latency_ms": 21.97830409722222,
+            "throughput_kbps": 13028.506111111112,
+            "loss_pct": 7.224614144444445,
+            "control_elapsed_ms": 0.054760694444444445,
+            "window_latency_p95_ms": 38.67031261666666
+          },
+          "1748": {
+            "latency_ms": 22.222601462500002,
+            "throughput_kbps": 12986.162083333333,
+            "loss_pct": 7.303279344444444,
+            "control_elapsed_ms": 0.05247736111111111,
+            "window_latency_p95_ms": 39.04035629166667
+          },
+          "1749": {
+            "latency_ms": 22.649315925,
+            "throughput_kbps": 12988.680416666666,
+            "loss_pct": 7.655575729166666,
+            "control_elapsed_ms": 0.08137027777777778,
+            "window_latency_p95_ms": 39.265754408333336
+          }
+        },
+        "decision_p95_ms": 0.1113
+      },
+      "A1": {
+        "latency_ms": 16.565428867083334,
+        "throughput_kbps": 12875.30636111111,
+        "loss_pct": 7.9021135368055555,
+        "control_elapsed_ms": 0.059489152777777776,
+        "window_latency_p95_ms": 26.041733444999995,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 16.397419975,
+            "throughput_kbps": 12890.066111111111,
+            "loss_pct": 7.833048075,
+            "control_elapsed_ms": 0.06138777777777778,
+            "window_latency_p95_ms": 24.44912948333332
+          },
+          "1741": {
+            "latency_ms": 17.079676843055555,
+            "throughput_kbps": 12791.686527777778,
+            "loss_pct": 7.9329527083333335,
+            "control_elapsed_ms": 0.06498847222222222,
+            "window_latency_p95_ms": 30.56724608333333
+          },
+          "1742": {
+            "latency_ms": 16.35402711111111,
+            "throughput_kbps": 12918.234722222222,
+            "loss_pct": 7.755927779166667,
+            "control_elapsed_ms": 0.057648194444444446,
+            "window_latency_p95_ms": 26.193382449999998
+          },
+          "1743": {
+            "latency_ms": 16.75018941111111,
+            "throughput_kbps": 12947.853611111112,
+            "loss_pct": 7.952083755555555,
+            "control_elapsed_ms": 0.060295555555555554,
+            "window_latency_p95_ms": 23.855956791666667
+          },
+          "1744": {
+            "latency_ms": 16.30947072777778,
+            "throughput_kbps": 12841.59486111111,
+            "loss_pct": 7.905309279166667,
+            "control_elapsed_ms": 0.05635486111111111,
+            "window_latency_p95_ms": 24.384317983333315
+          },
+          "1745": {
+            "latency_ms": 16.422443547222223,
+            "throughput_kbps": 12870.515555555556,
+            "loss_pct": 7.864795336111111,
+            "control_elapsed_ms": 0.04721972222222222,
+            "window_latency_p95_ms": 28.185269666666663
+          },
+          "1746": {
+            "latency_ms": 17.070501651388888,
+            "throughput_kbps": 12807.819166666666,
+            "loss_pct": 8.086806506944445,
+            "control_elapsed_ms": 0.05372736111111111,
+            "window_latency_p95_ms": 30.69355013333333
+          },
+          "1747": {
+            "latency_ms": 15.991957531944443,
+            "throughput_kbps": 12906.809166666666,
+            "loss_pct": 7.809101595833334,
+            "control_elapsed_ms": 0.04888902777777778,
+            "window_latency_p95_ms": 23.5631718
+          },
+          "1748": {
+            "latency_ms": 16.49340875972222,
+            "throughput_kbps": 12877.508333333333,
+            "loss_pct": 7.827593895833333,
+            "control_elapsed_ms": 0.04957597222222222,
+            "window_latency_p95_ms": 24.225647624999983
+          },
+          "1749": {
+            "latency_ms": 16.7851931125,
+            "throughput_kbps": 12900.975555555555,
+            "loss_pct": 8.053516436111112,
+            "control_elapsed_ms": 0.09480458333333333,
+            "window_latency_p95_ms": 24.29966243333333
+          }
+        },
+        "decision_p95_ms": 0.10520499999999992
+      },
+      "A2": {
+        "latency_ms": 16.964335479027778,
+        "throughput_kbps": 12823.812722222223,
+        "loss_pct": 8.313922304027779,
+        "control_elapsed_ms": 0.2319502361111111,
+        "window_latency_p95_ms": 29.06426315916666,
+        "vetoes": 134,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 16.618647859722223,
+            "throughput_kbps": 12870.641111111112,
+            "loss_pct": 7.961136540277778,
+            "control_elapsed_ms": 0.27108041666666666,
+            "window_latency_p95_ms": 31.071043841666665
+          },
+          "1741": {
+            "latency_ms": 17.228173895833333,
+            "throughput_kbps": 12761.804305555555,
+            "loss_pct": 8.149566170833333,
+            "control_elapsed_ms": 0.29350125,
+            "window_latency_p95_ms": 31.166539075
+          },
+          "1742": {
+            "latency_ms": 17.43806846111111,
+            "throughput_kbps": 12770.892777777777,
+            "loss_pct": 8.966401330555556,
+            "control_elapsed_ms": 0.20489375,
+            "window_latency_p95_ms": 31.320664666666666
+          },
+          "1743": {
+            "latency_ms": 17.60305,
+            "throughput_kbps": 12824.857777777777,
+            "loss_pct": 8.979470284722222,
+            "control_elapsed_ms": 0.21114430555555555,
+            "window_latency_p95_ms": 30.715041433333333
+          },
+          "1744": {
+            "latency_ms": 16.485157383333334,
+            "throughput_kbps": 12817.728194444444,
+            "loss_pct": 8.070973045833334,
+            "control_elapsed_ms": 0.20761444444444443,
+            "window_latency_p95_ms": 30.800277533333333
+          },
+          "1745": {
+            "latency_ms": 16.95878264027778,
+            "throughput_kbps": 12805.843333333334,
+            "loss_pct": 8.389735047222223,
+            "control_elapsed_ms": 0.18397611111111112,
+            "window_latency_p95_ms": 30.759065783333334
+          },
+          "1746": {
+            "latency_ms": 17.371538040277777,
+            "throughput_kbps": 12778.982361111111,
+            "loss_pct": 8.308196859722223,
+            "control_elapsed_ms": 0.20015875,
+            "window_latency_p95_ms": 31.431145591666663
+          },
+          "1747": {
+            "latency_ms": 16.396448777777778,
+            "throughput_kbps": 12903.045833333334,
+            "loss_pct": 7.844147255555556,
+            "control_elapsed_ms": 0.21336833333333333,
+            "window_latency_p95_ms": 24.36419592499998
+          },
+          "1748": {
+            "latency_ms": 16.624698358333333,
+            "throughput_kbps": 12841.476527777779,
+            "loss_pct": 8.119032977777778,
+            "control_elapsed_ms": 0.22188791666666666,
+            "window_latency_p95_ms": 24.372998333333314
+          },
+          "1749": {
+            "latency_ms": 16.918789373611112,
+            "throughput_kbps": 12862.855,
+            "loss_pct": 8.350563527777778,
+            "control_elapsed_ms": 0.31187708333333336,
+            "window_latency_p95_ms": 24.64165940833331
+          }
+        },
+        "decision_p95_ms": 0.500705
+      },
+      "H1": {
+        "latency_ms": 16.648713525277778,
+        "throughput_kbps": 12978.7895,
+        "loss_pct": 7.291487088055556,
+        "control_elapsed_ms": 0.056730333333333334,
+        "window_latency_p95_ms": 26.630335225833328,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 16.55450316527778,
+            "throughput_kbps": 12984.866527777778,
+            "loss_pct": 7.271661851388889,
+            "control_elapsed_ms": 0.066055,
+            "window_latency_p95_ms": 28.696161483333327
+          },
+          "1741": {
+            "latency_ms": 17.1329029,
+            "throughput_kbps": 12893.837916666667,
+            "loss_pct": 7.323479104166667,
+            "control_elapsed_ms": 0.05978916666666667,
+            "window_latency_p95_ms": 30.578950799999998
+          },
+          "1742": {
+            "latency_ms": 16.390673275,
+            "throughput_kbps": 13025.565555555555,
+            "loss_pct": 7.123074018055555,
+            "control_elapsed_ms": 0.05142819444444444,
+            "window_latency_p95_ms": 26.58001805
+          },
+          "1743": {
+            "latency_ms": 16.871980352777776,
+            "throughput_kbps": 13058.938888888888,
+            "loss_pct": 7.2966846125,
+            "control_elapsed_ms": 0.05948125,
+            "window_latency_p95_ms": 23.855956791666667
+          },
+          "1744": {
+            "latency_ms": 16.417608752777777,
+            "throughput_kbps": 12950.502916666666,
+            "loss_pct": 7.262697434722222,
+            "control_elapsed_ms": 0.05277125,
+            "window_latency_p95_ms": 24.384317983333315
+          },
+          "1745": {
+            "latency_ms": 16.45956136111111,
+            "throughput_kbps": 12974.23736111111,
+            "loss_pct": 7.255896306944445,
+            "control_elapsed_ms": 0.04861791666666666,
+            "window_latency_p95_ms": 28.185269666666663
+          },
+          "1746": {
+            "latency_ms": 17.1653659125,
+            "throughput_kbps": 12910.907777777778,
+            "loss_pct": 7.476493283333333,
+            "control_elapsed_ms": 0.049507499999999996,
+            "window_latency_p95_ms": 31.219822424999997
+          },
+          "1747": {
+            "latency_ms": 16.069296020833335,
+            "throughput_kbps": 13019.57138888889,
+            "loss_pct": 7.149536669444444,
+            "control_elapsed_ms": 0.05651194444444445,
+            "window_latency_p95_ms": 23.671853174999995
+          },
+          "1748": {
+            "latency_ms": 16.550702434722222,
+            "throughput_kbps": 12980.710416666667,
+            "loss_pct": 7.219905073611111,
+            "control_elapsed_ms": 0.05476138888888889,
+            "window_latency_p95_ms": 24.225647624999983
+          },
+          "1749": {
+            "latency_ms": 16.874541077777778,
+            "throughput_kbps": 12988.75625,
+            "loss_pct": 7.535442526388889,
+            "control_elapsed_ms": 0.06837972222222222,
+            "window_latency_p95_ms": 24.905354258333325
+          }
+        },
+        "decision_p95_ms": 0.10230499999999992
+      },
+      "A3": {
+        "latency_ms": 16.829420291666665,
+        "throughput_kbps": 12959.598291666667,
+        "loss_pct": 7.442859113194444,
+        "control_elapsed_ms": 0.19703038888888888,
+        "window_latency_p95_ms": 28.03827775833333,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 16.55450316527778,
+            "throughput_kbps": 12984.866527777778,
+            "loss_pct": 7.271661851388889,
+            "control_elapsed_ms": 0.2291198611111111,
+            "window_latency_p95_ms": 28.696161483333327
+          },
+          "1741": {
+            "latency_ms": 17.257007952777776,
+            "throughput_kbps": 12879.522916666667,
+            "loss_pct": 7.4357672430555555,
+            "control_elapsed_ms": 0.19809652777777778,
+            "window_latency_p95_ms": 30.7450788
+          },
+          "1742": {
+            "latency_ms": 17.07300406111111,
+            "throughput_kbps": 12944.664861111112,
+            "loss_pct": 7.763237309722222,
+            "control_elapsed_ms": 0.19796916666666667,
+            "window_latency_p95_ms": 31.238227633333334
+          },
+          "1743": {
+            "latency_ms": 17.49941389583333,
+            "throughput_kbps": 12999.953055555556,
+            "loss_pct": 7.762184427777778,
+            "control_elapsed_ms": 0.1863563888888889,
+            "window_latency_p95_ms": 30.705028175
+          },
+          "1744": {
+            "latency_ms": 16.417608752777777,
+            "throughput_kbps": 12948.685833333333,
+            "loss_pct": 7.278144358333333,
+            "control_elapsed_ms": 0.17651208333333335,
+            "window_latency_p95_ms": 24.384317983333315
+          },
+          "1745": {
+            "latency_ms": 16.7731272375,
+            "throughput_kbps": 12940.544722222223,
+            "loss_pct": 7.518890902777778,
+            "control_elapsed_ms": 0.17352944444444443,
+            "window_latency_p95_ms": 30.591286025
+          },
+          "1746": {
+            "latency_ms": 17.224998318055555,
+            "throughput_kbps": 12908.706944444444,
+            "loss_pct": 7.4938207694444445,
+            "control_elapsed_ms": 0.18626597222222221,
+            "window_latency_p95_ms": 31.219822424999997
+          },
+          "1747": {
+            "latency_ms": 16.069296020833335,
+            "throughput_kbps": 13019.57138888889,
+            "loss_pct": 7.149536669444444,
+            "control_elapsed_ms": 0.19462166666666667,
+            "window_latency_p95_ms": 23.671853174999995
+          },
+          "1748": {
+            "latency_ms": 16.550702434722222,
+            "throughput_kbps": 12980.710416666667,
+            "loss_pct": 7.219905073611111,
+            "control_elapsed_ms": 0.17824152777777777,
+            "window_latency_p95_ms": 24.225647624999983
+          },
+          "1749": {
+            "latency_ms": 16.874541077777778,
+            "throughput_kbps": 12988.75625,
+            "loss_pct": 7.535442526388889,
+            "control_elapsed_ms": 0.24959125,
+            "window_latency_p95_ms": 24.905354258333325
+          }
+        },
+        "decision_p95_ms": 0.4951299999999981
+      },
+      "O1": {
+        "latency_ms": 16.700084045277777,
+        "throughput_kbps": 12986.886416666666,
+        "loss_pct": 7.246328079444445,
+        "control_elapsed_ms": 0.11683887500000001,
+        "window_latency_p95_ms": 26.986619074999993,
+        "vetoes": 0,
+        "seed_means": {
+          "1740": {
+            "latency_ms": 16.436899269444446,
+            "throughput_kbps": 12986.430138888889,
+            "loss_pct": 7.263201576388889,
+            "control_elapsed_ms": 0.13923069444444444,
+            "window_latency_p95_ms": 24.396846391666653
+          },
+          "1741": {
+            "latency_ms": 17.311090244444443,
+            "throughput_kbps": 12910.140416666667,
+            "loss_pct": 7.232759343055555,
+            "control_elapsed_ms": 0.11673138888888888,
+            "window_latency_p95_ms": 32.88882794166666
+          },
+          "1742": {
+            "latency_ms": 16.473548301388888,
+            "throughput_kbps": 13035.034027777778,
+            "loss_pct": 7.070003034722222,
+            "control_elapsed_ms": 0.11392569444444445,
+            "window_latency_p95_ms": 27.08216350833333
+          },
+          "1743": {
+            "latency_ms": 16.88134782638889,
+            "throughput_kbps": 13068.339444444444,
+            "loss_pct": 7.245028484722222,
+            "control_elapsed_ms": 0.10606750000000001,
+            "window_latency_p95_ms": 24.147295924999998
+          },
+          "1744": {
+            "latency_ms": 16.471742406944443,
+            "throughput_kbps": 12956.807777777778,
+            "loss_pct": 7.2278727555555555,
+            "control_elapsed_ms": 0.10555027777777778,
+            "window_latency_p95_ms": 25.111423874999982
+          },
+          "1745": {
+            "latency_ms": 16.555546552777777,
+            "throughput_kbps": 12985.817500000001,
+            "loss_pct": 7.192753845833334,
+            "control_elapsed_ms": 0.10491847222222223,
+            "window_latency_p95_ms": 28.839205749999994
+          },
+          "1746": {
+            "latency_ms": 17.189754852777778,
+            "throughput_kbps": 12918.506111111112,
+            "loss_pct": 7.433238388888889,
+            "control_elapsed_ms": 0.11402652777777778,
+            "window_latency_p95_ms": 32.16454095833333
+          },
+          "1747": {
+            "latency_ms": 16.183462069444445,
+            "throughput_kbps": 13027.742916666666,
+            "loss_pct": 7.102342616666667,
+            "control_elapsed_ms": 0.10774180555555556,
+            "window_latency_p95_ms": 26.267012724999997
+          },
+          "1748": {
+            "latency_ms": 16.57824454861111,
+            "throughput_kbps": 12985.250833333334,
+            "loss_pct": 7.194287226388889,
+            "control_elapsed_ms": 0.12270111111111111,
+            "window_latency_p95_ms": 24.30692542499998
+          },
+          "1749": {
+            "latency_ms": 16.919204380555556,
+            "throughput_kbps": 12994.795,
+            "loss_pct": 7.501793522222222,
+            "control_elapsed_ms": 0.13749527777777779,
+            "window_latency_p95_ms": 24.661948249999995
+          }
+        },
+        "decision_p95_ms": 0.2140149999999998
+      }
+    },
+    "scenario_latency": {
+      "mixed": {
+        "A0": 30.451519805833332,
+        "B1": 27.3843995525,
+        "B2": 28.7945219725,
+        "A1": 23.7274918125,
+        "A2": 24.5709041275,
+        "H1": 23.89864301,
+        "A3": 24.37198011916667,
+        "O1": 23.774610150833333
+      },
+      "flash": {
+        "A0": 26.37326853,
+        "B1": 10.796983465,
+        "B2": 18.760771745833335,
+        "A1": 10.042372376666666,
+        "A2": 11.596333102500001,
+        "H1": 10.092264315,
+        "A3": 10.703167804166666,
+        "O1": 10.039237353333334
+      },
+      "alternate": {
+        "A0": 21.818593870833332,
+        "B1": 21.818593870833332,
+        "B2": 21.818593870833332,
+        "A1": 13.288117230833333,
+        "A2": 13.284183861666667,
+        "H1": 13.513113630833333,
+        "A3": 13.513113630833333,
+        "O1": 13.634416004166667
+      },
+      "shift": {
+        "A0": 25.583206439999998,
+        "B1": 15.207215844166667,
+        "B2": 19.934585836666667,
+        "A1": 8.566022490833333,
+        "A2": 8.566022490833333,
+        "H1": 8.619690904166667,
+        "A3": 8.619690904166667,
+        "O1": 8.983671471666666
+      },
+      "overload": {
+        "A0": 35.7691538525,
+        "B1": 35.7691538525,
+        "B2": 35.7691538525,
+        "A1": 35.768569291666665,
+        "A2": 35.768569291666665,
+        "H1": 35.768569291666665,
+        "A3": 35.768569291666665,
+        "O1": 35.768569291666665
+      },
+      "light": {
+        "A0": 8.0,
+        "B1": 8.0,
+        "B2": 8.0,
+        "A1": 8.0,
+        "A2": 8.0,
+        "H1": 8.0,
+        "A3": 8.0,
+        "O1": 8.0
+      }
+    },
+    "count": 57600,
+    "seeds": 10,
+    "cycles": 120,
+    "scenarios": {
+      "mixed": "Repeated mixed load",
+      "flash": "Primary flash crowd",
+      "alternate": "Busy alternate path",
+      "shift": "Traffic distribution shift",
+      "overload": "Persistent dual overload",
+      "light": "Light-load control"
+    },
+    "controllers": {
+      "A0": "Static primary",
+      "B1": "Least loaded",
+      "B2": "Guarded ECMP-style hash",
+      "A1": "Original no memory",
+      "A2": "Original embedding memory",
+      "H1": "Guarded no memory",
+      "A3": "Guarded balanced memory",
+      "O1": "Myopic model reference"
+    },
+    "wall_seconds": 11.326484900000196,
+    "paired": {
+      "mixed": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": -0.19892400833333213,
+            "ci95": [
+              -0.5969260165833336,
+              0.08502273660416766
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 114.72058333333352,
+            "ci95": [
+              85.46345208333368,
+              145.90654375000003
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -0.9295692408333336,
+            "ci95": [
+              -1.1923903016041673,
+              -0.6753831291666668
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.019840249241666667,
+            "ci95": [
+              0.015107602011458334,
+              0.025367555435625005
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -0.4247708099999997,
+            "ci95": [
+              -0.9705374700000029,
+              -0.0693799449999993
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": -5.916666666666667,
+            "ci95": [
+              -10.499999999999998,
+              -2.1666666666666665
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.009558666666666668,
+            "ci95": [
+              -0.03274706875,
+              0.014350549999999995
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.4733371091666669,
+            "ci95": [
+              0.17126789333333364,
+              0.830164216291667
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -43.97433333333338,
+            "ci95": [
+              -79.45003333333321,
+              -13.523833333333277
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.34086005916666656,
+            "ci95": [
+              0.10677478568750008,
+              0.6123088000625004
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.010492606483333333,
+            "ci95": [
+              -0.01840177899,
+              -0.0036295688995833272
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.8091249350000027,
+            "ci95": [
+              0.061135790000000155,
+              2.1069538900000055
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.17586466666666667,
+            "ci95": [
+              0.1614316083333333,
+              0.19609786041666666
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.1711511975000004,
+            "ci95": [
+              0.07594770043750046,
+              0.277454633166667
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 52.88608333333359,
+            "ci95": [
+              40.29011041666705,
+              63.787364583333854
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -0.341654995,
+            "ci95": [
+              -0.412301965,
+              -0.2611401537083334
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.006312789525,
+            "ci95": [
+              0.004534908080625,
+              0.008051277578125
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.002587999999999998,
+            "ci95": [
+              -0.011831564583333325,
+              0.004215762500000005
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.8434123149999995,
+            "ci95": [
+              0.5337604547916653,
+              1.181156690520834
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -105.80883333333331,
+            "ci95": [
+              -149.06078958333322,
+              -65.09300416666689
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.9287743050000001,
+            "ci95": [
+              0.5845884187083333,
+              1.2913916387708337
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.0240200662,
+            "ci95": [
+              -0.032192748698541676,
+              -0.016644322182916664
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 1.2338957450000023,
+            "ci95": [
+              0.3764593276249987,
+              2.5429134702500056
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 5.916666666666667,
+            "ci95": [
+              2.1666666666666665,
+              10.499999999999998
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.18283533333333332,
+            "ci95": [
+              0.17145967291666667,
+              0.19721904375000002
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": -3.0124194333333323,
+            "ci95": [
+              -3.5376216955416644,
+              -2.4706775225625
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -97.35316666666658,
+            "ci95": [
+              -133.70341249999998,
+              -66.41943541666673
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.6782720366666665,
+            "ci95": [
+              0.4479176783124996,
+              0.9508890348333332
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.007560239608333334,
+            "ci95": [
+              -0.0003908698908333325,
+              0.014824642832916667
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -1.1310346899999992,
+            "ci95": [
+              -1.6993601452500033,
+              -0.5523556474999956
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.18128816666666667,
+            "ci95": [
+              0.16671139583333336,
+              0.20031491875000002
+            ]
+          }
+        }
+      },
+      "flash": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": -0.8931652983333336,
+            "ci95": [
+              -1.3255540199375,
+              -0.5173906843958332
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 49.87558333333345,
+            "ci95": [
+              -3.32874583333316,
+              124.61965416666658
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -0.45824620833333324,
+            "ci95": [
+              -1.1333421221874997,
+              0.02459349718750005
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.01535247545000001,
+            "ci95": [
+              0.003972164243125013,
+              0.030136732793541666
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -6.404826724999993,
+            "ci95": [
+              -14.86398487575003,
+              -1.1438267849999888
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": -5.25,
+            "ci95": [
+              -6.916666666666666,
+              -3.3333333333333335
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.074216,
+            "ci95": [
+              -0.12731655833333333,
+              -0.01868890625
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.6109034891666667,
+            "ci95": [
+              0.0,
+              1.3734998225000001
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -71.1729166666668,
+            "ci95": [
+              -160.70774999999958,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.5673720916666667,
+            "ci95": [
+              0.0,
+              1.2807348158333336
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.015969560549999998,
+            "ci95": [
+              -0.03589502236666666,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 7.638530260000003,
+            "ci95": [
+              0.0,
+              17.140160840000004
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.19488924999999999,
+            "ci95": [
+              0.16164019166666665,
+              0.23186400833333334
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.049891938333333385,
+            "ci95": [
+              0.001955252499999993,
+              0.12208581916666664
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.00038808703333333415,
+            "ci95": [
+              -0.0009499679666666705,
+              -1.564201666666709e-05
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 2.8579255550000013,
+            "ci95": [
+              0.0,
+              7.95436395500001
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.012196916666666667,
+            "ci95": [
+              -0.049751637499999994,
+              0.012513766666666667
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 1.5539607258333337,
+            "ci95": [
+              0.6736211346666668,
+              2.677571934166667
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -121.04850000000025,
+            "ci95": [
+              -282.31113125000024,
+              2.789622916666578
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 1.0256182999999999,
+            "ci95": [
+              -0.02143894797916665,
+              2.3917793590416663
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.03171012303333334,
+            "ci95": [
+              -0.06581688510124999,
+              -0.005158159500208341
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 16.901282539999997,
+            "ci95": [
+              6.6072082089999435,
+              27.499716355125045
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 5.25,
+            "ci95": [
+              3.3333333333333335,
+              6.916666666666666
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.25690833333333335,
+            "ci95": [
+              0.22346171041666665,
+              0.29102815833333334
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": -0.09381566083333386,
+            "ci95": [
+              -0.6323685423541672,
+              0.5682371235208327
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -75.85708333333332,
+            "ci95": [
+              -165.9087249999996,
+              -6.113112499999782
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.6037503541666667,
+            "ci95": [
+              0.04803045154166669,
+              1.321087434416667
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.011390294333333323,
+            "ci95": [
+              -0.030861128001041658,
+              0.0032838765647916785
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -6.039330844999994,
+            "ci95": [
+              -14.64070298500003,
+              -0.5939304467499704
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.19525599999999999,
+            "ci95": [
+              0.16412734583333333,
+              0.22927863333333337
+            ]
+          }
+        }
+      },
+      "alternate": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": 0.22892976916666666,
+            "ci95": [
+              0.15350842843750015,
+              0.3079470875208332
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 371.9739166666659,
+            "ci95": [
+              353.68974999999955,
+              391.1672916666658
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -2.1874127966666665,
+            "ci95": [
+              -2.2993245785,
+              -2.0831878012499994
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.04981580556666667,
+            "ci95": [
+              0.04779745590208333,
+              0.05189970427791667
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.040517333333333336,
+            "ci95": [
+              -0.06180763750000001,
+              -0.02118048124999999
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.13353241666666665,
+            "ci95": [
+              0.10048161458333334,
+              0.18475322083333337
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.2249964000000002,
+            "ci95": [
+              0.14863033572916684,
+              0.3035937622500006
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 303.5729166666657,
+            "ci95": [
+              279.29180833333226,
+              325.01129583333244
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -1.7575837566666668,
+            "ci95": [
+              -1.8801768685208335,
+              -1.6190171761666665
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.04007690211666667,
+            "ci95": [
+              0.03718242541770833,
+              0.042676569791041674
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.010093583333333335,
+            "ci95": [
+              -0.0001588916666666668,
+              0.026100610416666677
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": -0.003933369166666445,
+            "ci95": [
+              -0.005453121645832977,
+              -0.0025549376874998983
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -68.40100000000021,
+            "ci95": [
+              -80.94560000000152,
+              -54.2271375
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.4298290399999999,
+            "ci95": [
+              0.33952299002083347,
+              0.5075522721041668
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.00973890345,
+            "ci95": [
+              -0.011511487118541665,
+              -0.007710017918541668
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.18414333333333333,
+            "ci95": [
+              0.1399727166666667,
+              0.24331717500000002
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": -8.30548024,
+            "ci95": [
+              -9.058716098166666,
+              -7.574078002020833
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -154.0859166666669,
+            "ci95": [
+              -170.8586750000001,
+              -137.7950916666665
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.8381407808333334,
+            "ci95": [
+              0.7495910780208335,
+              0.9303059000208336
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.03905936425,
+            "ci95": [
+              0.03514235551875,
+              0.04267447643895834
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -1.7950445850000007,
+            "ci95": [
+              -2.0416047918750015,
+              -1.5310560688750012
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.15122091666666665,
+            "ci95": [
+              0.10957411874999998,
+              0.21883583958333333
+            ]
+          }
+        }
+      },
+      "shift": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": 0.05366841333333312,
+            "ci95": [
+              0.019249902395833143,
+              0.099188361645833
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 278.14333333333343,
+            "ci95": [
+              265.4487958333334,
+              290.6621729166668
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -1.6511508991666668,
+            "ci95": [
+              -1.7226884662291668,
+              -1.5792544815208334
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.03842643350833334,
+            "ci95": [
+              0.03675926823854167,
+              0.04014342281000001
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.6736851300000009,
+            "ci95": [
+              0.07925448499999951,
+              1.3882221873750025
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.06678233333333333,
+            "ci95": [
+              -0.15054542083333333,
+              -0.020208733333333326
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.13242641666666666,
+            "ci95": [
+              0.11084475833333335,
+              0.15710280833333332
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.05366841333333312,
+            "ci95": [
+              0.019249902395833143,
+              0.099188361645833
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 264.43983333333364,
+            "ci95": [
+              251.78609791666747,
+              277.23199375000047
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": -1.5645199408333332,
+            "ci95": [
+              -1.6384557699999998,
+              -1.4921342861458333
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.036463843925,
+            "ci95": [
+              0.034761503254375006,
+              0.038230520114375006
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.6736851300000009,
+            "ci95": [
+              0.07925448499999951,
+              1.3882221873750025
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.008501000000000002,
+            "ci95": [
+              -0.015289583333333334,
+              -0.002550691666666664
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -13.703499999999803,
+            "ci95": [
+              -17.978177083333225,
+              -9.43298958333316
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.08663095833333342,
+            "ci95": [
+              0.05970589072916671,
+              0.11355705112500014
+            ]
+          },
+          "reward": {
+            "mean_difference": -0.001962589583333335,
+            "ci95": [
+              -0.00257521305791667,
+              -0.0013514653837500001
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.19070775,
+            "ci95": [
+              0.13305255625000004,
+              0.28554033333333334
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": -6.58752494,
+            "ci95": [
+              -6.9456618053333345,
+              -6.242344289687499
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": -159.43450000000013,
+            "ci95": [
+              -170.9124250000004,
+              -146.5206062500003
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.8920461825,
+            "ci95": [
+              0.8200068105625,
+              0.9565599871249999
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.022692160458333333,
+            "ci95": [
+              0.01944665818291667,
+              0.026285520735416668
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": -27.57583345,
+            "ci95": [
+              -28.3856173245,
+              -26.546004748500007
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.13013766666666668,
+            "ci95": [
+              0.10985676458333332,
+              0.15365247291666667
+            ]
+          }
+        }
+      },
+      "overload": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.09253825,
+            "ci95": [
+              0.08874880208333333,
+              0.0968768
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.19551883333333334,
+            "ci95": [
+              0.19265586666666665,
+              0.19909260416666666
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.0007552499999999996,
+            "ci95": [
+              -0.0012005229166666667,
+              0.0027751875
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.10373583333333333,
+            "ci95": [
+              0.10068719999999999,
+              0.10694700208333334
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": -0.0005845608333338248,
+            "ci95": [
+              -0.0007131551875008313,
+              -0.00046974122916701336
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 4.676491666666667e-06,
+            "ci95": [
+              3.757923541666667e-06,
+              5.7052531249999995e-06
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.20109741666666667,
+            "ci95": [
+              0.19762421458333335,
+              0.20524750000000003
+            ]
+          }
+        }
+      },
+      "light": {
+        "A3_minus_A2": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.110983,
+            "ci95": [
+              -0.13465337708333336,
+              -0.09012032291666666
+            ]
+          }
+        },
+        "A3_minus_H1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.009568749999999999,
+            "ci95": [
+              0.005581031249999999,
+              0.015271785416666668
+            ]
+          }
+        },
+        "H1_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": -0.004115833333333334,
+            "ci95": [
+              -0.011897304166666667,
+              0.001266677083333333
+            ]
+          }
+        },
+        "A2_minus_A1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.11643591666666667,
+            "ci95": [
+              0.0993097,
+              0.1363741041666667
+            ]
+          }
+        },
+        "A3_minus_B1": {
+          "latency_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "loss_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean_difference": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean_difference": 0.008384833333333333,
+            "ci95": [
+              0.0026862104166666635,
+              0.015189954166666667
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema": "selfx.visuals.v3",
+  "figures": [
+    {
+      "id": "traffic_scenarios",
+      "title": "Generated traffic used by every controller",
+      "caption": "Illustrative seed 1760. Ten matched seeds per scenario; virtual five-second windows. These are synthetic aggregate flow demands.",
+      "png": "output\\benchmarks\\v3\\figures\\traffic_scenarios.png",
+      "svg": "output\\benchmarks\\v3\\figures\\traffic_scenarios.svg"
+    },
+    {
+      "id": "scenario_latency_matrix",
+      "title": "Held-out delay across eight traffic scenarios",
+      "caption": "86,400 windows = 8 scenarios \u00d7 10 held-out seeds \u00d7 120 windows \u00d7 9 controllers. O1 is a privileged myopic model reference.",
+      "png": "output\\benchmarks\\v3\\figures\\scenario_latency_matrix.png",
+      "svg": "output\\benchmarks\\v3\\figures\\scenario_latency_matrix.svg"
+    },
+    {
+      "id": "paired_memory_effect",
+      "title": "Adaptive memory compared with previous guarded memory",
+      "caption": "A4 minus A3. Negative favors A4. 95% paired seed bootstrap intervals, 4,000 draws; exploratory with no multiplicity correction.",
+      "png": "output\\benchmarks\\v3\\figures\\paired_memory_effect.png",
+      "svg": "output\\benchmarks\\v3\\figures\\paired_memory_effect.svg"
+    },
+    {
+      "id": "guard_ablation",
+      "title": "The memory ablation after the same base guard",
+      "caption": "A4 minus H1. Negative favors A4. 95% paired seed bootstrap intervals, 4,000 draws; exploratory with no multiplicity correction.",
+      "png": "output\\benchmarks\\v3\\figures\\guard_ablation.png",
+      "svg": "output\\benchmarks\\v3\\figures\\guard_ablation.svg"
+    },
+    {
+      "id": "metric_tradeoffs",
+      "title": "Delay must be judged together with loss and goodput",
+      "caption": "Equal weights across the eight primary scenarios and ten paired seeds. A4 overlaps H1; their estimates are identical in this suite.",
+      "png": "output\\benchmarks\\v3\\figures\\metric_tradeoffs.png",
+      "svg": "output\\benchmarks\\v3\\figures\\metric_tradeoffs.svg"
+    },
+    {
+      "id": "distribution_ecdf",
+      "title": "Distributions over the measured simulation windows",
+      "caption": "These are distributions of modeled window means, not packet-delay distributions. A4 and H1 curves overlap.",
+      "png": "output\\benchmarks\\v3\\figures\\distribution_ecdf.png",
+      "svg": "output\\benchmarks\\v3\\figures\\distribution_ecdf.svg"
+    },
+    {
+      "id": "actions_and_vetoes",
+      "title": "Action feasibility and installed behavior",
+      "caption": "All controllers share the independent action validator. A4 had zero rejected proposals; this does not by itself prove a performance improvement.",
+      "png": "output\\benchmarks\\v3\\figures\\actions_and_vetoes.png",
+      "svg": "output\\benchmarks\\v3\\figures\\actions_and_vetoes.svg"
+    },
+    {
+      "id": "queue_shift_heatmap",
+      "title": "Queue occupancy around the alternate-path traffic shift",
+      "caption": "One illustrative trace, seed 1760. The dashed line marks the demand shift; it is not an aggregate estimator.",
+      "png": "output\\benchmarks\\v3\\figures\\queue_shift_heatmap.png",
+      "svg": "output\\benchmarks\\v3\\figures\\queue_shift_heatmap.svg"
+    },
+    {
+      "id": "offline_control_overhead",
+      "title": "Measured control computation in the isolated virtual environment",
+      "caption": "Includes the control computation, observation and measurement; excludes final batched memory persistence. Timing depends on this computer.",
+      "png": "output\\benchmarks\\v3\\figures\\offline_control_overhead.png",
+      "svg": "output\\benchmarks\\v3\\figures\\offline_control_overhead.svg"
+    },
+    {
+      "id": "api_latency_compare",
+      "title": "Actual Gemini control latency after the pipeline changes",
+      "caption": "Two fresh seeds, 24 cycles per mode. Full-cycle timing includes reflection and pacing. Smaller call counts do not prove a faster provider server.",
+      "png": "output\\benchmarks\\v3\\figures\\api_latency_compare.png",
+      "svg": "output\\benchmarks\\v3\\figures\\api_latency_compare.svg"
+    },
+    {
+      "id": "api_call_origins",
+      "title": "Provider work and local reuse are counted separately",
+      "caption": "Cache, bypass, memory reuse and provider failures are never labeled as new successful API decisions. Local reflection makes no provider request.",
+      "png": "output\\benchmarks\\v3\\figures\\api_call_origins.png",
+      "svg": "output\\benchmarks\\v3\\figures\\api_call_origins.svg"
+    },
+    {
+      "id": "api_timeline",
+      "title": "Measured full-cycle latency by simulated traffic window",
+      "caption": "Mode order reverses on the second seed. Timing includes all decision and reflection work; the dashed line is the five-second target.",
+      "png": "output\\benchmarks\\v3\\figures\\api_timeline.png",
+      "svg": "output\\benchmarks\\v3\\figures\\api_timeline.svg"
+    },
+    {
+      "id": "free_model_availability",
+      "title": "Compact free-model checks: 8/17 valid responses",
+      "caption": "One healthy-network schema check for every discovered zero-price :free model. Availability is not a congestion-control quality benchmark.",
+      "png": "output\\benchmarks\\v3\\figures\\free_model_availability.png",
+      "svg": "output\\benchmarks\\v3\\figures\\free_model_availability.svg"
+    },
+    {
+      "id": "memory_sensitivity",
+      "title": "Targeted memory diagnostic near the capacity boundary",
+      "caption": "Post-hoc constructed stress test, separate from the primary average. Ten seeds per level; all cold-start windows retained. Higher reward trades delay against goodput and loss.",
+      "png": "output\\benchmarks\\v3\\figures\\memory_sensitivity.png",
+      "svg": "output\\benchmarks\\v3\\figures\\memory_sensitivity.svg"
+    },
+    {
+      "id": "memory_learning",
+      "title": "Memory adapts after observed harmful throttling",
+      "caption": "Constructed excess = 0.0001 Mbps diagnostic. A4 learns from earlier action outcomes; the plotted privileged O1 reference has simulator access.",
+      "png": "output\\benchmarks\\v3\\figures\\memory_learning.png",
+      "svg": "output\\benchmarks\\v3\\figures\\memory_learning.svg"
+    }
+  ],
+  "source_sha256": {
+    "output\\benchmarks\\v3\\summary.json": "27f685d0d392ef31e939c30b38bae5f41c772156820e3d9d6900745b2861d74b",
+    "output\\benchmarks\\v3\\metrics.csv": "4994f1945faed64ad5c536135b594446c0e376710437f7ca502c229bd4cef834",
+    "output\\benchmarks\\v3\\latency_gemini\\summary.json": "b1f715dd7aef4b3e9c2e6e95f6eb2e098f737ead581058035eadd20552a078e2",
+    "output\\benchmarks\\v3\\latency_gemini\\metrics.csv": "104c950958694a63e720b960833b156ddf6949493e7e4e5c7df50c6c70e094c1",
+    "output\\benchmarks\\v3\\memory_sensitivity\\summary.json": "a3614da06ae1b73b6753483372e4c4fbb8e1ac6778672b3b8c4ca52e86ac7c92",
+    "output\\benchmarks\\v3\\free_model_checks.json": "38e868adef716b1382167aa519a760a491060bd356ee94887eb6cc408e1316dc"
+  },
+  "atlas_pages": 15
+}

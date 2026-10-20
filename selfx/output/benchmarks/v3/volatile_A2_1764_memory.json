@@ -1,0 +1,2162 @@
+[
+  {
+    "cycle": 1,
+    "timestamp": "2026-10-20T07:50:06.705691+00:00",
+    "state_summary": {
+      "latency_ms": 49.587304,
+      "throughput_kbps": 12022.9,
+      "loss_pct": 1.113643,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6834.2
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10135.400000000001,
+          "util_pct": 101.35400000000001
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2022.8999999999999,
+          "util_pct": 20.229
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 3.3012,
+        "alternate_background_mbps": 2.0229,
+        "elephant_mbps": 6.8342,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.33012,
+        0.20229,
+        0.68342,
+        1.0,
+        0.0,
+        1.01354
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline threshold controller: 85% primary trigger and 90% alternate ceiling."
+    },
+    "reward": 0.36183846999999997,
+    "reflection": "Measured reward 0.361838; total loss 0.0000%."
+  },
+  {
+    "cycle": 2,
+    "timestamp": "2026-10-20T07:50:06.705691+00:00",
+    "state_summary": {
+      "latency_ms": 33.301255,
+      "throughput_kbps": 17238.0,
+      "loss_pct": 1.653479,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3234.4
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10391.5,
+          "util_pct": 103.915
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 7238.0,
+          "util_pct": 72.38000000000001
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.1571,
+        "alternate_background_mbps": 7.238,
+        "elephant_mbps": 3.2344,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.71571,
+        0.7238,
+        0.32344,
+        0.0,
+        0.0,
+        1.03915
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 2588,
+      "rationale": "Offline threshold controller: 85% primary trigger and 90% alternate ceiling."
+    },
+    "reward": 0.1618870099999999,
+    "reflection": "Measured reward 0.161887; total loss 3.6666%."
+  },
+  {
+    "cycle": 3,
+    "timestamp": "2026-10-20T07:50:06.706694+00:00",
+    "state_summary": {
+      "latency_ms": 38.416066,
+      "throughput_kbps": 16088.4,
+      "loss_pct": 12.186125,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6950.700000000001
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12346.5,
+          "util_pct": 123.465
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 6088.4,
+          "util_pct": 60.884
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.3958,
+        "alternate_background_mbps": 6.0884,
+        "elephant_mbps": 6.9507,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.5395800000000001,
+        0.60884,
+        0.6950700000000001,
+        0.0,
+        0.0,
+        1.23465
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 5561,
+      "rationale": "Offline threshold controller: 85% primary trigger and 90% alternate ceiling."
+    },
+    "reward": 0.007694784000000027,
+    "reflection": "Measured reward 0.007695; total loss 12.1861%."
+  },
+  {
+    "cycle": 5,
+    "timestamp": "2026-10-20T07:50:06.706694+00:00",
+    "state_summary": {
+      "latency_ms": 51.494524,
+      "throughput_kbps": 11495.7,
+      "loss_pct": 21.048728,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 7199.7
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 13064.8,
+          "util_pct": 130.648
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1495.7,
+          "util_pct": 14.957
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.8651,
+        "alternate_background_mbps": 1.4957,
+        "elephant_mbps": 7.1997,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.58651,
+        0.14957,
+        0.71997,
+        1.0,
+        0.0,
+        1.30648
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 1; rebuild parameters for current flow."
+    },
+    "reward": 0.8096594319999999,
+    "reflection": "Measured reward 0.809659; total loss 0.0000%."
+  },
+  {
+    "cycle": 7,
+    "timestamp": "2026-10-20T07:50:06.706694+00:00",
+    "state_summary": {
+      "latency_ms": 38.58296,
+      "throughput_kbps": 15609.0,
+      "loss_pct": 6.011236,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 7495.8
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11104.7,
+          "util_pct": 111.04700000000001
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5609.0,
+          "util_pct": 56.09
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 3.6089,
+        "alternate_background_mbps": 5.609,
+        "elephant_mbps": 7.4958,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.36089000000000004,
+        0.5609,
+        0.74958,
+        0.0,
+        0.0,
+        1.11047
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 5997,
+      "rationale": "Offline case retrieval: reuse action from similar episode 3; rebuild parameters for current flow."
+    },
+    "reward": 0.18357309999999996,
+    "reflection": "Measured reward 0.183573; total loss 8.9675%."
+  },
+  {
+    "cycle": 18,
+    "timestamp": "2026-10-20T07:50:06.709696+00:00",
+    "state_summary": {
+      "latency_ms": 40.679978,
+      "throughput_kbps": 15061.2,
+      "loss_pct": 16.998609,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 8680.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 13204.999999999998,
+          "util_pct": 132.04999999999998
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5061.200000000001,
+          "util_pct": 50.612
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.5241,
+        "alternate_background_mbps": 5.0612,
+        "elephant_mbps": 8.6809,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.45241,
+        0.50612,
+        0.8680899999999999,
+        0.0,
+        0.0,
+        1.3204999999999998
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 6945,
+      "rationale": "Offline case retrieval: reuse action from similar episode 7; rebuild parameters for current flow."
+    },
+    "reward": 0.0048957120000000034,
+    "reflection": "Measured reward 0.004896; total loss 16.9986%."
+  },
+  {
+    "cycle": 24,
+    "timestamp": "2026-10-20T07:50:06.710692+00:00",
+    "state_summary": {
+      "latency_ms": 53.442579,
+      "throughput_kbps": 10748.8,
+      "loss_pct": 15.991296,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 7618.8
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12165.099999999999,
+          "util_pct": 121.65099999999998
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 748.8000000000001,
+          "util_pct": 7.488
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.5463,
+        "alternate_background_mbps": 0.7488,
+        "elephant_mbps": 7.6188,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.45463,
+        0.07488,
+        0.76188,
+        0.0,
+        0.0,
+        1.21651
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline threshold controller: 85% primary trigger and 90% alternate ceiling."
+    },
+    "reward": 0.6966615920000001,
+    "reflection": "Measured reward 0.696662; total loss 0.0000%."
+  },
+  {
+    "cycle": 26,
+    "timestamp": "2026-10-20T07:50:06.712027+00:00",
+    "state_summary": {
+      "latency_ms": 42.902724,
+      "throughput_kbps": 14090.6,
+      "loss_pct": 17.205286,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 9536.4
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 13048.9,
+          "util_pct": 130.489
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 4090.6000000000004,
+          "util_pct": 40.906000000000006
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 3.5125,
+        "alternate_background_mbps": 4.0906,
+        "elephant_mbps": 9.5364,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.35125,
+        0.40906000000000003,
+        0.95364,
+        0.0,
+        0.0,
+        1.3048899999999999
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 7630,
+      "rationale": "Offline case retrieval: reuse action from similar episode 7; rebuild parameters for current flow."
+    },
+    "reward": 0.007768103999999994,
+    "reflection": "Measured reward 0.007768; total loss 17.2053%."
+  },
+  {
+    "cycle": 31,
+    "timestamp": "2026-10-20T07:50:06.713094+00:00",
+    "state_summary": {
+      "latency_ms": 39.783567,
+      "throughput_kbps": 15731.4,
+      "loss_pct": 3.165165,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6039.1
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10514.2,
+          "util_pct": 105.14200000000001
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5731.4,
+          "util_pct": 57.314
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.4751,
+        "alternate_background_mbps": 5.7314,
+        "elephant_mbps": 6.0391,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.44751,
+        0.57314,
+        0.6039100000000001,
+        1.0,
+        0.0,
+        1.05142
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 4832,
+      "rationale": "Offline threshold controller: 85% primary trigger and 90% alternate ceiling."
+    },
+    "reward": 0.146248706,
+    "reflection": "Measured reward 0.146249; total loss 7.4303%."
+  },
+  {
+    "cycle": 33,
+    "timestamp": "2026-10-20T07:50:06.713094+00:00",
+    "state_summary": {
+      "latency_ms": 37.803764,
+      "throughput_kbps": 15003.0,
+      "loss_pct": 2.410184,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6218.4
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10472.999999999998,
+          "util_pct": 104.72999999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5003.0,
+          "util_pct": 50.03
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 4.2546,
+        "alternate_background_mbps": 5.003,
+        "elephant_mbps": 6.2184,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.42546,
+        0.5003,
+        0.62184,
+        0.0,
+        0.0,
+        1.0473
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 4975,
+      "rationale": "Offline case retrieval: reuse action from similar episode 7; rebuild parameters for current flow."
+    },
+    "reward": 0.120556192,
+    "reflection": "Measured reward 0.120556; total loss 8.0344%."
+  },
+  {
+    "cycle": 39,
+    "timestamp": "2026-10-20T07:50:06.715121+00:00",
+    "state_summary": {
+      "latency_ms": 54.768868,
+      "throughput_kbps": 10503.3,
+      "loss_pct": 20.592971,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6160.400000000001
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12849.8,
+          "util_pct": 128.498
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 503.29999999999995,
+          "util_pct": 5.0329999999999995
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.6894,
+        "alternate_background_mbps": 0.5033,
+        "elephant_mbps": 6.1604,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.66894,
+        0.05033,
+        0.61604,
+        0.0,
+        0.0,
+        1.28498
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 24; rebuild parameters for current flow."
+    },
+    "reward": 0.808064654,
+    "reflection": "Measured reward 0.808065; total loss 0.0000%."
+  },
+  {
+    "cycle": 45,
+    "timestamp": "2026-10-20T07:50:06.717495+00:00",
+    "state_summary": {
+      "latency_ms": 51.312877,
+      "throughput_kbps": 10970.5,
+      "loss_pct": 7.569445,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3449.6000000000004
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11006.6,
+          "util_pct": 110.066
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 970.5,
+          "util_pct": 9.705
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.557,
+        "alternate_background_mbps": 0.9705,
+        "elephant_mbps": 3.4496,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.7557,
+        0.09705,
+        0.34496000000000004,
+        0.0,
+        0.0,
+        1.10066
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.502725466,
+    "reflection": "Measured reward 0.502725; total loss 0.0000%."
+  },
+  {
+    "cycle": 46,
+    "timestamp": "2026-10-20T07:50:06.717897+00:00",
+    "state_summary": {
+      "latency_ms": 44.982413,
+      "throughput_kbps": 12922.4,
+      "loss_pct": 7.338281,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3918.6
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11131.3,
+          "util_pct": 111.31299999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2922.4,
+          "util_pct": 29.224
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.2127,
+        "alternate_background_mbps": 2.9224,
+        "elephant_mbps": 3.9186,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.72127,
+        0.29224,
+        0.39186,
+        0.0,
+        0.0,
+        1.11313
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.45974611400000015,
+    "reflection": "Measured reward 0.459746; total loss 0.0000%."
+  },
+  {
+    "cycle": 48,
+    "timestamp": "2026-10-20T07:50:06.717897+00:00",
+    "state_summary": {
+      "latency_ms": 34.896638,
+      "throughput_kbps": 18188.3,
+      "loss_pct": 10.806184,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6665.8
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12315.699999999999,
+          "util_pct": 123.157
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 8188.3,
+          "util_pct": 81.883
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.6499,
+        "alternate_background_mbps": 8.1883,
+        "elephant_mbps": 6.6658,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.56499,
+        0.81883,
+        0.66658,
+        0.0,
+        0.0,
+        1.23157
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 5333,
+      "rationale": "Offline case retrieval: reuse action from similar episode 3; rebuild parameters for current flow."
+    },
+    "reward": 0.006438888000000021,
+    "reflection": "Measured reward 0.006439; total loss 10.8062%."
+  },
+  {
+    "cycle": 51,
+    "timestamp": "2026-10-20T07:50:06.720419+00:00",
+    "state_summary": {
+      "latency_ms": 50.518953,
+      "throughput_kbps": 11470.9,
+      "loss_pct": 14.343561,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5237.4
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12037.6,
+          "util_pct": 120.376
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1470.9,
+          "util_pct": 14.709000000000001
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.8002,
+        "alternate_background_mbps": 1.4709,
+        "elephant_mbps": 5.2374,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.6800200000000001,
+        0.14709,
+        0.52374,
+        0.0,
+        0.0,
+        1.2037600000000002
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.6465952340000001,
+    "reflection": "Measured reward 0.646595; total loss 0.0000%."
+  },
+  {
+    "cycle": 59,
+    "timestamp": "2026-10-20T07:50:06.723849+00:00",
+    "state_summary": {
+      "latency_ms": 39.728707,
+      "throughput_kbps": 15758.6,
+      "loss_pct": 4.931799,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 4352.0
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10817.499999999998,
+          "util_pct": 108.17499999999998
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5758.6,
+          "util_pct": 57.586000000000006
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.4655,
+        "alternate_background_mbps": 5.7586,
+        "elephant_mbps": 4.352,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.64655,
+        0.57586,
+        0.43520000000000003,
+        1.0,
+        0.0,
+        1.08175
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 3482,
+      "rationale": "Offline case retrieval: reuse action from similar episode 31; rebuild parameters for current flow."
+    },
+    "reward": 0.063463078,
+    "reflection": "Measured reward 0.063463; total loss 5.2485%."
+  },
+  {
+    "cycle": 63,
+    "timestamp": "2026-10-20T07:50:06.723849+00:00",
+    "state_summary": {
+      "latency_ms": 34.465918,
+      "throughput_kbps": 13875.7,
+      "loss_pct": 0.627844,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 2269.7
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10188.3,
+          "util_pct": 101.883
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 3875.7000000000003,
+          "util_pct": 38.757000000000005
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 7.9186,
+        "alternate_background_mbps": 3.8757,
+        "elephant_mbps": 2.2697,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.79186,
+        0.38757,
+        0.22696999999999998,
+        0.0,
+        0.0,
+        1.01883
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 45; rebuild parameters for current flow."
+    },
+    "reward": 0.23306978399999995,
+    "reflection": "Measured reward 0.233070; total loss 0.0000%."
+  },
+  {
+    "cycle": 64,
+    "timestamp": "2026-10-20T07:50:06.723849+00:00",
+    "state_summary": {
+      "latency_ms": 44.351264,
+      "throughput_kbps": 12345.1,
+      "loss_pct": 3.022676,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5374.4
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10487.9,
+          "util_pct": 104.87899999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2345.1,
+          "util_pct": 23.451
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.1135,
+        "alternate_background_mbps": 2.3451,
+        "elephant_mbps": 5.3744,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.51135,
+        0.23451,
+        0.5374399999999999,
+        0.0,
+        0.0,
+        1.04879
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.360068872,
+    "reflection": "Measured reward 0.360069; total loss 0.0000%."
+  },
+  {
+    "cycle": 66,
+    "timestamp": "2026-10-20T07:50:06.726654+00:00",
+    "state_summary": {
+      "latency_ms": 49.336515,
+      "throughput_kbps": 11875.1,
+      "loss_pct": 18.062388,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 6553.7
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12739.8,
+          "util_pct": 127.398
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1875.1,
+          "util_pct": 18.751
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.1861,
+        "alternate_background_mbps": 1.8751,
+        "elephant_mbps": 6.5537,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.61861,
+        0.18751,
+        0.65537,
+        0.0,
+        0.0,
+        1.27398
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.7304999999999999,
+    "reflection": "Measured reward 0.730500; total loss 0.0000%."
+  },
+  {
+    "cycle": 71,
+    "timestamp": "2026-10-20T07:50:06.727661+00:00",
+    "state_summary": {
+      "latency_ms": 42.562793,
+      "throughput_kbps": 11457.6,
+      "loss_pct": 1.200205,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 9160.199999999999
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10240.4,
+          "util_pct": 102.404
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1457.6,
+          "util_pct": 14.576
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 1.0802,
+        "alternate_background_mbps": 1.4576,
+        "elephant_mbps": 9.1602,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.10802,
+        0.14576,
+        0.91602,
+        0.0,
+        0.0,
+        1.0240399999999998
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 7329,
+      "rationale": "Offline case retrieval: reuse action from similar episode 26; rebuild parameters for current flow."
+    },
+    "reward": 0.004700813999999914,
+    "reflection": "Measured reward 0.004701; total loss 15.6540%."
+  },
+  {
+    "cycle": 77,
+    "timestamp": "2026-10-20T07:50:06.729686+00:00",
+    "state_summary": {
+      "latency_ms": 39.503207,
+      "throughput_kbps": 15871.4,
+      "loss_pct": 0.260168,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 1838.7
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10041.4,
+          "util_pct": 100.41399999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 5871.400000000001,
+          "util_pct": 58.714000000000006
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 8.2027,
+        "alternate_background_mbps": 5.8714,
+        "elephant_mbps": 1.8387,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.82027,
+        0.58714,
+        0.18387,
+        1.0,
+        0.0,
+        1.00414
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 1471,
+      "rationale": "Offline case retrieval: reuse action from similar episode 59; rebuild parameters for current flow."
+    },
+    "reward": 0.17512542800000008,
+    "reflection": "Measured reward 0.175125; total loss 2.3107%."
+  },
+  {
+    "cycle": 90,
+    "timestamp": "2026-10-20T07:50:06.735308+00:00",
+    "state_summary": {
+      "latency_ms": 52.070128,
+      "throughput_kbps": 11022.3,
+      "loss_pct": 12.951977,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 3743.2
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11754.9,
+          "util_pct": 117.54899999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 1022.3,
+          "util_pct": 10.222999999999999
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 8.0117,
+        "alternate_background_mbps": 1.0223,
+        "elephant_mbps": 3.7432,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.8011699999999999,
+        0.10223,
+        0.37432,
+        0.0,
+        0.0,
+        1.17549
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.6224727940000001,
+    "reflection": "Measured reward 0.622473; total loss 0.0000%."
+  },
+  {
+    "cycle": 94,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 55.415387,
+      "throughput_kbps": 10545.1,
+      "loss_pct": 10.262105,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 4338.7
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 11205.9,
+          "util_pct": 112.059
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 545.1,
+          "util_pct": 5.4510000000000005
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.8672,
+        "alternate_background_mbps": 0.5451,
+        "elephant_mbps": 4.3387,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.68672,
+        0.05451,
+        0.43387000000000003,
+        1.0,
+        0.0,
+        1.12059
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 5; rebuild parameters for current flow."
+    },
+    "reward": 0.5826629539999999,
+    "reflection": "Measured reward 0.582663; total loss 0.0000%."
+  },
+  {
+    "cycle": 101,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 8.894134,
+      "throughput_kbps": 10474.5,
+      "loss_pct": 0.0,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 2059.8999999999996
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 7872.0,
+          "util_pct": 78.72
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2502.5,
+          "util_pct": 25.025
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.8121,
+        "alternate_background_mbps": 2.5025,
+        "elephant_mbps": 2.0599,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.58121,
+        0.25025,
+        0.20598999999999998,
+        1.0,
+        0.0,
+        0.7872
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 94; rebuild parameters for current flow."
+    },
+    "reward": 0.004457551999999992,
+    "reflection": "Measured reward 0.004458; total loss 0.0000%."
+  },
+  {
+    "cycle": 104,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 54.456312,
+      "throughput_kbps": 10762.8,
+      "loss_pct": 3.475243,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 4013.0
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10387.5,
+          "util_pct": 103.875
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 762.8000000000001,
+          "util_pct": 7.628
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.3745,
+        "alternate_background_mbps": 0.7628,
+        "elephant_mbps": 4.013,
+        "queues_mbit": [
+          0.5,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.6374500000000001,
+        0.07628,
+        0.4013,
+        1.0,
+        0.0,
+        1.0387499999999998
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 5; rebuild parameters for current flow."
+    },
+    "reward": 0.44222821399999995,
+    "reflection": "Measured reward 0.442228; total loss 0.0000%."
+  },
+  {
+    "cycle": 110,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 54.370975,
+      "throughput_kbps": 10601.1,
+      "loss_pct": 21.149623,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 7211.0
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12970.3,
+          "util_pct": 129.703
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 601.1,
+          "util_pct": 6.010999999999999
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.7593,
+        "alternate_background_mbps": 0.6011,
+        "elephant_mbps": 7.211,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.5759299999999999,
+        0.06011,
+        0.7211000000000001,
+        0.0,
+        0.0,
+        1.29703
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.82008803,
+    "reflection": "Measured reward 0.820088; total loss 0.0000%."
+  },
+  {
+    "cycle": 114,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 52.95594,
+      "throughput_kbps": 10924.9,
+      "loss_pct": 19.797327,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 7692.9
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12821.400000000001,
+          "util_pct": 128.214
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 924.9000000000001,
+          "util_pct": 9.249
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.1285,
+        "alternate_background_mbps": 0.9249,
+        "elephant_mbps": 7.6929,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.51285,
+        0.09249,
+        0.76929,
+        0.0,
+        0.0,
+        1.28214
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 110; rebuild parameters for current flow."
+    },
+    "reward": 0.7833327899999999,
+    "reflection": "Measured reward 0.783333; total loss 0.0000%."
+  },
+  {
+    "cycle": 115,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 39.951711,
+      "throughput_kbps": 14262.8,
+      "loss_pct": 3.133388,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5430.1
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10564.6,
+          "util_pct": 105.646
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 4262.8,
+          "util_pct": 42.628
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 5.1345,
+        "alternate_background_mbps": 4.2628,
+        "elephant_mbps": 5.4301,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.51345,
+        0.42628000000000005,
+        0.54301,
+        0.0,
+        0.0,
+        1.05646
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 4345,
+      "rationale": "Offline case retrieval: reuse action from similar episode 33; rebuild parameters for current flow."
+    },
+    "reward": 0.17212548800000005,
+    "reflection": "Measured reward 0.172125; total loss 7.3182%."
+  },
+  {
+    "cycle": 117,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 48.498004,
+      "throughput_kbps": 12125.7,
+      "loss_pct": 18.081371,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 5815.8
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 12798.5,
+          "util_pct": 127.98500000000001
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 2125.7000000000003,
+          "util_pct": 21.257
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.9827,
+        "alternate_background_mbps": 2.1257,
+        "elephant_mbps": 5.8158,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.6982700000000001,
+        0.21257,
+        0.58158,
+        0.0,
+        0.0,
+        1.2798500000000002
+      ]
+    },
+    "action": "reroute",
+    "params": {
+      "action": "reroute",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": 3,
+      "rate_limit_kbps": null,
+      "rationale": "Offline case retrieval: reuse action from similar episode 39; rebuild parameters for current flow."
+    },
+    "reward": 0.728677742,
+    "reflection": "Measured reward 0.728678; total loss 0.0000%."
+  },
+  {
+    "cycle": 118,
+    "timestamp": "2026-10-20T07:50:06.737401+00:00",
+    "state_summary": {
+      "latency_ms": 35.121148,
+      "throughput_kbps": 16964.7,
+      "loss_pct": 2.993525,
+      "num_switches": 4,
+      "top_flows": [
+        {
+          "dpid": "1",
+          "match": {
+            "in_port": 1,
+            "eth_type": 2048,
+            "ipv4_dst": "10.0.0.8"
+          },
+          "rate_kbps": 4311.6
+        }
+      ],
+      "hot_ports": [
+        {
+          "dpid": "1",
+          "port_no": 2,
+          "tx_kbps": 10626.6,
+          "util_pct": 106.26599999999999
+        },
+        {
+          "dpid": "1",
+          "port_no": 3,
+          "tx_kbps": 6964.7,
+          "util_pct": 69.64699999999999
+        }
+      ],
+      "simulation": {
+        "capacity_mbps": 10.0,
+        "buffer_mbit": 0.5,
+        "primary_background_mbps": 6.315,
+        "alternate_background_mbps": 6.9647,
+        "elephant_mbps": 4.3116,
+        "queues_mbit": [
+          0.0,
+          0.0
+        ],
+        "valid_reroute_out_port": 3,
+        "current_output_port": 2,
+        "action_lifetime": "one 5-second window; next flow starts on primary"
+      },
+      "embedding_features": [
+        0.6315000000000001,
+        0.6964699999999999,
+        0.43116000000000004,
+        0.0,
+        0.0,
+        1.06266
+      ]
+    },
+    "action": "rate_limit",
+    "params": {
+      "action": "rate_limit",
+      "target_dpid": 1,
+      "target_flow_match": {
+        "in_port": 1,
+        "eth_type": 2048,
+        "ipv4_dst": "10.0.0.8"
+      },
+      "reroute_out_port": null,
+      "rate_limit_kbps": 3450,
+      "rationale": "Offline case retrieval: reuse action from similar episode 115; rebuild parameters for current flow."
+    },
+    "reward": 0.17912567399999998,
+    "reflection": "Measured reward 0.179126; total loss 4.8979%."
+  }
+]

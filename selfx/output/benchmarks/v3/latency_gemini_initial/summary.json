@@ -1,0 +1,141 @@
+{
+  "schema": "selfx.latency.v3",
+  "created_at_utc": "2026-10-20T07:36:13.205776+00:00",
+  "provider": "gemini",
+  "requested_model": "gemini-3.5-flash-lite",
+  "provenance": "simulation",
+  "seeds": [
+    1770,
+    1771
+  ],
+  "cycles": 12,
+  "window_count": 72,
+  "trace_sha256": {
+    "1770": "87dbce99ae4e4f648b8ef361e670da62bca94515b6450d9be101a30923a50758",
+    "1771": "eeb894a4efd3b6b2195495a819aa867f4f8e4a83d7be54216a44c4e572aa93f3"
+  },
+  "groups": {
+    "legacy": {
+      "label": "Two serial calls with full prompts",
+      "windows": 24,
+      "origins": {
+        "api": 24
+      },
+      "latency_ms": 22.741477208333333,
+      "throughput_kbps": 12720.666666666666,
+      "loss_pct": 6.83038025,
+      "reward": 0.11171286000000002,
+      "decision_ms": 4385.174375000058,
+      "control_elapsed_ms": 8300.511508333291,
+      "pacing_ms": 5798.212458333333,
+      "transport_ms": 2491.344666666667,
+      "prompt_chars": 9243.208333333334,
+      "p95_control_ms": 8891.065470000467,
+      "deadline_misses": 24,
+      "api_calls": 48,
+      "api_successes": 48,
+      "per_seed": {
+        "1770": {
+          "control_elapsed_ms": 8170.802083333228,
+          "decision_ms": 4165.692158333286,
+          "latency_ms": 22.787251416666667,
+          "loss_pct": 6.852741833333334,
+          "reward": 0.11666812400000003
+        },
+        "1771": {
+          "control_elapsed_ms": 8430.220933333354,
+          "decision_ms": 4604.656591666829,
+          "latency_ms": 22.695703,
+          "loss_pct": 6.808018666666666,
+          "reward": 0.10675759600000002
+        }
+      }
+    },
+    "compact": {
+      "label": "One compact call and local reflection",
+      "windows": 24,
+      "origins": {
+        "api": 24
+      },
+      "latency_ms": 23.339926583333334,
+      "throughput_kbps": 12374.429166666667,
+      "loss_pct": 9.294038333333333,
+      "reward": 0.055003801666666706,
+      "decision_ms": 4167.957029166662,
+      "control_elapsed_ms": 4168.185666666659,
+      "pacing_ms": 3310.094416666667,
+      "transport_ms": 856.6865416666667,
+      "prompt_chars": 889.4166666666666,
+      "p95_control_ms": 4631.806085000379,
+      "deadline_misses": 1,
+      "api_calls": 24,
+      "api_successes": 24,
+      "per_seed": {
+        "1770": {
+          "control_elapsed_ms": 4142.333741666714,
+          "decision_ms": 4142.064449999907,
+          "latency_ms": 25.33986575,
+          "loss_pct": 10.221887166666667,
+          "reward": 0.025579775000000016
+        },
+        "1771": {
+          "control_elapsed_ms": 4194.037591666604,
+          "decision_ms": 4193.8496083334185,
+          "latency_ms": 21.339987416666666,
+          "loss_pct": 8.3661895,
+          "reward": 0.08442782833333339
+        }
+      }
+    },
+    "hybrid": {
+      "label": "Compact call with validated local reuse",
+      "windows": 24,
+      "origins": {
+        "healthy_bypass": 2,
+        "api": 12,
+        "api_cache": 10
+      },
+      "latency_ms": 21.548313791666665,
+      "throughput_kbps": 12453.225,
+      "loss_pct": 8.695722666666667,
+      "reward": 0.08111038733333338,
+      "decision_ms": 2104.5381083333345,
+      "control_elapsed_ms": 2104.7530749999623,
+      "pacing_ms": 1647.7509583333333,
+      "transport_ms": 456.0545416666667,
+      "prompt_chars": 443.375,
+      "p95_control_ms": 4511.893415000031,
+      "deadline_misses": 0,
+      "api_calls": 12,
+      "api_successes": 12,
+      "per_seed": {
+        "1770": {
+          "control_elapsed_ms": 2141.9275583332364,
+          "decision_ms": 2141.7203333333723,
+          "latency_ms": 25.33986575,
+          "loss_pct": 10.221887166666667,
+          "reward": 0.025579775000000016
+        },
+        "1771": {
+          "control_elapsed_ms": 2067.578591666688,
+          "decision_ms": 2067.355883333297,
+          "latency_ms": 17.756761833333332,
+          "loss_pct": 7.169558166666667,
+          "reward": 0.13664099966666673
+        }
+      }
+    }
+  },
+  "wall_seconds": 349.91238019999946,
+  "isolated_virtual_environment": true,
+  "runtime": "C:\\Users\\RAVIPRAKASH\\SDN\\SDN\\selfx\\.venv\\Scripts\\python.exe",
+  "deadline_ms": 5000,
+  "limits": [
+    "Small two-seed recurring synthetic-workload pilot",
+    "Different call counts and local reuse are explicit system changes, not proof of faster provider servers",
+    "Transport time includes HTTP/network/service time; pacing is recorded separately",
+    "Full control time includes reflection; no work is silently moved outside the measured interval",
+    "Seed order reverses mode order to reduce time-order bias; provider variation remains",
+    "Failures and local cache/bypass/memory origins remain in all metrics"
+  ]
+}

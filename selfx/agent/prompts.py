@@ -56,7 +56,7 @@ def build_decide_messages(state_summary: dict, few_shot_examples: list[dict]) ->
         else "(no memory yet — this is one of the first cycles)"
     )
     human = (
-        f"Your best past examples (highest reward first):\n{examples_block}\n\n"
+        f"Past measured examples (retrieved by current state similarity when available):\n{examples_block}\n\n"
         f"Current network state:\n{json.dumps(state_summary, indent=2)}\n\n"
         "Choose one action for this cycle."
     )

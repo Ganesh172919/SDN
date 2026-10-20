@@ -1,0 +1,2983 @@
+{
+  "schema": "selfx.memory.sensitivity.v3",
+  "design": "Post-hoc constructed mechanism stress test; excluded from the primary eight-scenario average",
+  "hypothesis": "A tiny overload can make a fixed 20% meter cost more goodput than its delay benefit; action-local negative episodes should reject it",
+  "levels_mbps": {
+    "excess_0001": 0.0001,
+    "excess_0005": 0.0005,
+    "excess_005": 0.005,
+    "excess_05": 0.05
+  },
+  "controllers": {
+    "H1": "Guarded no memory",
+    "A3": "Guarded balanced memory",
+    "A4": "Action-conditioned adaptive memory",
+    "O1": "Myopic model reference"
+  },
+  "cycles": 120,
+  "seeds": [
+    1780,
+    1781,
+    1782,
+    1783,
+    1784,
+    1785,
+    1786,
+    1787,
+    1788,
+    1789
+  ],
+  "window_count": 19200,
+  "traffic_sha256": {
+    "excess_0001_1780": "1f24b818c273728ded0c902cae06aa5967f54f38be51b79791fbe975b4dadec2",
+    "excess_0001_1781": "2d93669a7e785ae416cb458b9e6f9105ec2a41200dcb237a02e2534578625b35",
+    "excess_0001_1782": "ba45acc2520c28347eebdf94df2fd03636fc46cb21a59488f01eddd1905f2a06",
+    "excess_0001_1783": "f07fb22a051006b7354e593cffcbb86289416bddbcf1200fbe8b653426bfde7c",
+    "excess_0001_1784": "c4e72134ea1b4b5cef15f097b05f1df60712dddc86d04d21e6f153b703b99210",
+    "excess_0001_1785": "f9ec351d372e68dca5d3643759fba4b8704d15fce008dbf2115525373c439f0f",
+    "excess_0001_1786": "df16864cd58e53eaa5a3948e8ddc6e9f42ebad0b47e942f6b1547593928e06f3",
+    "excess_0001_1787": "f98e16e274f8b085db1e6705301c44b53543f6ebb4051b8bb5c2c9eac3afcd71",
+    "excess_0001_1788": "e99110add2b6acb29f1135b1d09388f68127f7bcc06d1a8e6c72ee72594958c6",
+    "excess_0001_1789": "375372d1551cfb385cf872a6bcbfbe9de26b06a76821ef9e52925eadf9c4a3b3",
+    "excess_0005_1780": "f80be81080246034cdcd822cdd35180b228fd64b25021868bab97cb3b6ab3113",
+    "excess_0005_1781": "1467aab906d78e5258c1770ab4bac558d13077ede6a88f79f500b464dce0c8a8",
+    "excess_0005_1782": "fc673c225339801f4f62fc7ab07aee5063aac1de9c6619544f6a9828389661d0",
+    "excess_0005_1783": "5e7af031e005fc8e83860351662c21187c2ae7a1125de5a2a47248c6206b2b2f",
+    "excess_0005_1784": "03b24d1b80afaec911236d0c79d59503a6d70191dce94c18c798dee83be1ee66",
+    "excess_0005_1785": "d5e2c7374766d61372c64371498f746346d90d93fdeeea742fda4f360b057d37",
+    "excess_0005_1786": "15701916a5ad0e6f9f263f7b0292420353ae8d559eba07af6f961b5abf8c30d3",
+    "excess_0005_1787": "1cdcbdd6175f0566719773e8b15b56246206499f124d4f5af53808ba264bd5a1",
+    "excess_0005_1788": "08ac43a8b5f859d04bef4c3e4023d0868fbd64ee7f2f06b477f7c156fe53b986",
+    "excess_0005_1789": "3bebf67d7b25c0513671c0e4f3c220f5114c5866e0b7d32261b6b7dc743e64ad",
+    "excess_005_1780": "07b7a031289e39e4a7b2d38544cdf9e8117eeb880ece6e0b14832c63cccacc72",
+    "excess_005_1781": "b2e5713beffc1e3c93b433c4374f8c78838b91d821efe427c42332a4e7328fcb",
+    "excess_005_1782": "4ae4c86e9d0c8d97b4beca29eae8bb93b10f629814067477c58f30f97039ca01",
+    "excess_005_1783": "db7879cf06df7e467cc09202f7f06c598af8fd056722b233fe73d977ccd89eba",
+    "excess_005_1784": "2d7026f36646b3f98dc4fdd6d46ca62e8980bb8f7f5c991bdcdfea5db5fca152",
+    "excess_005_1785": "34b64323c8fc22888dd111dd11061b6f7ba26369fbc4834c273c2ce94984ab2e",
+    "excess_005_1786": "51d6811de8be931a7ea6c652369e77b31f788c7fd576c5937415244d81caf47d",
+    "excess_005_1787": "070a7f605fa4230aab3c0b6f8ef4e8b212e0687502f1869a687e0201cd937787",
+    "excess_005_1788": "f6a2b352314739f40d5cd26d71f00958956507bf19234774cbdd9e7362ca2b5a",
+    "excess_005_1789": "ee520757d3c3152442c838f4acf511974ff83dc810bd0cd616e732cfa1505604",
+    "excess_05_1780": "57598412a9976afedfb0b622d49a6486f8b2343d340df1df35c06aff7745f4c0",
+    "excess_05_1781": "34d5f4f1cc33564e44205776ff0412f43605d53475e48c4459fc2995663e16dc",
+    "excess_05_1782": "4232dc79473a5ae8c8600c03ac7767bb4d78a9c2ca00a9ea951fa9da3511462e",
+    "excess_05_1783": "d3230c0babe18cb677e8d561caa205ee19505ea0282cadf5bcd38ba24e1b273f",
+    "excess_05_1784": "47ac10de2f9aaf0453eaf319962f7a79af6b463048ee8dac8b40360c3e4f1795",
+    "excess_05_1785": "9af3cd63fe51024562ca9ea9506bb4c34feff2e4796ab1091b2cc06d8fa05f16",
+    "excess_05_1786": "4f7feaa2ebde04ddcaf4b3131dd87814ec6186133216b2b2bd2f22b8254981ad",
+    "excess_05_1787": "96fcc1e7e3b011d58d56e08ed07da384f47b5eeda1e1acabb65a37bc258f9986",
+    "excess_05_1788": "43e897c8fa764db67aaca4b475ba910d6f53084a60bb91bbd12f5b198ce52928",
+    "excess_05_1789": "eb22a8c916caa55ae3ee62e3dd34ac1175790d176263ae1e69ca50f9d2cefdba"
+  },
+  "groups": {
+    "excess_0001": {
+      "H1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16751.82,
+            "ci95": [
+              16558.107999999997,
+              16968.864499999996
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.6974621,
+            "ci95": [
+              6.6120658875,
+              6.783395725
+            ]
+          },
+          "reward": {
+            "mean": -0.163031186,
+            "ci95": [
+              -0.16473579092500001,
+              -0.1613241183
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.03729483333333333,
+            "ci95": [
+              0.03643873125,
+              0.03817470833333333
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16618.7,
+            "loss_pct": 6.725599,
+            "reward": -0.16299973,
+            "control_elapsed_ms": 0.039253333333333335,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.725599146882189
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17143.6,
+            "loss_pct": 6.709112,
+            "reward": -0.16560629,
+            "control_elapsed_ms": 0.035995,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.709112181318531
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16405.7,
+            "loss_pct": 6.813857,
+            "reward": -0.16398497,
+            "control_elapsed_ms": 0.035865,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.8138571907323335
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17243.0,
+            "loss_pct": 6.510589,
+            "reward": -0.16105345,
+            "control_elapsed_ms": 0.03925833333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.510588924191328
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17146.9,
+            "loss_pct": 6.72161,
+            "reward": -0.1659473,
+            "control_elapsed_ms": 0.03834,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.721610227118182
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16508.6,
+            "loss_pct": 6.649854,
+            "reward": -0.16045744,
+            "control_elapsed_ms": 0.0390525,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.649853544892167
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16450.3,
+            "loss_pct": 6.784492,
+            "reward": -0.16350759,
+            "control_elapsed_ms": 0.037075833333333336,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.784491942247106
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16394.6,
+            "loss_pct": 6.962517,
+            "reward": -0.16765567,
+            "control_elapsed_ms": 0.03612083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.962517379337738
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16569.9,
+            "loss_pct": 6.618463,
+            "reward": -0.16001592,
+            "control_elapsed_ms": 0.035916666666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.618463393878596
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17036.9,
+            "loss_pct": 6.478528,
+            "reward": -0.1590835,
+            "control_elapsed_ms": 0.03607083333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.47852841560951
+          }
+        }
+      },
+      "A3": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16751.82,
+            "ci95": [
+              16558.107999999997,
+              16968.864499999996
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.6974621,
+            "ci95": [
+              6.6120658875,
+              6.783395725
+            ]
+          },
+          "reward": {
+            "mean": -0.163031186,
+            "ci95": [
+              -0.16473579092500001,
+              -0.1613241183
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.20236125,
+            "ci95": [
+              0.199226275,
+              0.20596809166666669
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16618.7,
+            "loss_pct": 6.725599,
+            "reward": -0.16299973,
+            "control_elapsed_ms": 0.21550166666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.725599146882189
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17143.6,
+            "loss_pct": 6.709112,
+            "reward": -0.16560629,
+            "control_elapsed_ms": 0.20531083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.709112181318531
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16405.7,
+            "loss_pct": 6.813857,
+            "reward": -0.16398497,
+            "control_elapsed_ms": 0.20410166666666665,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.8138571907323335
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17243.0,
+            "loss_pct": 6.510589,
+            "reward": -0.16105345,
+            "control_elapsed_ms": 0.2036425,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.510588924191328
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17146.9,
+            "loss_pct": 6.72161,
+            "reward": -0.1659473,
+            "control_elapsed_ms": 0.2045775,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.721610227118182
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16508.6,
+            "loss_pct": 6.649854,
+            "reward": -0.16045744,
+            "control_elapsed_ms": 0.19915916666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.649853544892167
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16450.3,
+            "loss_pct": 6.784492,
+            "reward": -0.16350759,
+            "control_elapsed_ms": 0.19472833333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.784491942247106
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16394.6,
+            "loss_pct": 6.962517,
+            "reward": -0.16765567,
+            "control_elapsed_ms": 0.2004,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.962517379337738
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16569.9,
+            "loss_pct": 6.618463,
+            "reward": -0.16001592,
+            "control_elapsed_ms": 0.19757583333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.618463393878596
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17036.9,
+            "loss_pct": 6.478528,
+            "reward": -0.1590835,
+            "control_elapsed_ms": 0.19861499999999999,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.47852841560951
+          }
+        }
+      },
+      "A4": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 9.588995655833333,
+            "ci95": [
+              9.5694248685625,
+              9.606475876125
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17923.8675,
+            "ci95": [
+              17725.3714125,
+              18147.070143750003
+            ]
+          },
+          "loss_pct": {
+            "mean": 0.1674365525,
+            "ci95": [
+              0.16530164718749998,
+              0.16958489312500002
+            ]
+          },
+          "reward": {
+            "mean": -0.00407577965,
+            "ci95": [
+              -0.004118394773125,
+              -0.0040331029575
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 11.079788945,
+            "ci95": [
+              11.041856991624998,
+              11.11366897025
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.10506641666666666,
+            "ci95": [
+              0.10334890624999998,
+              0.10729137291666667
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 9.600657241666667,
+            "throughput_kbps": 17786.945,
+            "loss_pct": 0.168139975,
+            "reward": -0.004074993250000001,
+            "control_elapsed_ms": 0.1029825,
+            "window_latency_p95_ms": 11.1023912,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16813997867205474
+          },
+          "1781": {
+            "latency_ms": 9.551922566666667,
+            "throughput_kbps": 18345.58,
+            "loss_pct": 0.1677278,
+            "reward": -0.00414015725,
+            "control_elapsed_ms": 0.1069175,
+            "window_latency_p95_ms": 11.0079344,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16772780453296326
+          },
+          "1782": {
+            "latency_ms": 9.619904925,
+            "throughput_kbps": 17575.2125,
+            "loss_pct": 0.170346425,
+            "reward": -0.00409962425,
+            "control_elapsed_ms": 0.11346416666666667,
+            "window_latency_p95_ms": 11.13969705,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.1703464297683083
+          },
+          "1783": {
+            "latency_ms": 9.546259683333334,
+            "throughput_kbps": 18413.6825,
+            "loss_pct": 0.162764725,
+            "reward": -0.00402633625,
+            "control_elapsed_ms": 0.10165916666666666,
+            "window_latency_p95_ms": 10.99695845,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.1627647231047832
+          },
+          "1784": {
+            "latency_ms": 9.551416033333334,
+            "throughput_kbps": 18351.5125,
+            "loss_pct": 0.16804025,
+            "reward": -0.0041486825,
+            "control_elapsed_ms": 0.10168166666666667,
+            "window_latency_p95_ms": 11.006952,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16804025567795455
+          },
+          "1785": {
+            "latency_ms": 9.612641016666666,
+            "throughput_kbps": 17655.1025,
+            "loss_pct": 0.16624635000000001,
+            "reward": -0.004011436,
+            "control_elapsed_ms": 0.10595666666666667,
+            "window_latency_p95_ms": 11.12561865,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16624633862230415
+          },
+          "1786": {
+            "latency_ms": 9.6160221,
+            "throughput_kbps": 17617.57,
+            "loss_pct": 0.1696123,
+            "reward": -0.00408768975,
+            "control_elapsed_ms": 0.10529,
+            "window_latency_p95_ms": 11.13217165,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16961229855617765
+          },
+          "1787": {
+            "latency_ms": 9.618415675,
+            "throughput_kbps": 17590.730000000003,
+            "loss_pct": 0.174062925,
+            "reward": -0.0041913917500000005,
+            "control_elapsed_ms": 0.10395666666666667,
+            "window_latency_p95_ms": 11.136810749999999,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.17406293448344348
+          },
+          "1788": {
+            "latency_ms": 9.607215325,
+            "throughput_kbps": 17714.842500000002,
+            "loss_pct": 0.165461575,
+            "reward": -0.0040003980000000005,
+            "control_elapsed_ms": 0.10473166666666667,
+            "window_latency_p95_ms": 11.11510195,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.1654615848469649
+          },
+          "1789": {
+            "latency_ms": 9.565501991666666,
+            "throughput_kbps": 18187.4975,
+            "loss_pct": 0.1619632,
+            "reward": -0.0039770874999999995,
+            "control_elapsed_ms": 0.10402416666666667,
+            "window_latency_p95_ms": 11.03425335,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.16196321039023773
+          }
+        }
+      },
+      "O1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 9.6715273175,
+            "ci95": [
+              9.650940033749999,
+              9.689915450645834
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17953.920000000002,
+            "ci95": [
+              17755.216999999997,
+              18177.167
+            ]
+          },
+          "loss_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 11.163365344999999,
+            "ci95": [
+              11.12440384875,
+              11.198164870625
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.07122283333333333,
+            "ci95": [
+              0.06750962291666666,
+              0.07787347708333332
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 9.6837946,
+            "throughput_kbps": 17816.9,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06711916666666666,
+            "window_latency_p95_ms": 11.18658115,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1781": {
+            "latency_ms": 9.632528666666667,
+            "throughput_kbps": 18376.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06851916666666667,
+            "window_latency_p95_ms": 11.08956045,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1782": {
+            "latency_ms": 9.704042,
+            "throughput_kbps": 17605.2,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.10027,
+            "window_latency_p95_ms": 11.22489905,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1783": {
+            "latency_ms": 9.626571666666667,
+            "throughput_kbps": 18443.7,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.07011916666666666,
+            "window_latency_p95_ms": 11.0782865,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1784": {
+            "latency_ms": 9.631995833333333,
+            "throughput_kbps": 18382.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06780583333333333,
+            "window_latency_p95_ms": 11.088552,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1785": {
+            "latency_ms": 9.696400808333333,
+            "throughput_kbps": 17684.5,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06632333333333333,
+            "window_latency_p95_ms": 11.21043865,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1786": {
+            "latency_ms": 9.6999575,
+            "throughput_kbps": 17647.5,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06712749999999999,
+            "window_latency_p95_ms": 11.217169649999999,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1787": {
+            "latency_ms": 9.7024754,
+            "throughput_kbps": 17621.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06846833333333334,
+            "window_latency_p95_ms": 11.221934749999999,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1788": {
+            "latency_ms": 9.6906933,
+            "throughput_kbps": 17744.2,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.0693575,
+            "window_latency_p95_ms": 11.1996369,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1789": {
+            "latency_ms": 9.6468134,
+            "throughput_kbps": 18217.0,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06711833333333334,
+            "window_latency_p95_ms": 11.11659435,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          }
+        }
+      }
+    },
+    "excess_0005": {
+      "H1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16751.92,
+            "ci95": [
+              16558.405499999997,
+              16968.867
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.698974,
+            "ci95": [
+              6.6137267575,
+              6.78377888
+            ]
+          },
+          "reward": {
+            "mean": -0.162592563,
+            "ci95": [
+              -0.16428254660000002,
+              -0.16089971639999998
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.038006333333333336,
+            "ci95": [
+              0.03644655625,
+              0.040093095833333335
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16618.7,
+            "loss_pct": 6.727693,
+            "reward": -0.16257167,
+            "control_elapsed_ms": 0.037025,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7276931538832825
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17143.6,
+            "loss_pct": 6.711143,
+            "reward": -0.16519125,
+            "control_elapsed_ms": 0.044458333333333336,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.711142793398233
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16405.7,
+            "loss_pct": 6.815974,
+            "reward": -0.16355172,
+            "control_elapsed_ms": 0.037333333333333336,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.815974371936357
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17243.0,
+            "loss_pct": 6.512616,
+            "reward": -0.16063997,
+            "control_elapsed_ms": 0.04295416666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.512616432265971
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17146.9,
+            "loss_pct": 6.72364,
+            "reward": -0.1655324,
+            "control_elapsed_ms": 0.03626416666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.723639904476442
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16508.6,
+            "loss_pct": 6.651965,
+            "reward": -0.16002619,
+            "control_elapsed_ms": 0.03591916666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.6519649420412765
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16450.3,
+            "loss_pct": 6.786605,
+            "reward": -0.16307539,
+            "control_elapsed_ms": 0.03668166666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.786604714415233
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16395.6,
+            "loss_pct": 6.958954,
+            "reward": -0.16708605,
+            "control_elapsed_ms": 0.03567083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.958954482774277
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16569.9,
+            "loss_pct": 6.620568,
+            "reward": -0.15958611,
+            "control_elapsed_ms": 0.0364875,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.620568395070075
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17036.9,
+            "loss_pct": 6.480582,
+            "reward": -0.15866488,
+            "control_elapsed_ms": 0.037269166666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.480581858103472
+          }
+        }
+      },
+      "A3": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16751.92,
+            "ci95": [
+              16558.405499999997,
+              16968.867
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.698974,
+            "ci95": [
+              6.6137267575,
+              6.78377888
+            ]
+          },
+          "reward": {
+            "mean": -0.162592563,
+            "ci95": [
+              -0.16428254660000002,
+              -0.16089971639999998
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.2041385,
+            "ci95": [
+              0.19816284375,
+              0.21385730833333336
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16618.7,
+            "loss_pct": 6.727693,
+            "reward": -0.16257167,
+            "control_elapsed_ms": 0.19792333333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7276931538832825
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17143.6,
+            "loss_pct": 6.711143,
+            "reward": -0.16519125,
+            "control_elapsed_ms": 0.20013833333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.711142793398233
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16405.7,
+            "loss_pct": 6.815974,
+            "reward": -0.16355172,
+            "control_elapsed_ms": 0.1975625,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.815974371936357
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17243.0,
+            "loss_pct": 6.512616,
+            "reward": -0.16063997,
+            "control_elapsed_ms": 0.20946916666666668,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.512616432265971
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17146.9,
+            "loss_pct": 6.72364,
+            "reward": -0.1655324,
+            "control_elapsed_ms": 0.2422475,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.723639904476442
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16508.6,
+            "loss_pct": 6.651965,
+            "reward": -0.16002619,
+            "control_elapsed_ms": 0.20182166666666668,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.6519649420412765
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16450.3,
+            "loss_pct": 6.786605,
+            "reward": -0.16307539,
+            "control_elapsed_ms": 0.19876416666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.786604714415233
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16395.6,
+            "loss_pct": 6.958954,
+            "reward": -0.16708605,
+            "control_elapsed_ms": 0.20139416666666665,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.958954482774277
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16569.9,
+            "loss_pct": 6.620568,
+            "reward": -0.15958611,
+            "control_elapsed_ms": 0.1961925,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.620568395070075
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17036.9,
+            "loss_pct": 6.480582,
+            "reward": -0.15866488,
+            "control_elapsed_ms": 0.19587166666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.480581858103472
+          }
+        }
+      },
+      "A4": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 14.237260609166666,
+            "ci95": [
+              14.153074349041665,
+              14.309707143833332
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17914.281666666666,
+            "ci95": [
+              17715.812789583335,
+              18137.46699375
+            ]
+          },
+          "loss_pct": {
+            "mean": 0.22329913333333334,
+            "ci95": [
+              0.22045755858333332,
+              0.22612596266666668
+            ]
+          },
+          "reward": {
+            "mean": -0.0044501648,
+            "ci95": [
+              -0.004509930422499999,
+              -0.004392810945000001
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 21.421038595,
+            "ci95": [
+              21.248158495624995,
+              21.571801364499997
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.10931733333333334,
+            "ci95": [
+              0.10476084791666668,
+              0.11629965208333334
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 14.303816533333332,
+            "throughput_kbps": 17777.389166666668,
+            "loss_pct": 0.22425643333333334,
+            "reward": -0.0044408105,
+            "control_elapsed_ms": 0.10201666666666667,
+            "window_latency_p95_ms": 21.5475308,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22425643846277604
+          },
+          "1781": {
+            "latency_ms": 14.010866691666667,
+            "throughput_kbps": 18335.731666666667,
+            "loss_pct": 0.22370476666666667,
+            "reward": -0.004565309083333333,
+            "control_elapsed_ms": 0.10675083333333334,
+            "window_latency_p95_ms": 20.9990092,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.2237047597799411
+          },
+          "1782": {
+            "latency_ms": 14.379618275,
+            "throughput_kbps": 17565.645833333336,
+            "loss_pct": 0.22719913333333333,
+            "reward": -0.004462122083333334,
+            "control_elapsed_ms": 0.13818583333333334,
+            "window_latency_p95_ms": 21.710438149999998,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22719914573121192
+          },
+          "1783": {
+            "latency_ms": 14.089573691666667,
+            "throughput_kbps": 18404.105833333335,
+            "loss_pct": 0.2170872,
+            "reward": -0.004408412833333333,
+            "control_elapsed_ms": 0.11265916666666667,
+            "window_latency_p95_ms": 21.0871244,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.2170872144088657
+          },
+          "1784": {
+            "latency_ms": 14.109810208333334,
+            "throughput_kbps": 18341.645833333336,
+            "loss_pct": 0.2241213333333333,
+            "reward": -0.00456788925,
+            "control_elapsed_ms": 0.10761083333333334,
+            "window_latency_p95_ms": 21.130765999999998,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22412133014921473
+          },
+          "1785": {
+            "latency_ms": 14.351062883333332,
+            "throughput_kbps": 17645.7325,
+            "loss_pct": 0.22173216666666665,
+            "reward": -0.0043493025,
+            "control_elapsed_ms": 0.10839416666666667,
+            "window_latency_p95_ms": 21.64895835,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22173216473470925
+          },
+          "1786": {
+            "latency_ms": 14.3643313,
+            "throughput_kbps": 17608.0225,
+            "loss_pct": 0.22622016666666667,
+            "reward": -0.00444857125,
+            "control_elapsed_ms": 0.1031325,
+            "window_latency_p95_ms": 21.67757515,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22622015714717444
+          },
+          "1787": {
+            "latency_ms": 14.268427341666667,
+            "throughput_kbps": 17580.965,
+            "loss_pct": 0.23196513333333335,
+            "reward": -0.004589775583333334,
+            "control_elapsed_ms": 0.1045675,
+            "window_latency_p95_ms": 21.55596065,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.23196514942580923
+          },
+          "1788": {
+            "latency_ms": 14.329697908333333,
+            "throughput_kbps": 17705.485833333332,
+            "loss_pct": 0.22068559999999998,
+            "reward": -0.004337855916666667,
+            "control_elapsed_ms": 0.1051425,
+            "window_latency_p95_ms": 21.60303655,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.22068561316900248
+          },
+          "1789": {
+            "latency_ms": 14.165401258333333,
+            "throughput_kbps": 18178.0925,
+            "loss_pct": 0.2160194,
+            "reward": -0.004331599,
+            "control_elapsed_ms": 0.10471333333333334,
+            "window_latency_p95_ms": 21.249986699999997,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.21601939527011577
+          }
+        }
+      },
+      "O1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 16.357636594166667,
+            "ci95": [
+              16.25470017441667,
+              16.4495772551875
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17953.920000000002,
+            "ci95": [
+              17755.216999999997,
+              18177.167
+            ]
+          },
+          "loss_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reward": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 23.816827205,
+            "ci95": [
+              23.622019891875,
+              23.990824977
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.071776,
+            "ci95": [
+              0.06637557500000002,
+              0.08172695833333334
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 16.418973,
+            "throughput_kbps": 17816.9,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06559,
+            "window_latency_p95_ms": 23.932906799999998,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1781": {
+            "latency_ms": 16.162643383333332,
+            "throughput_kbps": 18376.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.066505,
+            "window_latency_p95_ms": 23.447802199999998,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1782": {
+            "latency_ms": 16.52021,
+            "throughput_kbps": 17605.2,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.11538916666666667,
+            "window_latency_p95_ms": 24.1244972,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1783": {
+            "latency_ms": 16.132858366666667,
+            "throughput_kbps": 18443.7,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06930083333333334,
+            "window_latency_p95_ms": 23.3914344,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1784": {
+            "latency_ms": 16.1599791,
+            "throughput_kbps": 18382.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06657583333333333,
+            "window_latency_p95_ms": 23.44276,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1785": {
+            "latency_ms": 16.482004033333332,
+            "throughput_kbps": 17684.5,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06769416666666667,
+            "window_latency_p95_ms": 24.052192350000002,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1786": {
+            "latency_ms": 16.4997875,
+            "throughput_kbps": 17647.5,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.0685925,
+            "window_latency_p95_ms": 24.08584815,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1787": {
+            "latency_ms": 16.512377,
+            "throughput_kbps": 17621.4,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.065265,
+            "window_latency_p95_ms": 24.109673649999998,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1788": {
+            "latency_ms": 16.453466475,
+            "throughput_kbps": 17744.2,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06647666666666667,
+            "window_latency_p95_ms": 23.99818555,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          },
+          "1789": {
+            "latency_ms": 16.234067083333333,
+            "throughput_kbps": 18217.0,
+            "loss_pct": 0.0,
+            "reward": 0.0,
+            "control_elapsed_ms": 0.06637083333333334,
+            "window_latency_p95_ms": 23.58297175,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.0
+          }
+        }
+      }
+    },
+    "excess_005": {
+      "H1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16755.62,
+            "ci95": [
+              16561.829500000003,
+              16972.77675
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.7017813,
+            "ci95": [
+              6.615524725,
+              6.787900007499999
+            ]
+          },
+          "reward": {
+            "mean": -0.157310055,
+            "ci95": [
+              -0.159006008,
+              -0.15560050890000002
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.03611258333333334,
+            "ci95": [
+              0.03580939166666666,
+              0.0364710875
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16622.7,
+            "loss_pct": 6.7288,
+            "reward": -0.15721135,
+            "control_elapsed_ms": 0.0355925,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.728799959600265
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17147.6,
+            "loss_pct": 6.71222,
+            "reward": -0.15998444,
+            "control_elapsed_ms": 0.03557916666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7122199614828055
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16408.7,
+            "loss_pct": 6.82275,
+            "reward": -0.15826736,
+            "control_elapsed_ms": 0.03583083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.822750451442912
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17247.0,
+            "loss_pct": 6.513738,
+            "reward": -0.15545148,
+            "control_elapsed_ms": 0.0356225,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.513738095367152
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17150.9,
+            "loss_pct": 6.724714,
+            "reward": -0.16032716,
+            "control_elapsed_ms": 0.035825,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.724713662616789
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16512.6,
+            "loss_pct": 6.653099,
+            "reward": -0.15462832,
+            "control_elapsed_ms": 0.035867500000000004,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.653099296192654
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16453.3,
+            "loss_pct": 6.793372,
+            "reward": -0.15780319,
+            "control_elapsed_ms": 0.036305833333333336,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.793372043619885
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16398.6,
+            "loss_pct": 6.965688,
+            "reward": -0.16180596,
+            "control_elapsed_ms": 0.036645,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.965687831888532
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16573.9,
+            "loss_pct": 6.621707,
+            "reward": -0.15420542,
+            "control_elapsed_ms": 0.03674416666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.62170689383183
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17040.9,
+            "loss_pct": 6.481725,
+            "reward": -0.15341587,
+            "control_elapsed_ms": 0.03711333333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.4817253868949605
+          }
+        }
+      },
+      "A3": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16755.62,
+            "ci95": [
+              16561.829500000003,
+              16972.77675
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.7017813,
+            "ci95": [
+              6.615524725,
+              6.787900007499999
+            ]
+          },
+          "reward": {
+            "mean": -0.157310055,
+            "ci95": [
+              -0.159006008,
+              -0.15560050890000002
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.2001295,
+            "ci95": [
+              0.19738749166666666,
+              0.2033252125
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16622.7,
+            "loss_pct": 6.7288,
+            "reward": -0.15721135,
+            "control_elapsed_ms": 0.19609166666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.728799959600265
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17147.6,
+            "loss_pct": 6.71222,
+            "reward": -0.15998444,
+            "control_elapsed_ms": 0.20989083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7122199614828055
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16408.7,
+            "loss_pct": 6.82275,
+            "reward": -0.15826736,
+            "control_elapsed_ms": 0.19611583333333332,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.822750451442912
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17247.0,
+            "loss_pct": 6.513738,
+            "reward": -0.15545148,
+            "control_elapsed_ms": 0.20414,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.513738095367152
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17150.9,
+            "loss_pct": 6.724714,
+            "reward": -0.16032716,
+            "control_elapsed_ms": 0.19773,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.724713662616789
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16512.6,
+            "loss_pct": 6.653099,
+            "reward": -0.15462832,
+            "control_elapsed_ms": 0.19509333333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.653099296192654
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16453.3,
+            "loss_pct": 6.793372,
+            "reward": -0.15780319,
+            "control_elapsed_ms": 0.2001125,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.793372043619885
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16398.6,
+            "loss_pct": 6.965688,
+            "reward": -0.16180596,
+            "control_elapsed_ms": 0.20434416666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.965687831888532
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16573.9,
+            "loss_pct": 6.621707,
+            "reward": -0.15420542,
+            "control_elapsed_ms": 0.195655,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.62170689383183
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17040.9,
+            "loss_pct": 6.481725,
+            "reward": -0.15341587,
+            "control_elapsed_ms": 0.20212166666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.4817253868949605
+          }
+        }
+      },
+      "A4": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 14.110491874166666,
+            "ci95": [
+              14.034983832229164,
+              14.177855134291669
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17727.9125,
+            "ci95": [
+              17530.250370833335,
+              17949.533945833336
+            ]
+          },
+          "loss_pct": {
+            "mean": 1.2845080825,
+            "ci95": [
+              1.2679755722916666,
+              1.3010141681041667
+            ]
+          },
+          "reward": {
+            "mean": -0.021863335875,
+            "ci95": [
+              -0.022208155036875,
+              -0.021529426565000002
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 22.6258639,
+            "ci95": [
+              22.44572512,
+              22.78676005
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.11213416666666666,
+            "ci95": [
+              0.10948775624999998,
+              0.11562168333333334
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 14.155418225,
+            "throughput_kbps": 17591.678333333333,
+            "loss_pct": 1.2896866666666666,
+            "reward": -0.021786399416666668,
+            "control_elapsed_ms": 0.10889166666666666,
+            "window_latency_p95_ms": 22.733203,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.289686658923384
+          },
+          "1781": {
+            "latency_ms": 13.967309958333333,
+            "throughput_kbps": 18144.54666666667,
+            "loss_pct": 1.2865088333333334,
+            "reward": -0.022557507666666667,
+            "control_elapsed_ms": 0.12566833333333333,
+            "window_latency_p95_ms": 22.284626,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.2865088259508712
+          },
+          "1782": {
+            "latency_ms": 14.229408108333333,
+            "throughput_kbps": 17379.537500000002,
+            "loss_pct": 1.30769375,
+            "reward": -0.021891749999999998,
+            "control_elapsed_ms": 0.10981166666666667,
+            "window_latency_p95_ms": 22.910367,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.307693836526558
+          },
+          "1783": {
+            "latency_ms": 13.946131083333334,
+            "throughput_kbps": 18217.99916666667,
+            "loss_pct": 1.24846645,
+            "reward": -0.021721962333333334,
+            "control_elapsed_ms": 0.11210416666666667,
+            "window_latency_p95_ms": 22.232502,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.2484664682787041
+          },
+          "1784": {
+            "latency_ms": 13.965312416666666,
+            "throughput_kbps": 18150.029166666667,
+            "loss_pct": 1.2889035166666667,
+            "reward": -0.022625347666666667,
+            "control_elapsed_ms": 0.11490500000000001,
+            "window_latency_p95_ms": 22.279963,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.288903452001551
+          },
+          "1785": {
+            "latency_ms": 14.201971191666667,
+            "throughput_kbps": 17463.552499999998,
+            "loss_pct": 1.2751773083333333,
+            "reward": -0.021234781333333334,
+            "control_elapsed_ms": 0.10781916666666666,
+            "window_latency_p95_ms": 22.843507,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.275177365103592
+          },
+          "1786": {
+            "latency_ms": 14.214519516666666,
+            "throughput_kbps": 17422.278333333332,
+            "loss_pct": 1.3020629666666665,
+            "reward": -0.02182265875,
+            "control_elapsed_ms": 0.11415083333333333,
+            "window_latency_p95_ms": 22.874628,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.3020629750271449
+          },
+          "1787": {
+            "latency_ms": 14.223162541666667,
+            "throughput_kbps": 17390.696666666667,
+            "loss_pct": 1.3350902,
+            "reward": -0.022573321666666667,
+            "control_elapsed_ms": 0.11051833333333333,
+            "window_latency_p95_ms": 22.89666,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.3350901677786353
+          },
+          "1788": {
+            "latency_ms": 14.181132966666667,
+            "throughput_kbps": 17523.559166666666,
+            "loss_pct": 1.2691605083333333,
+            "reward": -0.0211812335,
+            "control_elapsed_ms": 0.1095,
+            "window_latency_p95_ms": 22.793566,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.269160487984434
+          },
+          "1789": {
+            "latency_ms": 14.020552733333334,
+            "throughput_kbps": 17995.2475,
+            "loss_pct": 1.242330625,
+            "reward": -0.02123839641666667,
+            "control_elapsed_ms": 0.1079725,
+            "window_latency_p95_ms": 22.409617,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 1.2423306991548675
+          }
+        }
+      },
+      "O1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 17.299119359166667,
+            "ci95": [
+              17.1978479443125,
+              17.4182162524375
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17882.649833333333,
+            "ci95": [
+              17682.0796125,
+              18108.02475625
+            ]
+          },
+          "loss_pct": {
+            "mean": 0.42435512,
+            "ci95": [
+              0.40711865587500007,
+              0.44069673024999995
+            ]
+          },
+          "reward": {
+            "mean": 0.0002639126583333333,
+            "ci95": [
+              0.00017463643666666665,
+              0.0003648903510416667
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 27.3541467,
+            "ci95": [
+              27.024459987500002,
+              27.724582582500002
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.06872025,
+            "ci95": [
+              0.06723336458333334,
+              0.07036382916666667
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 17.2036882,
+            "throughput_kbps": 17741.953333333335,
+            "loss_pct": 0.44858666666666663,
+            "reward": 7.8624e-05,
+            "control_elapsed_ms": 0.06818416666666667,
+            "window_latency_p95_ms": 26.942689,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.44858666397335095
+          },
+          "1781": {
+            "latency_ms": 17.324964416666667,
+            "throughput_kbps": 18309.095,
+            "loss_pct": 0.3915461666666667,
+            "reward": 0.0002663459166666667,
+            "control_elapsed_ms": 0.07108416666666667,
+            "window_latency_p95_ms": 27.726388,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.3915461644198303
+          },
+          "1782": {
+            "latency_ms": 17.314315466666667,
+            "throughput_kbps": 17530.100000000002,
+            "loss_pct": 0.45485000000000003,
+            "reward": 0.00013107199999999998,
+            "control_elapsed_ms": 0.0737925,
+            "window_latency_p95_ms": 27.170472,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.454850030096194
+          },
+          "1783": {
+            "latency_ms": 17.291908125,
+            "throughput_kbps": 18378.2675,
+            "loss_pct": 0.37996805,
+            "reward": 0.0004892609166666667,
+            "control_elapsed_ms": 0.06957333333333333,
+            "window_latency_p95_ms": 27.654408,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.3799680555630839
+          },
+          "1784": {
+            "latency_ms": 17.321839733333334,
+            "throughput_kbps": 18314.9375,
+            "loss_pct": 0.3922749833333333,
+            "reward": 0.00024398266666666668,
+            "control_elapsed_ms": 0.06697083333333333,
+            "window_latency_p95_ms": 27.71995,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.392274963652646
+          },
+          "1785": {
+            "latency_ms": 17.273353666666665,
+            "throughput_kbps": 17611.04,
+            "loss_pct": 0.44353993333333336,
+            "reward": 0.00032101133333333333,
+            "control_elapsed_ms": 0.06787833333333333,
+            "window_latency_p95_ms": 27.084509,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.4435399530795103
+          },
+          "1786": {
+            "latency_ms": 17.292059066666667,
+            "throughput_kbps": 17572.553333333333,
+            "loss_pct": 0.45289146666666663,
+            "reward": 0.00013675466666666667,
+            "control_elapsed_ms": 0.06609333333333334,
+            "window_latency_p95_ms": 27.124522,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.45289146957465903
+          },
+          "1787": {
+            "latency_ms": 17.72478865,
+            "throughput_kbps": 17554.445,
+            "loss_pct": 0.4063318,
+            "reward": 0.00055403775,
+            "control_elapsed_ms": 0.06591166666666666,
+            "window_latency_p95_ms": 28.571578,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.40633179019349763
+          },
+          "1788": {
+            "latency_ms": 17.242199466666666,
+            "throughput_kbps": 17670.846666666668,
+            "loss_pct": 0.4414471333333333,
+            "reward": 0.00031433199999999996,
+            "control_elapsed_ms": 0.06606333333333334,
+            "window_latency_p95_ms": 27.0203,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.4414471262554553
+          },
+          "1789": {
+            "latency_ms": 17.0020768,
+            "throughput_kbps": 18143.26,
+            "loss_pct": 0.43211499999999997,
+            "reward": 0.00010370533333333333,
+            "control_elapsed_ms": 0.07165083333333333,
+            "window_latency_p95_ms": 26.526651,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 0.43211502579299743
+          }
+        }
+      }
+    },
+    "excess_05": {
+      "H1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16791.62,
+            "ci95": [
+              16597.829500000003,
+              17008.77675
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.7350275,
+            "ci95": [
+              6.648646305,
+              6.821089535
+            ]
+          },
+          "reward": {
+            "mean": -0.104616697,
+            "ci95": [
+              -0.10645761814999999,
+              -0.10284648199999999
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.037427749999999996,
+            "ci95": [
+              0.03659475833333333,
+              0.038444541666666665
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16658.7,
+            "loss_pct": 6.762225,
+            "reward": -0.10415176,
+            "control_elapsed_ms": 0.037560833333333335,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.762225120194324
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17183.6,
+            "loss_pct": 6.744671,
+            "reward": -0.10845309,
+            "control_elapsed_ms": 0.03758333333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7446706898797375
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16444.7,
+            "loss_pct": 6.856337,
+            "reward": -0.10460197,
+            "control_elapsed_ms": 0.03950416666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.856336943223524
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17283.0,
+            "loss_pct": 6.546554,
+            "reward": -0.10410248,
+            "control_elapsed_ms": 0.036101666666666664,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.546553691257024
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17186.9,
+            "loss_pct": 6.757123,
+            "reward": -0.10881137,
+            "control_elapsed_ms": 0.03617083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7571233263167025
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16548.6,
+            "loss_pct": 6.686966,
+            "reward": -0.10119496,
+            "control_elapsed_ms": 0.04081083333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.686966083058446
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16489.3,
+            "loss_pct": 6.826953,
+            "reward": -0.10426028,
+            "control_elapsed_ms": 0.03631583333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.82695295945755
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16434.6,
+            "loss_pct": 6.99888,
+            "reward": -0.10818362,
+            "control_elapsed_ms": 0.036171666666666664,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.998879545480265
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16609.9,
+            "loss_pct": 6.655539,
+            "reward": -0.10094295,
+            "control_elapsed_ms": 0.03738583333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.655539445437275
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17076.9,
+            "loss_pct": 6.515027,
+            "reward": -0.10146449,
+            "control_elapsed_ms": 0.0366725,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.515027098045657
+          }
+        }
+      },
+      "A3": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 16791.62,
+            "ci95": [
+              16597.829500000003,
+              17008.77675
+            ]
+          },
+          "loss_pct": {
+            "mean": 6.7350275,
+            "ci95": [
+              6.648646305,
+              6.821089535
+            ]
+          },
+          "reward": {
+            "mean": -0.104616697,
+            "ci95": [
+              -0.10645761814999999,
+              -0.10284648199999999
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 8.0,
+            "ci95": [
+              8.0,
+              8.0
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.21189249999999998,
+            "ci95": [
+              0.20098924375,
+              0.22685115625000002
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16658.7,
+            "loss_pct": 6.762225,
+            "reward": -0.10415176,
+            "control_elapsed_ms": 0.20447916666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.762225120194324
+          },
+          "1781": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17183.6,
+            "loss_pct": 6.744671,
+            "reward": -0.10845309,
+            "control_elapsed_ms": 0.20035333333333333,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7446706898797375
+          },
+          "1782": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16444.7,
+            "loss_pct": 6.856337,
+            "reward": -0.10460197,
+            "control_elapsed_ms": 0.20096666666666665,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.856336943223524
+          },
+          "1783": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17283.0,
+            "loss_pct": 6.546554,
+            "reward": -0.10410248,
+            "control_elapsed_ms": 0.19908416666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.546553691257024
+          },
+          "1784": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17186.9,
+            "loss_pct": 6.757123,
+            "reward": -0.10881137,
+            "control_elapsed_ms": 0.20037333333333332,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.7571233263167025
+          },
+          "1785": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16548.6,
+            "loss_pct": 6.686966,
+            "reward": -0.10119496,
+            "control_elapsed_ms": 0.202575,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.686966083058446
+          },
+          "1786": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16489.3,
+            "loss_pct": 6.826953,
+            "reward": -0.10426028,
+            "control_elapsed_ms": 0.19559333333333334,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.82695295945755
+          },
+          "1787": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16434.6,
+            "loss_pct": 6.99888,
+            "reward": -0.10818362,
+            "control_elapsed_ms": 0.21246666666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.998879545480265
+          },
+          "1788": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 16609.9,
+            "loss_pct": 6.655539,
+            "reward": -0.10094295,
+            "control_elapsed_ms": 0.26649666666666666,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.655539445437275
+          },
+          "1789": {
+            "latency_ms": 8.0,
+            "throughput_kbps": 17076.9,
+            "loss_pct": 6.515027,
+            "reward": -0.10146449,
+            "control_elapsed_ms": 0.23653666666666667,
+            "window_latency_p95_ms": 8.0,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 6.515027098045657
+          }
+        }
+      },
+      "A4": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 10.839107755,
+            "ci95": [
+              10.803141514500002,
+              10.871045898562501
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17246.232500000002,
+            "ci95": [
+              17050.476937500003,
+              17465.311187500003
+            ]
+          },
+          "loss_pct": {
+            "mean": 4.2093921875,
+            "ci95": [
+              4.155403940625,
+              4.263180959375
+            ]
+          },
+          "reward": {
+            "mean": -0.02342855985,
+            "ci95": [
+              -0.024801349598541668,
+              -0.022165073530416666
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 14.9646972,
+            "ci95": [
+              14.878916892499998,
+              15.041314387500002
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.123086,
+            "ci95": [
+              0.11706200208333335,
+              0.13223014583333334
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 10.860360499999999,
+            "throughput_kbps": 17111.775,
+            "loss_pct": 4.226390625,
+            "reward": -0.022844398166666665,
+            "control_elapsed_ms": 0.117425,
+            "window_latency_p95_ms": 15.015811,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.226390700121452
+          },
+          "1781": {
+            "latency_ms": 10.769695766666667,
+            "throughput_kbps": 17649.65,
+            "loss_pct": 4.215419375,
+            "reward": -0.02674482925,
+            "control_elapsed_ms": 0.12864916666666668,
+            "window_latency_p95_ms": 14.802203,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.215419181174836
+          },
+          "1782": {
+            "latency_ms": 10.894606966666666,
+            "throughput_kbps": 16898.6375,
+            "loss_pct": 4.2852106249999995,
+            "reward": -0.022634568166666667,
+            "control_elapsed_ms": 0.11463,
+            "window_latency_p95_ms": 15.100175,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.285210589514702
+          },
+          "1783": {
+            "latency_ms": 10.76266085,
+            "throughput_kbps": 17737.0125,
+            "loss_pct": 4.09159625,
+            "reward": -0.024194544666666665,
+            "control_elapsed_ms": 0.11746083333333333,
+            "window_latency_p95_ms": 14.777382,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.091596057035641
+          },
+          "1784": {
+            "latency_ms": 10.768535625,
+            "throughput_kbps": 17653.9625,
+            "loss_pct": 4.223201875,
+            "reward": -0.02697960716666667,
+            "control_elapsed_ms": 0.13077166666666667,
+            "window_latency_p95_ms": 14.799983,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.2232020789479385
+          },
+          "1785": {
+            "latency_ms": 10.884191858333333,
+            "throughput_kbps": 16993.3125,
+            "loss_pct": 4.17935375,
+            "reward": -0.020710640666666665,
+            "control_elapsed_ms": 0.11553,
+            "window_latency_p95_ms": 15.068337,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.179353801911529
+          },
+          "1786": {
+            "latency_ms": 10.887889166666668,
+            "throughput_kbps": 16942.375,
+            "loss_pct": 4.266845625,
+            "reward": -0.022521627833333332,
+            "control_elapsed_ms": 0.11553666666666666,
+            "window_latency_p95_ms": 15.083156,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.266845599660968
+          },
+          "1787": {
+            "latency_ms": 10.889269641666667,
+            "throughput_kbps": 16898.4,
+            "loss_pct": 4.3743,
+            "reward": -0.02488960808333333,
+            "control_elapsed_ms": 0.11670666666666667,
+            "window_latency_p95_ms": 15.093647,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.374299715925166
+          },
+          "1788": {
+            "latency_ms": 10.874634858333334,
+            "throughput_kbps": 17054.0125,
+            "loss_pct": 4.159711875,
+            "reward": -0.020692373166666667,
+            "control_elapsed_ms": 0.11751916666666666,
+            "window_latency_p95_ms": 15.044555,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.159712153398296
+          },
+          "1789": {
+            "latency_ms": 10.799232316666666,
+            "throughput_kbps": 17523.1875,
+            "loss_pct": 4.071891875,
+            "reward": -0.022073401333333336,
+            "control_elapsed_ms": 0.15663083333333333,
+            "window_latency_p95_ms": 14.861723,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 4.071891936278536
+          }
+        }
+      },
+      "O1": {
+        "metrics": {
+          "latency_ms": {
+            "mean": 11.6243609,
+            "ci95": [
+              11.57844651125,
+              11.665133070000001
+            ]
+          },
+          "throughput_kbps": {
+            "mean": 17397.77,
+            "ci95": [
+              17202.241250000003,
+              17617.328875
+            ]
+          },
+          "loss_pct": {
+            "mean": 3.36751375,
+            "ci95": [
+              3.3243231525,
+              3.4105447675
+            ]
+          },
+          "reward": {
+            "mean": 0.004273129,
+            "ci95": [
+              0.002997282025,
+              0.0054282215375000015
+            ]
+          },
+          "window_latency_p95_ms": {
+            "mean": 14.9646972,
+            "ci95": [
+              14.878916892499998,
+              15.041314387500002
+            ]
+          },
+          "safety_veto_pct": {
+            "mean": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          },
+          "control_elapsed_ms": {
+            "mean": 0.07289158333333333,
+            "ci95": [
+              0.06990060625000001,
+              0.07683202916666666
+            ]
+          }
+        },
+        "seed_metrics": {
+          "1780": {
+            "latency_ms": 11.651492,
+            "throughput_kbps": 17262.800000000003,
+            "loss_pct": 3.3811125,
+            "reward": 0.00490191,
+            "control_elapsed_ms": 0.07385416666666667,
+            "window_latency_p95_ms": 15.015811,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.381112560097162
+          },
+          "1781": {
+            "latency_ms": 11.535750499999999,
+            "throughput_kbps": 17805.0,
+            "loss_pct": 3.3723355,
+            "reward": 0.001113885,
+            "control_elapsed_ms": 0.07895666666666666,
+            "window_latency_p95_ms": 14.802203,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.3723353449398688
+          },
+          "1782": {
+            "latency_ms": 11.695211,
+            "throughput_kbps": 17049.95,
+            "loss_pct": 3.4281685,
+            "reward": 0.005339425,
+            "control_elapsed_ms": 0.06852166666666666,
+            "window_latency_p95_ms": 15.100175,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.428168471611762
+          },
+          "1783": {
+            "latency_ms": 11.526769,
+            "throughput_kbps": 17888.35,
+            "loss_pct": 3.273277,
+            "reward": 0.00306319,
+            "control_elapsed_ms": 0.06896333333333333,
+            "window_latency_p95_ms": 14.777382,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.273276845628512
+          },
+          "1784": {
+            "latency_ms": 11.5342695,
+            "throughput_kbps": 17809.65,
+            "loss_pct": 3.3785615,
+            "reward": 0.000919955,
+            "control_elapsed_ms": 0.0755075,
+            "window_latency_p95_ms": 14.799983,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.3785616631583513
+          },
+          "1785": {
+            "latency_ms": 11.6819145,
+            "throughput_kbps": 17141.55,
+            "loss_pct": 3.343483,
+            "reward": 0.00676724,
+            "control_elapsed_ms": 0.06843250000000001,
+            "window_latency_p95_ms": 15.068337,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.343483041529223
+          },
+          "1786": {
+            "latency_ms": 11.686635,
+            "throughput_kbps": 17093.4,
+            "loss_pct": 3.4134765,
+            "reward": 0.005374655,
+            "control_elapsed_ms": 0.06973,
+            "window_latency_p95_ms": 15.083156,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.413476479728775
+          },
+          "1787": {
+            "latency_ms": 11.688398,
+            "throughput_kbps": 17053.0,
+            "loss_pct": 3.49944,
+            "reward": 0.00352477,
+            "control_elapsed_ms": 0.0694325,
+            "window_latency_p95_ms": 15.093647,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.4994397727401325
+          },
+          "1788": {
+            "latency_ms": 11.669714,
+            "throughput_kbps": 17202.050000000003,
+            "loss_pct": 3.3277695,
+            "reward": 0.006705475,
+            "control_elapsed_ms": 0.06943666666666666,
+            "window_latency_p95_ms": 15.044555,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.3277697227186374
+          },
+          "1789": {
+            "latency_ms": 11.5734555,
+            "throughput_kbps": 17671.95,
+            "loss_pct": 3.2575135,
+            "reward": 0.005020785,
+            "control_elapsed_ms": 0.08608083333333333,
+            "window_latency_p95_ms": 14.861723,
+            "safety_veto_pct": 0.0,
+            "pooled_loss_pct": 3.2575135490228284
+          }
+        }
+      }
+    }
+  },
+  "paired_comparisons": {
+    "excess_0001": {
+      "A4_minus_H1": {
+        "latency_ms": {
+          "mean_difference": 1.5889956558333336,
+          "ci95": [
+            1.5694248685625003,
+            1.606475876125
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 1172.047500000001,
+          "ci95": [
+            1159.0992562500003,
+            1185.7277250000006
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -6.5300255475,
+          "ci95": [
+            -6.613810831874999,
+            -6.4467642403125005
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.15895540635,
+          "ci95": [
+            0.15729101534249995,
+            0.160617396151875
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 3.079788945,
+          "ci95": [
+            3.041856991625,
+            3.1136689702500004
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": 0.06777158333333333,
+          "ci95": [
+            0.06539854791666667,
+            0.07047060624999998
+          ]
+        }
+      },
+      "A4_minus_A3": {
+        "latency_ms": {
+          "mean_difference": 1.5889956558333336,
+          "ci95": [
+            1.5694248685625003,
+            1.606475876125
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 1172.047500000001,
+          "ci95": [
+            1159.0992562500003,
+            1185.7277250000006
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -6.5300255475,
+          "ci95": [
+            -6.613810831874999,
+            -6.4467642403125005
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.15895540635,
+          "ci95": [
+            0.15729101534249995,
+            0.160617396151875
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 3.079788945,
+          "ci95": [
+            3.041856991625,
+            3.1136689702500004
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": -0.09729483333333333,
+          "ci95": [
+            -0.10176661874999998,
+            -0.093573175
+          ]
+        }
+      }
+    },
+    "excess_0005": {
+      "A4_minus_H1": {
+        "latency_ms": {
+          "mean_difference": 6.2372606091666665,
+          "ci95": [
+            6.153074349041667,
+            6.309707143833332
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 1162.361666666667,
+          "ci95": [
+            1149.6014458333323,
+            1175.7676770833339
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -6.475674866666666,
+          "ci95": [
+            -6.557652917333334,
+            -6.393269198916666
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.1581423982,
+          "ci95": [
+            0.156505957434375,
+            0.15977586218979162
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 13.421038594999999,
+          "ci95": [
+            13.248158495624999,
+            13.571801364499999
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": 0.071311,
+          "ci95": [
+            0.06667461666666666,
+            0.07859121666666667
+          ]
+        }
+      },
+      "A4_minus_A3": {
+        "latency_ms": {
+          "mean_difference": 6.2372606091666665,
+          "ci95": [
+            6.153074349041667,
+            6.309707143833332
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 1162.361666666667,
+          "ci95": [
+            1149.6014458333323,
+            1175.7676770833339
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -6.475674866666666,
+          "ci95": [
+            -6.557652917333334,
+            -6.393269198916666
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.1581423982,
+          "ci95": [
+            0.156505957434375,
+            0.15977586218979162
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 13.421038594999999,
+          "ci95": [
+            13.248158495624999,
+            13.571801364499999
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": -0.09482116666666666,
+          "ci95": [
+            -0.10649568333333334,
+            -0.08424460416666665
+          ]
+        }
+      }
+    },
+    "excess_005": {
+      "A4_minus_H1": {
+        "latency_ms": {
+          "mean_difference": 6.110491874166667,
+          "ci95": [
+            6.034983832229167,
+            6.177855134291666
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 972.2925000000002,
+          "ci95": [
+            961.5659166666665,
+            983.5691541666678
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -5.4172732175,
+          "ci95": [
+            -5.486885839395834,
+            -5.347549152708333
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.135446719125,
+          "ci95": [
+            0.13405276966895835,
+            0.136812674324375
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 14.6258639,
+          "ci95": [
+            14.44572512,
+            14.786760049999998
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": 0.07602158333333334,
+          "ci95": [
+            0.07319863124999999,
+            0.07963591041666668
+          ]
+        }
+      },
+      "A4_minus_A3": {
+        "latency_ms": {
+          "mean_difference": 6.110491874166667,
+          "ci95": [
+            6.034983832229167,
+            6.177855134291666
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 972.2925000000002,
+          "ci95": [
+            961.5659166666665,
+            983.5691541666678
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -5.4172732175,
+          "ci95": [
+            -5.486885839395834,
+            -5.347549152708333
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.135446719125,
+          "ci95": [
+            0.13405276966895835,
+            0.136812674324375
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 14.6258639,
+          "ci95": [
+            14.44572512,
+            14.786760049999998
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": -0.08799533333333333,
+          "ci95": [
+            -0.09051977916666666,
+            -0.08576483541666666
+          ]
+        }
+      }
+    },
+    "excess_05": {
+      "A4_minus_H1": {
+        "latency_ms": {
+          "mean_difference": 2.8391077549999997,
+          "ci95": [
+            2.8031415145,
+            2.8710458985624996
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 454.61250000000075,
+          "ci95": [
+            449.6362500000003,
+            459.8439375000018
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -2.5256353125,
+          "ci95": [
+            -2.5579085756249995,
+            -2.493242364375
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.08118813715,
+          "ci95": [
+            0.08048349650833332,
+            0.08188533172749998
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 6.9646972,
+          "ci95": [
+            6.8789168924999995,
+            7.0413143875
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": 0.08565825,
+          "ci95": [
+            0.07916708333333333,
+            0.09487512083333337
+          ]
+        }
+      },
+      "A4_minus_A3": {
+        "latency_ms": {
+          "mean_difference": 2.8391077549999997,
+          "ci95": [
+            2.8031415145,
+            2.8710458985624996
+          ]
+        },
+        "throughput_kbps": {
+          "mean_difference": 454.61250000000075,
+          "ci95": [
+            449.6362500000003,
+            459.8439375000018
+          ]
+        },
+        "loss_pct": {
+          "mean_difference": -2.5256353125,
+          "ci95": [
+            -2.5579085756249995,
+            -2.493242364375
+          ]
+        },
+        "reward": {
+          "mean_difference": 0.08118813715,
+          "ci95": [
+            0.08048349650833332,
+            0.08188533172749998
+          ]
+        },
+        "window_latency_p95_ms": {
+          "mean_difference": 6.9646972,
+          "ci95": [
+            6.8789168924999995,
+            7.0413143875
+          ]
+        },
+        "safety_veto_pct": {
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "control_elapsed_ms": {
+          "mean_difference": -0.0888065,
+          "ci95": [
+            -0.10365037916666667,
+            -0.07840971875
+          ]
+        }
+      }
+    }
+  },
+  "wall_seconds": 2.9749180999997407,
+  "provenance": "simulation"
+}

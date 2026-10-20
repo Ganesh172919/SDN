@@ -3,9 +3,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from selfx.eval.result_schema import ResultValidationError, SCHEMA_VERSION
-from selfx.eval.result_writer import ResultWriter, read_run
-from selfx.eval.tests.test_result_schema import valid_metric, valid_run
+from eval.result_schema import ResultValidationError, SCHEMA_VERSION
+from eval.result_writer import ResultWriter, read_run
+from eval.tests.test_result_schema import valid_metric, valid_run
 
 
 class ResultWriterTests(unittest.TestCase):

@@ -3,13 +3,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from selfx.eval.result_integration import (
+from eval.result_integration import (
     ExperimentResultRecorder,
     build_metric_record,
     build_run_metadata,
 )
-from selfx.eval.result_schema import ResultValidationError, validate_metric_record, validate_run_metadata
-from selfx.eval.result_writer import read_run
+from eval.result_schema import ResultValidationError, validate_metric_record, validate_run_metadata
+from eval.result_writer import read_run
 
 
 def row(cycle=0, action="no_op"):

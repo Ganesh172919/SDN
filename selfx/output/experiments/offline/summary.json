@@ -1,0 +1,308 @@
+{
+  "schema": "selfx.simulation.v1",
+  "created_at_utc": "2026-10-20T04:45:06.169172+00:00",
+  "provenance": "simulation",
+  "decision_backend": "offline",
+  "seeds": [
+    1729,
+    1730,
+    1731,
+    1732,
+    1733
+  ],
+  "cycles_per_condition_seed": 120,
+  "simulated_seconds_per_condition_seed": 600.0,
+  "wall_seconds": 3.6042978999994375,
+  "trace_sha256": {
+    "1729": "c765efd6306730d447a525595e53e6da3dfafe80786306b0f8831ba1c0dbc380",
+    "1730": "d147f1271f52ee89983f4164491828ff77069ce0720ad8ee25de9d6e7d7738bb",
+    "1731": "f854e410bdc659daee0da20e121dc3cd330a155fc96a7c889a7af81e886eaf83",
+    "1732": "5db7a127e601311a333fd373e81307a9152144a7a18fb2d06daf3895027acf0e",
+    "1733": "e3078182f7924e8c288b5e7d0c2c6e271d6c3825b4483da682034c5535ddc660"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "topology": "diamond-4-switch-8-host-logical-paths",
+  "capacity_per_path_mbps": 10,
+  "buffer_per_path_mbit": 0.5,
+  "interval_seconds": 5.0,
+  "conditions": {
+    "A0": {
+      "label": "Static primary path",
+      "windows": 600,
+      "latency_ms": 30.296275818333335,
+      "throughput_kbps": 13325.941833333334,
+      "loss_pct": 9.966163535,
+      "reward": 0.0,
+      "control_elapsed_ms": 0.04070833333333333,
+      "pooled_loss_pct": 12.435306305178258,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "actions": {
+        "no_op": 600
+      }
+    },
+    "B1": {
+      "label": "Greedy least-loaded path",
+      "windows": 600,
+      "latency_ms": 27.422634855,
+      "throughput_kbps": 13399.493333333334,
+      "loss_pct": 9.416323493333334,
+      "reward": 0.032804361666666663,
+      "control_elapsed_ms": 0.04258833333333333,
+      "pooled_loss_pct": 11.952030007067979,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "actions": {
+        "reroute": 220,
+        "no_op": 380
+      }
+    },
+    "A1": {
+      "label": "Controller without memory",
+      "windows": 600,
+      "latency_ms": 23.858901376666665,
+      "throughput_kbps": 13307.594333333333,
+      "loss_pct": 10.012542381666666,
+      "reward": 0.04502417166666667,
+      "control_elapsed_ms": 0.05998333333333333,
+      "pooled_loss_pct": 12.555860092382847,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "actions": {
+        "no_op": 151,
+        "reroute": 69,
+        "rate_limit": 380
+      }
+    },
+    "A2": {
+      "label": "Controller with state embedding memory",
+      "windows": 600,
+      "latency_ms": 24.984365153333332,
+      "throughput_kbps": 13232.923333333334,
+      "loss_pct": 10.690915311666666,
+      "reward": 0.02397173,
+      "control_elapsed_ms": 5.471918333333333,
+      "pooled_loss_pct": 13.046492159114225,
+      "safety_vetoes": 62,
+      "fallback_windows": 0,
+      "actions": {
+        "no_op": 175,
+        "reroute": 51,
+        "rate_limit": 374
+      }
+    }
+  },
+  "seed_means": {
+    "A0": {
+      "1729": {
+        "latency_ms": 29.679340591666666,
+        "throughput_kbps": 13386.768333333333,
+        "loss_pct": 10.9491128,
+        "reward": 0.0
+      },
+      "1730": {
+        "latency_ms": 31.19994675,
+        "throughput_kbps": 13362.815,
+        "loss_pct": 10.61303735,
+        "reward": 0.0
+      },
+      "1731": {
+        "latency_ms": 30.493427,
+        "throughput_kbps": 13305.001666666667,
+        "loss_pct": 9.312779016666667,
+        "reward": 0.0
+      },
+      "1732": {
+        "latency_ms": 27.910523491666666,
+        "throughput_kbps": 13376.334166666667,
+        "loss_pct": 8.933826625,
+        "reward": 0.0
+      },
+      "1733": {
+        "latency_ms": 32.19814125833334,
+        "throughput_kbps": 13198.789999999999,
+        "loss_pct": 10.022061883333333,
+        "reward": 0.0
+      }
+    },
+    "B1": {
+      "1729": {
+        "latency_ms": 27.425389525,
+        "throughput_kbps": 13424.568333333333,
+        "loss_pct": 10.658023416666667,
+        "reward": 0.02255905
+      },
+      "1730": {
+        "latency_ms": 29.263574541666667,
+        "throughput_kbps": 13431.059166666666,
+        "loss_pct": 10.115419516666666,
+        "reward": 0.024534083333333335
+      },
+      "1731": {
+        "latency_ms": 27.588078033333332,
+        "throughput_kbps": 13368.244166666667,
+        "loss_pct": 8.838059416666667,
+        "reward": 0.03188635833333334
+      },
+      "1732": {
+        "latency_ms": 25.26808235,
+        "throughput_kbps": 13440.147500000001,
+        "loss_pct": 8.455142500000001,
+        "reward": 0.029269616666666665
+      },
+      "1733": {
+        "latency_ms": 27.568049825,
+        "throughput_kbps": 13333.4475,
+        "loss_pct": 9.014972616666666,
+        "reward": 0.0557727
+      }
+    },
+    "A1": {
+      "1729": {
+        "latency_ms": 25.659531191666666,
+        "throughput_kbps": 13341.7,
+        "loss_pct": 11.229672158333333,
+        "reward": 0.02335168333333333
+      },
+      "1730": {
+        "latency_ms": 25.729375991666668,
+        "throughput_kbps": 13351.135833333334,
+        "loss_pct": 10.651192858333333,
+        "reward": 0.037314875
+      },
+      "1731": {
+        "latency_ms": 22.949687191666666,
+        "throughput_kbps": 13235.805,
+        "loss_pct": 9.666973316666667,
+        "reward": 0.046324591666666665
+      },
+      "1732": {
+        "latency_ms": 21.55133165,
+        "throughput_kbps": 13338.819166666666,
+        "loss_pct": 9.108130216666666,
+        "reward": 0.04008300833333333
+      },
+      "1733": {
+        "latency_ms": 23.404580858333333,
+        "throughput_kbps": 13270.511666666667,
+        "loss_pct": 9.406743358333333,
+        "reward": 0.0780467
+      }
+    },
+    "A2": {
+      "1729": {
+        "latency_ms": 25.849591033333333,
+        "throughput_kbps": 13281.245833333332,
+        "loss_pct": 11.792800625,
+        "reward": 0.011485091666666666
+      },
+      "1730": {
+        "latency_ms": 26.578280925,
+        "throughput_kbps": 13287.018333333333,
+        "loss_pct": 11.199933275,
+        "reward": 0.020463183333333333
+      },
+      "1731": {
+        "latency_ms": 23.993814266666668,
+        "throughput_kbps": 13177.971666666666,
+        "loss_pct": 10.267303541666667,
+        "reward": 0.027692025
+      },
+      "1732": {
+        "latency_ms": 23.393933483333335,
+        "throughput_kbps": 13323.458333333334,
+        "loss_pct": 9.2413401,
+        "reward": 0.024214641666666665
+      },
+      "1733": {
+        "latency_ms": 25.106206058333335,
+        "throughput_kbps": 13094.9225,
+        "loss_pct": 10.953199016666666,
+        "reward": 0.03600370833333333
+      }
+    }
+  },
+  "paired_seed_comparisons": {
+    "B1_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -2.873640963333334,
+        "ci95": [
+          -4.17600592624144,
+          -1.571276000425228
+        ]
+      },
+      "throughput_kbps": {
+        "mean_difference": 73.55149999999995,
+        "ci95": [
+          28.612063232063,
+          118.49093676793689
+        ]
+      },
+      "loss_pct": {
+        "mean_difference": -0.5498400416666666,
+        "ci95": [
+          -0.8838045876709173,
+          -0.21587549566241587
+        ]
+      }
+    },
+    "A1_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -6.437374441666667,
+        "ci95": [
+          -8.723246455134358,
+          -4.151502428198976
+        ]
+      },
+      "throughput_kbps": {
+        "mean_difference": -18.347499999999854,
+        "ci95": [
+          -85.84471466271957,
+          49.14971466271986
+        ]
+      },
+      "loss_pct": {
+        "mean_difference": 0.04637884666666636,
+        "ci95": [
+          -0.4359852592627772,
+          0.5287429525961099
+        ]
+      }
+    },
+    "A2_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -5.311910664999999,
+        "ci95": [
+          -7.054931198152703,
+          -3.5688901318472954
+        ]
+      },
+      "throughput_kbps": {
+        "mean_difference": -93.01850000000013,
+        "ci95": [
+          -128.8861935221512,
+          -57.15080647784908
+        ]
+      },
+      "loss_pct": {
+        "mean_difference": 0.7247517766666665,
+        "ci95": [
+          0.3832765531291127,
+          1.0662270002042202
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Analytical fluid simulation; no packets or physical SDN measurements.",
+    "Offline controller results do not establish LLM effectiveness.",
+    "One workload family and topology; no external dataset calibration.",
+    "State embedding is hand-designed and normalized, not a trained neural representation.",
+    "Reward compares each action against a same-window no-op model counterfactual.",
+    "Mean window loss and pooled traffic-volume loss are different statistics.",
+    "No guarantee that reflection or memory improves results."
+  ]
+}

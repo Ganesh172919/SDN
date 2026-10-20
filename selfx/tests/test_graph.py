@@ -116,6 +116,7 @@ def test_full_cycle_reroute_allowed():
         latency_fn=lambda: 10.0,
         wait_fn=lambda secs: None,   # don't actually sleep in a test
         interval_sec=5.0,
+        allowed_reroute_ports_fn=lambda dpid, match: [3],
     )
     app = build_graph(deps)
     result = run_cycle(app, cycle=0, raw_state_prev=None)
@@ -167,6 +168,7 @@ def test_full_cycle_unsafe_rate_limit_falls_back_to_noop():
         latency_fn=lambda: 10.0,
         wait_fn=lambda secs: None,
         interval_sec=5.0,
+        allowed_reroute_ports_fn=lambda dpid, match: [3],
     )
     app = build_graph(deps)
     result = run_cycle(app, cycle=1, raw_state_prev=None)

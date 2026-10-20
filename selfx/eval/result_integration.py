@@ -26,14 +26,14 @@ except ImportError:  # pragma: no cover - supports imports from repository root
 
 
 RESULT_PROVENANCE = "live"
-DEFAULT_RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
+DEFAULT_RESULTS_ROOT = Path(__file__).resolve().parents[1] / "output" / "testbed_results"
 
 
 def _git_commit() -> str:
     try:
         return subprocess.check_output(
             ["git", "rev-parse", "HEAD"],
-            cwd=Path(__file__).resolve().parents[2],
+            cwd=Path(__file__).resolve().parents[1],
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip() or "unknown"

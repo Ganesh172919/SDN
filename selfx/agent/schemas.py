@@ -41,6 +41,14 @@ class DecisionOutput(BaseModel):
         """Extra structural checks beyond what the schema/type system enforces."""
         if self.action not in config.ACTIONS:
             return False
+        if self.target_dpid is not None and self.target_dpid <= 0:
+            return False
+        if self.action != "no_op" and not self.target_flow_match:
+            return False
+        if self.reroute_out_port is not None and self.reroute_out_port <= 0:
+            return False
+        if self.rate_limit_kbps is not None and self.rate_limit_kbps <= 0:
+            return False
         if self.action == "reroute" and (
             self.target_dpid is None
             or self.target_flow_match is None

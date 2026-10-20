@@ -33,7 +33,6 @@ import time
 
 import config
 import ryu_client
-import topo
 import traffic_gen
 import latency_probe
 from agent import metrics
@@ -46,12 +45,8 @@ except ImportError:
 
 
 def _make_llm():
-    from langchain_anthropic import ChatAnthropic
-    return ChatAnthropic(
-        model=config.ANTHROPIC_MODEL,
-        temperature=config.LLM_TEMPERATURE,
-        max_tokens=config.LLM_MAX_TOKENS,
-    )
+    from agent.providers import RestLLM
+    return RestLLM(os.environ.get("SDN_LLM_PROVIDER", "auto"))
 
 
 def _clear_all_flows(dpids):
@@ -69,6 +64,7 @@ def _run_condition(condition: str, run_duration_sec: int, out_dir: str, results_
 
     net = None
     try:
+        import topo  # Linux-only dependency must not break portable CLI help.
         net = topo.build_net()
         time.sleep(2)  # let OVS<->Ryu handshake settle
         dpids = ryu_client.get_switches()

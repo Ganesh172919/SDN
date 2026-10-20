@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from selfx.eval.result_schema import (
+from eval.result_schema import (
     ResultValidationError,
     SCHEMA_VERSION,
     validate_artifact_path,

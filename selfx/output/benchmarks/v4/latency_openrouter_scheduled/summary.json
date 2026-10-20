@@ -1,0 +1,108 @@
+{
+  "schema": "selfx.latency.v4",
+  "created_at_utc": "2026-10-20T08:38:56.941563+00:00",
+  "provider": "openrouter",
+  "seeds": [
+    1940,
+    1941
+  ],
+  "cycles": 12,
+  "window_count": 48,
+  "trace_sha256": {
+    "1940": "2248eab9b1b65dede0f6850e3f1f204334319bfe7a2b81d865922ede62c0a05d",
+    "1941": "2c80ed419e8ebfe69820e480ff27adbbeb818c25945643791572a7b4f92fbd02"
+  },
+  "groups": {
+    "previous": {
+      "label": "Previous v3 hybrid, fixed 20% meter",
+      "windows": 24,
+      "origins": {
+        "healthy_bypass": 2,
+        "fallback_heuristic": 12,
+        "api": 6,
+        "api_cache": 4
+      },
+      "control_elapsed_ms": 1094.588166666502,
+      "latency_ms": 17.801743208333335,
+      "throughput_kbps": 12640.358333333334,
+      "loss_pct": 7.32317,
+      "reward": 0.14143398550000003,
+      "pacing_ms": 0.0005,
+      "p95_control_ms": 4178.670240000064,
+      "max_control_ms": 5151.956799998516,
+      "api_calls": 12,
+      "api_successes": 6,
+      "deadline_miss": 1,
+      "local_timeouts": 0,
+      "deferred": 0,
+      "per_seed": {
+        "1940": {
+          "control_elapsed_ms": 547.4108583334782,
+          "latency_ms": 17.735926833333334,
+          "loss_pct": 7.210892333333333,
+          "reward": 0.13861594933333335
+        },
+        "1941": {
+          "control_elapsed_ms": 1641.765474999526,
+          "latency_ms": 17.867559583333332,
+          "loss_pct": 7.435447666666667,
+          "reward": 0.1442520216666667
+        }
+      }
+    },
+    "bounded": {
+      "label": "Bounded provider wait and loss-aware memory",
+      "windows": 24,
+      "origins": {
+        "healthy_bypass": 2,
+        "provider_fallback": 6,
+        "deadline_fallback": 7,
+        "api": 6,
+        "api_cache": 3
+      },
+      "control_elapsed_ms": 2243.931574999806,
+      "latency_ms": 17.807405125,
+      "throughput_kbps": 12687.216666666667,
+      "loss_pct": 7.063220375,
+      "reward": 0.1477416174166667,
+      "pacing_ms": 0.01653333310969174,
+      "p95_control_ms": 3619.5946999992884,
+      "max_control_ms": 3620.6490000004123,
+      "api_calls": 19,
+      "api_successes": 6,
+      "deadline_miss": 0,
+      "local_timeouts": 7,
+      "deferred": 0,
+      "per_seed": {
+        "1940": {
+          "control_elapsed_ms": 2704.448416666461,
+          "latency_ms": 17.740804166666667,
+          "loss_pct": 6.80561125,
+          "reward": 0.14846987083333335
+        },
+        "1941": {
+          "control_elapsed_ms": 1783.4147333331505,
+          "latency_ms": 17.874006083333335,
+          "loss_pct": 7.3208295,
+          "reward": 0.14701336400000004
+        }
+      }
+    }
+  },
+  "deadline_ms": 5000,
+  "provider_wait_budget_ms": 3800,
+  "wall_seconds": 229.6870787000007,
+  "isolated_virtual_environment": true,
+  "runtime": "C:\\Users\\RAVIPRAKASH\\SDN\\SDN\\selfx\\.venv\\Scripts\\python.exe",
+  "stress": false,
+  "realtime_observations": true,
+  "observation_schedule": "Five wall-clock seconds between observations; idle wait is reported separately from control work",
+  "limits": [
+    "Actual authenticated provider requests; network outcomes are fluid simulation",
+    "Timeouts and deferrals are retained; zero control misses does not mean every API answered",
+    "All process startup, pacing, cancellation and cleanup counted in full-cycle time",
+    "Client cancellation cannot undo generation already received by a cloud server",
+    "Small two-seed pilot; reversed mode order, time-varying service remains a confound",
+    "Rules installed only in a simulated rule table, never physical switches"
+  ]
+}

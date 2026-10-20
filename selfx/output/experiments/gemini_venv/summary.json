@@ -1,0 +1,184 @@
+{
+  "schema": "selfx.simulation.v1",
+  "created_at_utc": "2026-10-20T06:43:06.754066+00:00",
+  "provenance": "simulation",
+  "decision_backend": "gemini",
+  "seeds": [
+    1740
+  ],
+  "cycles_per_condition_seed": 12,
+  "simulated_seconds_per_condition_seed": 60.0,
+  "wall_seconds": 198.45863329999975,
+  "trace_sha256": {
+    "1740": "e12941fefdd5f5d21404f6c6b4e31a9cccaefc982f1c1b019a4912580b27bca7"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "topology": "diamond-4-switch-8-host-logical-paths",
+  "capacity_per_path_mbps": 10,
+  "buffer_per_path_mbit": 0.5,
+  "interval_seconds": 5.0,
+  "conditions": {
+    "A0": {
+      "label": "Static primary path",
+      "windows": 12,
+      "latency_ms": 24.1116885,
+      "throughput_kbps": 13268.958333333334,
+      "loss_pct": 9.02914625,
+      "reward": 0.0,
+      "control_elapsed_ms": 0.07183333333333333,
+      "pooled_loss_pct": 11.766774433283823,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "api_decision_windows": 0,
+      "api_reflection_windows": 0,
+      "actions": {
+        "no_op": 12
+      }
+    },
+    "B1": {
+      "label": "Greedy least-loaded path",
+      "windows": 12,
+      "latency_ms": 23.956163416666666,
+      "throughput_kbps": 13268.958333333334,
+      "loss_pct": 9.02914625,
+      "reward": 0.0012441666666666666,
+      "control_elapsed_ms": 0.05458333333333333,
+      "pooled_loss_pct": 11.766774433283823,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "api_decision_windows": 0,
+      "api_reflection_windows": 0,
+      "actions": {
+        "reroute": 5,
+        "no_op": 7
+      }
+    },
+    "A1": {
+      "label": "Controller without memory",
+      "windows": 12,
+      "latency_ms": 23.956163416666666,
+      "throughput_kbps": 13268.958333333334,
+      "loss_pct": 9.02914625,
+      "reward": 0.0012441666666666666,
+      "control_elapsed_ms": 8134.8485,
+      "pooled_loss_pct": 11.766774433283823,
+      "safety_vetoes": 7,
+      "fallback_windows": 0,
+      "api_decision_windows": 12,
+      "api_reflection_windows": 12,
+      "actions": {
+        "reroute": 4,
+        "no_op": 8
+      }
+    },
+    "A2": {
+      "label": "Controller with state embedding memory",
+      "windows": 12,
+      "latency_ms": 23.956163416666666,
+      "throughput_kbps": 13268.958333333334,
+      "loss_pct": 9.02914625,
+      "reward": 0.0012441666666666666,
+      "control_elapsed_ms": 8402.498416666667,
+      "pooled_loss_pct": 11.766774433283823,
+      "safety_vetoes": 5,
+      "fallback_windows": 0,
+      "api_decision_windows": 12,
+      "api_reflection_windows": 12,
+      "actions": {
+        "reroute": 3,
+        "no_op": 8,
+        "rate_limit": 1
+      }
+    }
+  },
+  "seed_means": {
+    "A0": {
+      "1740": {
+        "latency_ms": 24.1116885,
+        "throughput_kbps": 13268.958333333334,
+        "loss_pct": 9.02914625,
+        "reward": 0.0
+      }
+    },
+    "B1": {
+      "1740": {
+        "latency_ms": 23.956163416666666,
+        "throughput_kbps": 13268.958333333334,
+        "loss_pct": 9.02914625,
+        "reward": 0.0012441666666666666
+      }
+    },
+    "A1": {
+      "1740": {
+        "latency_ms": 23.956163416666666,
+        "throughput_kbps": 13268.958333333334,
+        "loss_pct": 9.02914625,
+        "reward": 0.0012441666666666666
+      }
+    },
+    "A2": {
+      "1740": {
+        "latency_ms": 23.956163416666666,
+        "throughput_kbps": 13268.958333333334,
+        "loss_pct": 9.02914625,
+        "reward": 0.0012441666666666666
+      }
+    }
+  },
+  "paired_seed_comparisons": {
+    "B1_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -0.15552508333333392,
+        "ci95": null
+      },
+      "throughput_kbps": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "loss_pct": {
+        "mean_difference": 0.0,
+        "ci95": null
+      }
+    },
+    "A1_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -0.15552508333333392,
+        "ci95": null
+      },
+      "throughput_kbps": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "loss_pct": {
+        "mean_difference": 0.0,
+        "ci95": null
+      }
+    },
+    "A2_minus_A0": {
+      "latency_ms": {
+        "mean_difference": -0.15552508333333392,
+        "ci95": null
+      },
+      "throughput_kbps": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "loss_pct": {
+        "mean_difference": 0.0,
+        "ci95": null
+      }
+    }
+  },
+  "limitations": [
+    "Analytical fluid simulation; no packets or physical SDN measurements.",
+    "Offline controller results do not establish LLM effectiveness.",
+    "One workload family and topology; no external dataset calibration.",
+    "State embedding is hand-designed and normalized, not a trained neural representation.",
+    "Reward compares each action against a same-window no-op model counterfactual.",
+    "Mean window loss and pooled traffic-volume loss are different statistics.",
+    "No guarantee that reflection or memory improves results."
+  ]
+}

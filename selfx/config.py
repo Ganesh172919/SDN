@@ -7,6 +7,14 @@ agree on the same numbers.
 """
 
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+try:
+    from dotenv import load_dotenv
+    load_dotenv(PROJECT_ROOT / ".env", encoding="utf-8-sig")
+except ImportError:
+    pass  # Offline core does not require dotenv.
 
 # ---------------------------------------------------------------------------
 # Ryu / OpenFlow
@@ -59,7 +67,7 @@ SAFETY_MIN_RATE_LIMIT_KBPS = 512   # a rate_limit action may never throttle a li
 # ---------------------------------------------------------------------------
 # Reflection & memory (Phase 4)
 # ---------------------------------------------------------------------------
-MEMORY_PATH = os.environ.get("SDN_AGENT_MEMORY_PATH", "agent_memory.json")
+MEMORY_PATH = os.environ.get("SDN_AGENT_MEMORY_PATH", str(PROJECT_ROOT / "agent_memory.json"))
 MEMORY_MAX_ENTRIES = 30
 FEWSHOT_MIN_EXAMPLES = 5
 FEWSHOT_MAX_EXAMPLES = 10
@@ -75,6 +83,9 @@ REWARD_WEIGHT_LOSS = -0.2        # loss increase is bad
 ANTHROPIC_MODEL = os.environ.get("SDN_AGENT_MODEL", "claude-sonnet-4-6")
 LLM_TEMPERATURE = 0.2
 LLM_MAX_TOKENS = 1024
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
+LLM_TIMEOUT_SEC = 25
 
 # ---------------------------------------------------------------------------
 # Evaluation harness (Phase 5)
