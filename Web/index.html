@@ -43,11 +43,6 @@
 
     <!-- Live Telemetry Ticker & System Health -->
     <div class="header-status-bar">
-      <button class="sound-toggle-btn" id="btnSoundToggle" title="Toggle Sci-Fi Audio Feedback">
-        <span id="soundIcon">🔊</span>
-        <span id="soundText">SFX: ON</span>
-      </button>
-
       <button class="sound-toggle-btn" id="btnShortcutsHelp" title="View Keyboard Shortcuts & Hotkeys [Hotkey: ? or H]">
         <span>⌨️</span>
         <span>KEYS</span>
@@ -91,14 +86,14 @@
 
   <!-- Interactive Control & Experiment Action Deck -->
   <section class="quick-controls">
+    <div style="width: 100%; margin-bottom: 0.6rem; padding: 0.4rem 0.8rem; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 4px; font-size: 0.73rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00f2fe; flex-shrink: 0;"></span>
+      <span><strong>LOCAL BROWSER SIMULATION:</strong> Controls below interact with the browser-local queue model only. They do not inject network packets or modify live SDN switches.</span>
+    </div>
+
     <div class="ctrl-group traffic-group">
       <span class="group-label">TRAFFIC INGESTION</span>
-      <button class="btn-ctrl btn-burst" id="btnBurstElephant" title="Inject elephant flow burst h2 -> h8 at 12 Mbps [Hotkey: B]">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <span>Inject Elephant Burst (12M)</span>
-      </button>
-
-      <button class="btn-ctrl btn-steady" id="btnSteadyFlow" title="Toggle background steady traffic h1 -> h7 at 3 Mbps">
+      <button class="btn-ctrl btn-steady" id="btnSteadyFlow" title="Toggle background steady traffic h1 -> h7 at 3 Mbps (Local simulation only)">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
         <span>Steady Load (3M)</span>
       </button>
@@ -106,17 +101,17 @@
 
     <div class="ctrl-group actions-group">
       <span class="group-label">AGENT ACTIONS</span>
-      <button class="btn-ctrl" id="btnTriggerReroute" title="Manually execute dynamic flow reroute onto secondary link">
+      <button class="btn-ctrl" id="btnTriggerReroute" title="Execute local simulation flow reroute onto secondary link">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
         <span>Reroute Flow</span>
       </button>
 
-      <button class="btn-ctrl" id="btnTriggerRateLimit" title="Apply OpenFlow 1.3 meter rate-limiting ceiling">
+      <button class="btn-ctrl" id="btnTriggerRateLimit" title="Apply local simulation meter rate-limiting ceiling">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
         <span>Rate Limit (Meter)</span>
       </button>
 
-      <button class="btn-ctrl" id="btnStepAgent" title="Execute single observe-decide-safety-act-reflect cycle">
+      <button class="btn-ctrl" id="btnStepAgent" title="Execute single observe-decide-safety-act-reflect cycle in browser model">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         <span>Step Loop</span>
       </button>
@@ -157,18 +152,18 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricLatency">5.2</span>
+        <span class="metric-val" id="metricLatency">&mdash;</span>
         <span class="metric-unit">ms</span>
       </div>
       <!-- Mini Sparkline Waveform -->
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineLatency" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 22 Q30 18 60 12 T120 6 L120 28 Z" fill="rgba(0, 242, 254, 0.12)"></path>
-          <path class="sparkline-line" d="M0 22 Q30 18 60 12 T120 6" stroke="#00f2fe" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(0, 242, 254, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#00f2fe" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-good" id="metricLatencyDelta">
-        <span class="delta-chip">▼ 41.2%</span> <span class="delta-desc">vs A0 baseline</span>
+      <div class="metric-delta" id="metricLatencyDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
 
@@ -182,17 +177,17 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricThroughput">11.8</span>
+        <span class="metric-val" id="metricThroughput">&mdash;</span>
         <span class="metric-unit">Mbps</span>
       </div>
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineThroughput" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 20 Q30 22 60 14 T120 8 L120 28 Z" fill="rgba(16, 185, 129, 0.12)"></path>
-          <path class="sparkline-line" d="M0 20 Q30 22 60 14 T120 8" stroke="#10b981" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(16, 185, 129, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#10b981" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-good" id="metricThroughputDelta">
-        <span class="delta-chip">▲ 28.5%</span> <span class="delta-desc">throughput gain</span>
+      <div class="metric-delta" id="metricThroughputDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
 
@@ -206,17 +201,17 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricLoss">0.0</span>
+        <span class="metric-val" id="metricLoss">&mdash;</span>
         <span class="metric-unit">%</span>
       </div>
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineLoss" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 18 Q30 16 60 26 T120 27 L120 28 Z" fill="rgba(239, 68, 68, 0.12)"></path>
-          <path class="sparkline-line" d="M0 18 Q30 16 60 26 T120 27" stroke="#ef4444" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(239, 68, 68, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#ef4444" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-good" id="metricLossDelta">
-        <span class="delta-chip">▼ 92.4%</span> <span class="delta-desc">dropped packets</span>
+      <div class="metric-delta" id="metricLossDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
 
@@ -230,17 +225,17 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricLinkUtil">48.5</span>
+        <span class="metric-val" id="metricLinkUtil">&mdash;</span>
         <span class="metric-unit">%</span>
       </div>
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineUtil" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 14 Q30 20 60 16 T120 15 L120 28 Z" fill="rgba(245, 158, 11, 0.12)"></path>
-          <path class="sparkline-line" d="M0 14 Q30 20 60 16 T120 15" stroke="#f59e0b" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(245, 158, 11, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#f59e0b" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-neutral" id="metricLinkUtilDelta">
-        <span class="delta-desc">Primary: 48M / Sec: 51M</span>
+      <div class="metric-delta" id="metricLinkUtilDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
 
@@ -254,17 +249,17 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricReward">+14.62</span>
+        <span class="metric-val" id="metricReward">&mdash;</span>
         <span class="metric-unit">pts</span>
       </div>
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineReward" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 25 Q30 22 60 12 T120 4 L120 28 Z" fill="rgba(168, 85, 247, 0.12)"></path>
-          <path class="sparkline-line" d="M0 25 Q30 22 60 12 T120 4" stroke="#a855f7" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(168, 85, 247, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#a855f7" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-good" id="metricRewardDelta">
-        <span class="delta-chip">▲ Trending upward</span> <span class="delta-desc">(Self-Improving)</span>
+      <div class="metric-delta" id="metricRewardDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
 
@@ -278,17 +273,17 @@
         </div>
       </div>
       <div class="metric-value-row">
-        <span class="metric-val" id="metricSafetyStatus">PASS</span>
-        <span class="metric-unit">100%</span>
+        <span class="metric-val" id="metricSafetyStatus">&mdash;</span>
+        <span class="metric-unit"></span>
       </div>
       <div class="metric-sparkline-container">
         <svg class="metric-sparkline" id="sparklineSafety" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="M0 28 L0 8 L120 8 L120 28 Z" fill="rgba(99, 102, 241, 0.12)"></path>
-          <path class="sparkline-line" d="M0 8 L120 8" stroke="#6366f1" stroke-width="2" fill="none"></path>
+          <path class="sparkline-area" d="" fill="rgba(99, 102, 241, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#6366f1" stroke-width="2" fill="none"></path>
         </svg>
       </div>
-      <div class="metric-delta delta-good" id="metricSafetyDelta">
-        <span class="delta-chip">0 Failures</span> <span class="delta-desc">(Fail-Closed active)</span>
+      <div class="metric-delta" id="metricSafetyDelta">
+        <span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>
       </div>
     </div>
   </section>
@@ -491,137 +486,68 @@
     <!-- VIEW 2: AGENT COGNITION LOOP & LANGGRAPH -->
     <div class="tab-pane" id="tab-agent">
       <div class="agent-layout">
-        <!-- LangGraph Interactive State Machine DAG -->
+        <!-- Authoritative Two-Timescale Architecture & Implementation Status Card -->
         <div class="langgraph-card">
           <div class="panel-header">
             <div class="panel-title-group">
               <div class="panel-badge-row">
                 <span class="live-indicator-dot"></span>
-                <span class="tag-openflow">LangGraph State Machine DAG</span>
-                <span class="tag-dpid">Decide-Act-Reflect Loop</span>
+                <span class="tag-openflow">Two-Timescale Architecture</span>
+                <span class="tag-dpid">Slow Governance (10–60s) &bull; Fast Control (Sub-ms)</span>
               </div>
-              <h2>Interactive Cognition Pipeline</h2>
-              <p>Autonomous state transitions executing every interval: N = 5 seconds</p>
+              <h2>SELF-X Architecture &amp; Implementation Status</h2>
+              <p>Decoupled slow-timescale LLM governance emitting policy updates &Delta;&Pi; = (V, w, M) paired with fast-timescale Lyapunov Drift-Plus-Penalty stability.</p>
             </div>
             <div style="display:flex; align-items:center; gap:0.6rem;">
-              <button class="btn-ctrl" id="btnStepFromDag" style="padding: 0.35rem 0.8rem; font-size: 0.72rem; border-color: rgba(0, 242, 254, 0.4);" title="Step LangGraph State Machine Loop">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                <span>Step Pipeline Loop</span>
-              </button>
-              <span class="badge-tag accent-cyan">CYCLE FREQ: 0.2 Hz</span>
+              <span class="badge-tag accent-purple">SPEC: v2.0 REVISED</span>
+              <span class="badge-tag accent-cyan">STABILITY BOUND: B + VC</span>
             </div>
           </div>
 
-          <!-- Dynamic LangGraph Visual Nodes Graph -->
-          <div class="dag-pipeline-container">
-            <!-- Node 1: Observe -->
-            <div class="dag-node-card" id="nodePhaseObserve" data-step="observe">
-              <div class="dag-node-header">
-                <div class="dag-step-bubble">1</div>
-                <div class="dag-title-box">
-                  <h4>OBSERVE</h4>
-                  <span class="dag-sub">Telemetry Intake</span>
-                </div>
-                <span class="node-status-tag" id="statusObserve">COMPLETED</span>
-              </div>
-              <p class="dag-desc">Polls Ryu ofctl_rest API for per-flow and per-port byte counters.</p>
-              <div class="dag-badges">
-                <span>Ryu REST</span>
-                <span>Stats JSON</span>
-              </div>
-            </div>
-
-            <div class="dag-wire-connector"><div class="wire-pulse"></div></div>
-
-            <!-- Node 2: Decide -->
-            <div class="dag-node-card" id="nodePhaseDecide" data-step="decide">
-              <div class="dag-node-header">
-                <div class="dag-step-bubble">2</div>
-                <div class="dag-title-box">
-                  <h4>DECIDE</h4>
-                  <span class="dag-sub">LLM Reasoning</span>
-                </div>
-                <span class="node-status-tag" id="statusDecide">STANDBY</span>
-              </div>
-              <p class="dag-desc">ChatAnthropic tool calling with few-shot memory context.</p>
-              <div class="dag-badges">
-                <span>3-Action Space</span>
-                <span>Pydantic Schema</span>
-              </div>
-            </div>
-
-            <div class="dag-wire-connector"><div class="wire-pulse"></div></div>
-
-            <!-- Node 3: Safety Gate -->
-            <div class="dag-node-card" id="nodePhaseSafety" data-step="safety">
-              <div class="dag-node-header">
-                <div class="dag-step-bubble">3</div>
-                <div class="dag-title-box">
-                  <h4>SAFETY GATE</h4>
-                  <span class="dag-sub">Deterministic Guard</span>
-                </div>
-                <span class="node-status-tag" id="statusSafety">STANDBY</span>
-              </div>
-              <p class="dag-desc">Fail-closed check: reject if flow drop &gt; 20% or link util &gt; 90%.</p>
-              <div class="dag-badges">
-                <span>Hardcoded</span>
-                <span>Fail-Closed</span>
-              </div>
-            </div>
-
-            <div class="dag-wire-connector"><div class="wire-pulse"></div></div>
-
-            <!-- Node 4: Act -->
-            <div class="dag-node-card" id="nodePhaseAct" data-step="act">
-              <div class="dag-node-header">
-                <div class="dag-step-bubble">4</div>
-                <div class="dag-title-box">
-                  <h4>ACT</h4>
-                  <span class="dag-sub">OpenFlow Execution</span>
-                </div>
-                <span class="node-status-tag" id="statusAct">STANDBY</span>
-              </div>
-              <p class="dag-desc">Installs flow-mod rule or meter ceiling onto switches via REST.</p>
-              <div class="dag-badges">
-                <span>OpenFlow 1.3</span>
-                <span>Table 0 Modification</span>
-              </div>
-            </div>
-
-            <div class="dag-wire-connector"><div class="wire-pulse"></div></div>
-
-            <!-- Node 5: Reflect -->
-            <div class="dag-node-card active-phase" id="nodePhaseReflect" data-step="reflect">
-              <div class="dag-node-header">
-                <div class="dag-step-bubble">5</div>
-                <div class="dag-title-box">
-                  <h4>REFLECT</h4>
-                  <span class="dag-sub">Experience Memory</span>
-                </div>
-                <span class="node-status-tag" id="statusReflect">ACTIVE</span>
-              </div>
-              <p class="dag-desc">Calculates multi-objective reward R and writes verbal critique.</p>
-              <div class="dag-badges">
-                <span>R = Weighted Delta</span>
-                <span>Top-30 Pruning</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Interactive Node Inspector Drawer inside LangGraph -->
-          <div class="dag-inspector-panel" id="dagInspectorPanel">
-            <div class="dag-inspector-header">
-              <span class="inspector-chip">ACTIVE STAGE INSPECTION</span>
-              <h4 id="dagInspectTitle">Phase 5: Verbal Reflection &amp; Multi-Objective Memory</h4>
-            </div>
-            <div class="dag-inspector-body" id="dagInspectBody">
-              <div class="formula-box">
-                <code>Reward Formula: R = -0.4&middot;&Delta;latency + 0.4&middot;&Delta;throughput - 0.2&middot;&Delta;loss</code>
-              </div>
-              <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.4rem;">
-                The agent evaluates post-action telemetry deltas against the baseline, assigns a scalar reward, generates a concise sentence critique, and updates the top-30 few-shot memory cache.
-              </p>
-            </div>
+          <!-- Architecture & Component Verification Matrix -->
+          <div style="padding: 1rem 1.4rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; margin: 0.8rem 1.2rem; border: 1px solid rgba(255, 255, 255, 0.06);">
+            <table class="detail-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: left; color: var(--text-secondary);">
+                  <th style="padding: 0.5rem 0.6rem;">Subsystem</th>
+                  <th style="padding: 0.5rem 0.6rem;">Official Spec Requirement</th>
+                  <th style="padding: 0.5rem 0.6rem;">Implementation in Repository</th>
+                  <th style="padding: 0.5rem 0.6rem;">Verified Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 0.6rem; font-weight: 600; color: #38bdf8;">Slow Governance</td>
+                  <td style="padding: 0.6rem; color: var(--text-secondary);">5 Specialist Roles (Traffic, Security, SLA, Topology, Energy) emitting &Delta;&Pi; = (V, w, M)</td>
+                  <td style="padding: 0.6rem;">Consolidated prompt schema in <code>selfx/agent/prompts.py</code>; isolated REST API pilot in <code>run_gemini_project.py</code></td>
+                  <td style="padding: 0.6rem;"><span class="badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">Partially Implemented (Prototype)</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 0.6rem; font-weight: 600; color: #34d399;">Fast Control Layer</td>
+                  <td style="padding: 0.6rem; color: var(--text-secondary);">Lyapunov Drift-Plus-Penalty min [&Delta;L(Q) + V&middot;P(a)] with bounded backlog B + VC</td>
+                  <td style="padding: 0.6rem;">Simulated in fluid queue model (<code>selfx/eval/simulator.py</code>); not an in-switch OpenFlow pipeline</td>
+                  <td style="padding: 0.6rem;"><span class="badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">Partially Implemented (Fluid Model)</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 0.6rem; font-weight: 600; color: #a78bfa;">Action-Mask Safety</td>
+                  <td style="padding: 0.6rem; color: var(--text-secondary);">Hard fail-closed constraints: alt util &le; 90%, drop &le; 20%, rate floor &ge; 512 kbps</td>
+                  <td style="padding: 0.6rem;">Deterministic checks in <code>selfx/safety.py</code> and <code>rule_demo.py</code>; 0 violations in 86,400 sim windows</td>
+                  <td style="padding: 0.6rem;"><span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">Unit-Tested in Sim (Unverified on Live)</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 0.6rem; font-weight: 600; color: #f472b6;">Episodic Memory</td>
+                  <td style="padding: 0.6rem; color: var(--text-secondary);">Nearest-neighbor reflection retrieval to avoid repeated congestion mistakes</td>
+                  <td style="padding: 0.6rem;">Parameter-conditioned memory in <code>selfx/agent/loss_aware_memory.py</code> tested in v4 suite</td>
+                  <td style="padding: 0.6rem;"><span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">Unit-Tested in Sim (Unverified on Live)</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 0.6rem; font-weight: 600; color: #94a3b8;">LoRA Adaptation</td>
+                  <td style="padding: 0.6rem; color: var(--text-secondary);">Safety-gated online parameter promotion with holdout policy compliance validator</td>
+                  <td style="padding: 0.6rem;">No fine-tuning scripts, trained weights, or weight-promotion pipelines exist in repository</td>
+                  <td style="padding: 0.6rem;"><span class="badge-tag" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);">Designed but Not Implemented</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- Vocabulary Footer -->
@@ -876,11 +802,85 @@
             <span>Refresh Results</span>
           </button>
         </div>
+      <!-- SECTION 1: PRIMARY OFFLINE BENCHMARK ATLAS (86,400 windows) -->
+      <div class="benchmark-atlas-panel" style="margin-bottom: 2rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.2rem;">
+        <div class="panel-header" style="margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="live-indicator-dot" style="background:#10b981;"></span>
+              <span class="tag-openflow">Offline Simulation Suite</span>
+              <span class="tag-dpid">GET /api/benchmarks/summary &bull; 86,400 Windows</span>
+            </div>
+            <h2>Primary Benchmark Atlas &amp; Controller Ablation</h2>
+            <p>Empirical evaluation across 8 traffic scenarios, 10 held-out seeds, and 9 controller variants. Includes 95% paired bootstrap confidence intervals.</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <label for="benchmarkScenarioSelect" style="font-size:0.75rem; color:var(--text-secondary);">Scenario:</label>
+            <select id="benchmarkScenarioSelect" style="background:#0f172a; color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:0.3rem 0.6rem; font-size:0.75rem;">
+              <option value="mixed" selected>mixed (Mixed Traffic)</option>
+              <option value="flash">flash (Flash Crowd)</option>
+              <option value="alternate">alternate (Alternate Heavy)</option>
+              <option value="shift">shift (Distribution Shift)</option>
+              <option value="overload">overload (Dual Overload)</option>
+              <option value="light">light (Light Load)</option>
+              <option value="recurring">recurring (Recurring Contexts)</option>
+              <option value="volatile">volatile (Unpredictable Demand)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Metric Selector Chips -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.6rem;">
+          <button class="benchmark-metric-btn active" id="btnMetricLoss" data-metric="loss_pct" type="button" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.4); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Loss Rate (% - lower is better)</button>
+          <button class="benchmark-metric-btn" id="btnMetricLatency" data-metric="latency_ms" type="button" style="background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Network Delay (ms - lower is better)</button>
+          <button class="benchmark-metric-btn" id="btnMetricThroughput" data-metric="throughput_kbps" type="button" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Throughput (Mbps - higher is better)</button>
+        </div>
+
+        <!-- Chart Container -->
+        <div style="position:relative; width:100%; height:320px; background:#0b1120; border-radius:6px; border:1px solid rgba(255,255,255,0.04); margin-bottom:1rem;">
+          <canvas id="benchmarkBarCanvas" width="900" height="320" style="width:100%; height:100%;"></canvas>
+        </div>
+
+        <!-- Dynamic Metrics Table -->
+        <div id="benchmarkMetricsTableContainer" style="overflow-x:auto; margin-bottom:0.8rem;">
+          <table class="detail-table" id="benchmarkMetricsTable" style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+            <!-- Populated dynamically -->
+          </table>
+        </div>
+
+        <!-- Provenance & Disclaimer Note -->
+        <div style="font-size:0.72rem; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:0.6rem 0.8rem; border-radius:4px; border-left:3px solid #38bdf8;">
+          <strong>PROVENANCE &amp; METHODOLOGY:</strong> Generated by a seeded finite-buffer fluid network (10 Mbps capacity, 0.5 Mbit queue, 8 ms propagation delay per path) across 10 paired seeds (1900–1909), 120 windows/seed, and 9 controller variants. Total evaluation: 86,400 windows. Whiskers represent 95% paired bootstrap confidence intervals (4,000 draws). Results represent analytical fluid simulation, not wire-format packet captures or physical switch hardware.
+        </div>
       </div>
 
-      <!-- Data Integrity Notice -->
-      <div class="results-data-notice" role="note">
-        <strong>DATA INTEGRITY NOTICE:</strong> Metrics shown here reflect actual saved experiment bundles loaded from read-only <code>/api/results</code> endpoints. When no saved experiment bundles exist, no claims of target latency reduction, backlog bounds, or generalization requirements are made. Incomplete or failed runs are clearly flagged and never presented as successful.
+      <!-- SECTION 1B: LLM API DIAGNOSTICS -->
+      <div class="llm-diagnostics-card" style="margin-bottom: 2rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.2rem;">
+        <div class="panel-header" style="margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="tag-openflow">API Telemetry</span>
+              <span class="tag-dpid">GET /api/benchmarks/llm-diagnostics</span>
+            </div>
+            <h3>LLM API Diagnostics (Gemini &amp; OpenRouter Pilots)</h3>
+            <p>Verification of real external LLM API connectivity, latency distributions, deadline misses, and deterministic fallback activation.</p>
+          </div>
+        </div>
+        <div id="llmDiagnosticsBody" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- SECTION 2: LIVE TESTBED RESULTS ARCHIVE -->
+      <div class="panel-header" style="margin-top: 1.5rem; margin-bottom: 0.8rem;">
+        <div class="panel-title-group">
+          <div class="panel-badge-row">
+            <span class="tag-openflow">Live Testbed Archive</span>
+            <span class="tag-dpid">GET /api/results &bull; selfx.result.v1</span>
+          </div>
+          <h3>Saved Live Experiment Result Bundles</h3>
+          <p>Validated evaluation bundles loaded from read-only <code>/api/results</code> endpoints. When no saved experiment bundles exist, no claims of target latency reduction, backlog bounds, or generalization requirements are made.</p>
+        </div>
       </div>
 
       <!-- State 1: Loading State -->

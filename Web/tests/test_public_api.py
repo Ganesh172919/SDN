@@ -69,6 +69,11 @@ class PublicApiTests(unittest.TestCase):
         status, _, body = self.request("/api/status")
         self.assertEqual(status, 200)
         self.assertNotIn(b"ryu_base_url", body)
+        data = json.loads(body.decode("utf-8"))
+        self.assertIn("testbed_mode", data)
+        self.assertIn("testbed_message", data)
+        self.assertIn("benchmarks_available", data)
+        self.assertIn(data["testbed_mode"], ("live", "offline"))
 
     def test_login_is_retired(self):
         status, headers, _ = self.request("/login")
@@ -134,6 +139,44 @@ class PublicApiTests(unittest.TestCase):
         status, _, _ = self.request("/api/ryu/stats/flowentry/add", method="POST", data=b"{}")
         self.assertEqual(status, 409)
 
+    def test_benchmarks_summary(self):
+        status, headers, body = self.request("/api/benchmarks/summary")
+        self.assertEqual(status, 200)
+        self.assertIn(b"window_count", body)
+        data = json.loads(body.decode("utf-8"))
+        self.assertEqual(data.get("window_count"), 86400)
+        self.assertIn("A4", data.get("controllers", {}))
+        self.assertIn("mixed", data.get("groups", {}))
+
+        # Test safe missing file handling
+        orig = server.BENCHMARKS_V4_SUMMARY
+        try:
+            server.BENCHMARKS_V4_SUMMARY = Path("D:/SDN/non_existent_summary.json")
+            m_status, _, m_body = self.request("/api/benchmarks/summary")
+            self.assertEqual(m_status, 404)
+
+            # Test malformed JSON
+            temp_malformed = self.results_root / "bad_summary.json"
+            temp_malformed.write_text("{not valid json", encoding="utf-8")
+            server.BENCHMARKS_V4_SUMMARY = temp_malformed
+            bad_status, _, _ = self.request("/api/benchmarks/summary")
+            self.assertEqual(bad_status, 502)
+
+            # Test incomplete payload schema
+            temp_malformed.write_text(json.dumps({"some_key": 123}), encoding="utf-8")
+            inc_status, _, _ = self.request("/api/benchmarks/summary")
+            self.assertEqual(inc_status, 502)
+        finally:
+            server.BENCHMARKS_V4_SUMMARY = orig
+
+    def test_benchmarks_llm_diagnostics(self):
+        status, headers, body = self.request("/api/benchmarks/llm-diagnostics")
+        self.assertEqual(status, 200)
+        data = json.loads(body.decode("utf-8"))
+        self.assertEqual(data.get("status"), "ok")
+        self.assertEqual(data.get("provenance"), "LLM API Diagnostic Check")
+        self.assertTrue("gemini_v4" in data.get("runs", {}) or "openrouter_v4" in data.get("runs", {}))
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main()

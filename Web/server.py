@@ -62,7 +62,10 @@ except ImportError:
 PORT = int(os.environ.get("SDN_WEB_PORT", 5000))
 RYU_BASE_URL = os.environ.get("RYU_REST_BASE", "http://127.0.0.1:8080")
 RESULTS_ROOT = Path(os.environ.get("SELFX_RESULTS_ROOT", Path(PROJECT_ROOT) / "results")).resolve()
+BENCHMARKS_V4_SUMMARY = (Path(PROJECT_ROOT) / "selfx" / "output" / "benchmarks" / "v4" / "summary.json").resolve()
+EXPERIMENTS_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "experiments").resolve()
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
 
 class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -111,6 +114,16 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             return
         if path.startswith('/api/results/'):
             self.handle_result_resource(path)
+            return
+
+        # API: Pre-computed v4 offline benchmark summary
+        if path == '/api/benchmarks/summary':
+            self.handle_benchmarks_summary()
+            return
+
+        # API: Real LLM API diagnostic pilot summaries
+        if path == '/api/benchmarks/llm-diagnostics':
+            self.handle_benchmarks_llm_diagnostics()
             return
 
         # Raw Ryu telemetry is private and is no longer proxied publicly.
@@ -187,12 +200,48 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "connected_switches": switches,
             "project": "SELF-X SDN Agent",
             "course": "EC466 Software Defined Networks",
-            "team": "SDN_07"
+            "team": "SDN_07",
+            "testbed_mode": "live" if ryu_online else "offline",
+            "testbed_message": "Live Ryu controller connected." if ryu_online else "Live testbed disconnected. No live packet measurements currently available.",
+            "benchmarks_available": BENCHMARKS_V4_SUMMARY.is_file()
         }
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode('utf-8'))
+        self.send_json(200, data)
+
+    def handle_benchmarks_summary(self):
+        if not BENCHMARKS_V4_SUMMARY.is_file():
+            self.send_json(404, {"error": "benchmark summary not found", "available": False})
+            return
+        try:
+            with open(BENCHMARKS_V4_SUMMARY, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, dict) or "controllers" not in data or "groups" not in data:
+                self.send_json(502, {"error": "benchmark summary payload is incomplete or invalid"})
+                return
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
+        except (json.JSONDecodeError, ValueError):
+            self.send_json(502, {"error": "benchmark summary is malformed JSON"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to read benchmark summary: {str(e)}"})
+
+    def handle_benchmarks_llm_diagnostics(self):
+        runs = {}
+        for provider in ("gemini_v4", "openrouter_v4"):
+            pfile = EXPERIMENTS_DIR / provider / "summary.json"
+            if pfile.is_file():
+                try:
+                    with open(pfile, "r", encoding="utf-8") as f:
+                        runs[provider] = json.load(f)
+                except Exception:
+                    pass
+        if not runs:
+            self.send_json(404, {"error": "no LLM diagnostic summaries found", "runs": {}})
+            return
+        self.send_json(200, {
+            "status": "ok",
+            "provenance": "LLM API Diagnostic Check",
+            "disclaimer": "Analytical fluid simulation with authenticated external LLM calls. No in-switch packet forwarding.",
+            "runs": runs
+        })
 
     def handle_memory(self):
         candidates = [

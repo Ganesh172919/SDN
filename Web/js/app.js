@@ -4,154 +4,29 @@
  * Web Audio API synthesizer, dynamic SVG sparklines, hotkeys, and component coordination.
  */
 
-class CyberAudioEngine {
-  constructor() {
-    this.ctx = null;
-    this.muted = false;
-    this.initFromStorage();
-  }
-
-  initFromStorage() {
-    const saved = localStorage.getItem('selfx_sfx_muted');
-    if (saved !== null) {
-      this.muted = saved === 'true';
-    }
-  }
-
-  initContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-      }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  }
-
-  toggleMute() {
-    this.muted = !this.muted;
-    localStorage.setItem('selfx_sfx_muted', this.muted);
-    return !this.muted;
-  }
-
-  play(type) {
-    if (this.muted) return;
-    this.initContext();
-    if (!this.ctx) return;
-
-    try {
-      const now = this.ctx.currentTime;
-      switch (type) {
-        case 'click': {
-          // Crisp subtle UI blip
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, now);
-          osc.frequency.exponentialRampToValueAtTime(400, now + 0.04);
-          gain.gain.setValueAtTime(0.06, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.04);
-          break;
-        }
-        case 'burst': {
-          // Warning rumble & alarm
-          const osc = this.ctx.createOscillator();
-          const osc2 = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sawtooth';
-          osc2.type = 'sine';
-          osc.frequency.setValueAtTime(180, now);
-          osc.frequency.linearRampToValueAtTime(280, now + 0.16);
-          osc2.frequency.setValueAtTime(360, now);
-          osc2.frequency.linearRampToValueAtTime(560, now + 0.16);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-          osc.connect(gain);
-          osc2.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc2.start(now);
-          osc.stop(now + 0.22);
-          osc2.stop(now + 0.22);
-          break;
-        }
-        case 'reroute': {
-          // Cyber frequency riser sweep
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(350, now);
-          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.18);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.22);
-          break;
-        }
-        case 'step': {
-          // Telemetry loop tick
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(950, now);
-          osc.frequency.exponentialRampToValueAtTime(650, now + 0.05);
-          gain.gain.setValueAtTime(0.04, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.05);
-          break;
-        }
-        case 'success': {
-          // Harmonic chord
-          [523.25, 659.25, 783.99].forEach((freq, idx) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, now + idx * 0.03);
-            gain.gain.setValueAtTime(0.06, now + idx * 0.03);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.03 + 0.16);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now + idx * 0.03);
-            osc.stop(now + idx * 0.03 + 0.16);
-          });
-          break;
-        }
-      }
-    } catch (e) {
-      // AudioContext error or gesture required
-    }
-  }
+// Audio synthesizer removed in compliance with project directives
+class DummyAudioEngine {
+  play() {}
+  toggleMute() { return false; }
 }
 
 class DashboardApp {
   constructor() {
-    this.audio = new CyberAudioEngine();
+    this.audio = new DummyAudioEngine();
     this.appMode = 'simulation';
     this.liveStatus = null;
     this.liveStatusTimer = null;
 
     this.sparklineHistory = {
-      latency: [24, 22, 19, 15, 11, 7.5, 5.8, 5.2],
-      throughput: [8.5, 9.0, 9.8, 10.5, 11.2, 11.6, 11.7, 11.8],
-      loss: [8.2, 6.4, 4.0, 2.1, 0.8, 0.0, 0.0, 0.0],
-      linkUtil: [45, 52, 50, 48, 51, 49, 48.5, 48.0],
-      reward: [0, 1.8, 4.5, 7.8, 10.6, 12.8, 13.9, 14.62],
-      safety: [100, 100, 100, 100, 100, 100, 100, 100]
+      latency: [],
+      throughput: [],
+      loss: [],
+      linkUtil: [],
+      reward: [],
+      safety: []
     };
 
     this.initClock();
-    this.initSoundToggle();
     this.initTabs();
     this.initControls();
     this.initHotkeys();
@@ -164,6 +39,11 @@ class DashboardApp {
     this.simulator = new SDNSimulator(this);
     if (typeof ExperimentResultsManager !== 'undefined') {
       this.results = new ExperimentResultsManager(this);
+    }
+    if (typeof BenchmarkBarChart !== 'undefined') {
+      this.benchmarkChart = new BenchmarkBarChart('benchmarkBarCanvas');
+      this.initBenchmarkAtlas();
+      this.initLLMDiagnostics();
     }
     this.initAppMode();
 
@@ -262,10 +142,16 @@ class DashboardApp {
   renderLiveUnavailable() {
     ['metricLatency', 'metricThroughput', 'metricLoss', 'metricLinkUtil', 'metricReward'].forEach((id) => {
       const element = document.getElementById(id);
-      if (element) element.textContent = '--';
+      if (element) element.textContent = '—';
     });
     const safety = document.getElementById('metricSafetyStatus');
-    if (safety) safety.textContent = 'N/A';
+    if (safety) safety.textContent = '—';
+    ['metricLatencyDelta', 'metricThroughputDelta', 'metricLossDelta', 'metricLinkUtilDelta', 'metricRewardDelta'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>';
+    });
+    this.sparklineHistory = { latency: [], throughput: [], loss: [], linkUtil: [], reward: [], safety: [] };
+    this.renderAllSparklines();
     if (this.charts && this.charts.clear) this.charts.clear();
   }
 
@@ -288,7 +174,7 @@ class DashboardApp {
   }
 
   playSound(type) {
-    if (this.audio) this.audio.play(type);
+    // Audio synthesizer removed in compliance with project directives
   }
 
   initClock() {
@@ -304,36 +190,80 @@ class DashboardApp {
     setInterval(update, 1000);
   }
 
-  initSoundToggle() {
-    const btn = document.getElementById('btnSoundToggle');
-    const icon = document.getElementById('soundIcon');
-    const text = document.getElementById('soundText');
-
-    const updateBtnUI = () => {
-      if (this.audio.muted) {
-        if (icon) icon.textContent = '🔇';
-        if (text) text.textContent = 'SFX: MUTED';
-        if (btn) btn.classList.add('muted');
-      } else {
-        if (icon) icon.textContent = '🔊';
-        if (text) text.textContent = 'SFX: ON';
-        if (btn) btn.classList.remove('muted');
+  async initBenchmarkAtlas() {
+    try {
+      const res = await fetch('/api/benchmarks/summary');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (this.benchmarkChart) {
+        this.benchmarkChart.setData(data);
       }
-    };
 
-    updateBtnUI();
+      const select = document.getElementById('benchmarkScenarioSelect');
+      if (select) {
+        select.addEventListener('change', (e) => {
+          if (this.benchmarkChart) this.benchmarkChart.setScenario(e.target.value);
+        });
+      }
 
-    if (btn) {
-      btn.addEventListener('click', () => {
-        const unmuted = this.audio.toggleMute();
-        updateBtnUI();
-        if (unmuted) {
-          this.audio.play('click');
-          this.showToast('Audio Enabled', 'Futuristic UI micro-sound feedback active.', 'success');
-        } else {
-          this.showToast('Audio Muted', 'Sound feedback muted.', 'info');
-        }
+      document.querySelectorAll('.benchmark-metric-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.benchmark-metric-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'rgba(255,255,255,0.06)';
+          });
+          btn.classList.add('active');
+          btn.style.background = btn.dataset.metric === 'loss_pct'
+            ? 'rgba(239,68,68,0.2)'
+            : (btn.dataset.metric === 'latency_ms' ? 'rgba(56,189,248,0.2)' : 'rgba(16,185,129,0.2)');
+          if (this.benchmarkChart) this.benchmarkChart.setMetric(btn.dataset.metric);
+        });
       });
+    } catch (e) {
+      if (this.benchmarkChart) this.benchmarkChart.clear();
+      const table = document.getElementById('benchmarkMetricsTable');
+      if (table) {
+        table.innerHTML = `<tbody><tr><td colspan="6" style="padding:1rem; text-align:center; color:#f87171;">Failed to load benchmark summary: ${e.message}</td></tr></tbody>`;
+      }
+    }
+  }
+
+  async initLLMDiagnostics() {
+    const container = document.getElementById('llmDiagnosticsBody');
+    if (!container) return;
+    try {
+      const res = await fetch('/api/benchmarks/llm-diagnostics');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const payload = await res.json();
+      const runs = payload.runs || {};
+
+      let html = '';
+      for (const [provider, data] of Object.entries(runs)) {
+        const cond = data.conditions || {};
+        const a4 = cond.A4 || {};
+        const origins = a4.decision_origins || {};
+        const originStr = Object.entries(origins).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A';
+        html += `
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+              <h4 style="margin:0; font-size:0.9rem; color:#38bdf8;">${provider.toUpperCase()} Pilot</h4>
+              <span class="badge-tag" style="background:rgba(16,185,129,0.15); color:#34d399;">${data.provenance || 'API Diagnostic'}</span>
+            </div>
+            <table class="detail-table" style="width:100%; font-size:0.75rem;">
+              <tr><th>Target Model</th><td>${data.environment?.model || provider}</td></tr>
+              <tr><th>Windows / Seeds</th><td>${data.cycles_per_condition_seed || 12} windows &bull; ${data.seeds?.length || 2} seeds</td></tr>
+              <tr><th>Mean Latency</th><td>${a4.latency_ms ? a4.latency_ms.toFixed(2) + ' ms' : 'N/A'}</td></tr>
+              <tr><th>Control Elapsed</th><td>${a4.control_elapsed_ms ? a4.control_elapsed_ms.toFixed(1) + ' ms' : 'N/A'}</td></tr>
+              <tr><th>Decision Origins</th><td><code>${originStr}</code></td></tr>
+              <tr><th>Fallback Windows</th><td>${a4.fallback_windows || 0}</td></tr>
+              <tr><th>Safety Vetoes</th><td><span style="color:#34d399;">${a4.safety_vetoes || 0} (100% Compliant)</span></td></tr>
+            </table>
+          </div>
+        `;
+      }
+      container.innerHTML = html || '<p style="color:var(--text-secondary); font-size:0.8rem;">No LLM diagnostic logs found.</p>';
+    } catch (e) {
+      container.innerHTML = `<p style="color:#f87171; font-size:0.8rem;">Unable to load LLM diagnostics: ${e.message}</p>`;
     }
   }
 
@@ -704,13 +634,20 @@ class DashboardApp {
 
     if (node.type === 'switch') {
       idEl.textContent = `Switch ${node.id.toUpperCase()} (DPID: ${node.dpid})`;
-      statusEl.textContent = 'HEALTHY / FLOWS ACTIVE';
-      statusEl.className = 'badge-state ok';
-      rateEl.textContent = `Tx: ${node.tx.toFixed(1)} Mbps | Rx: ${node.rx.toFixed(1)} Mbps`;
-      flowsEl.textContent = `${node.flows} active flow entries (Table 0)`;
+      if (this.isSimulationMode()) {
+        statusEl.textContent = 'SIMULATED / FLOWS ACTIVE';
+        statusEl.className = 'badge-state ok';
+        rateEl.textContent = `Tx: ${(typeof node.tx === 'number' ? node.tx.toFixed(1) : '0.0')} Mbps | Rx: ${(typeof node.rx === 'number' ? node.rx.toFixed(1) : '0.0')} Mbps (simulated)`;
+        flowsEl.textContent = `${node.flows || 0} active flow entries (Table 0)`;
+      } else {
+        statusEl.textContent = 'UNVERIFIED / NO TELEMETRY';
+        statusEl.className = 'badge-state error';
+        rateEl.textContent = 'Tx: — | Rx: — (live telemetry unlinked)';
+        flowsEl.textContent = 'Port telemetry not exposed by controller';
+      }
     } else {
       idEl.textContent = `Host ${node.id.toUpperCase()} (${node.ip})`;
-      statusEl.textContent = 'ONLINE / ATTACHED';
+      statusEl.textContent = this.isSimulationMode() ? 'SIMULATED / ATTACHED' : 'UNVERIFIED / NO TELEMETRY';
       statusEl.className = 'badge-state ok';
       rateEl.textContent = `MAC: ${node.mac}`;
       flowsEl.textContent = 'Standard IP Stack';
@@ -728,56 +665,68 @@ class DashboardApp {
 
     if (node.type === 'switch') {
       modalTitle.textContent = `Switch ${node.id.toUpperCase()} — OpenFlow 1.3 Inspection`;
-      modalSubtitle.textContent = `Datapath ID: ${node.dpid} | ofctl_rest Port Telemetry`;
-
-      modalBody.innerHTML = `
-        <table class="table-custom" style="margin-top:0.5rem;">
-          <thead>
-            <tr>
-              <th>Port No</th>
-              <th>Link Peer</th>
-              <th>Rx Packets</th>
-              <th>Tx Packets</th>
-              <th>Bandwidth</th>
-              <th>Link Delay</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Port 1</td>
-              <td>Host Interface</td>
-              <td>14,290</td>
-              <td>14,310</td>
-              <td>100 Mbps</td>
-              <td>1ms</td>
-            </tr>
-            <tr>
-              <td>Port 2</td>
-              <td>Host Interface</td>
-              <td>38,102</td>
-              <td>37,990</td>
-              <td>100 Mbps</td>
-              <td>1ms</td>
-            </tr>
-            <tr>
-              <td>Port 3</td>
-              <td>Primary Core Link (s2-s3)</td>
-              <td>84,192</td>
-              <td>84,001</td>
-              <td>10 Mbps</td>
-              <td>5ms</td>
-            </tr>
-            <tr>
-              <td>Port 4</td>
-              <td>Secondary Core Link (s2-s3)</td>
-              <td>42,501</td>
-              <td>42,490</td>
-              <td>10 Mbps</td>
-              <td>12ms</td>
-            </tr>
-          </tbody>
-        </table>
-      `;
+      if (this.isSimulationMode()) {
+        modalSubtitle.textContent = `Datapath ID: ${node.dpid} | Browser Simulation Model`;
+        modalBody.innerHTML = `
+          <div style="margin-bottom:0.8rem; padding:0.5rem 0.8rem; background:rgba(245,158,11,0.1); border-left:3px solid #f59e0b; font-size:0.8rem; color:#fcd34d;">
+            <strong>SIMULATION NOTICE:</strong> Port counters below are generated by the local browser discrete model for demonstration purposes. They do not represent live physical SDN switch counters.
+          </div>
+          <table class="table-custom" style="margin-top:0.5rem;">
+            <thead>
+              <tr>
+                <th>Port No</th>
+                <th>Link Peer</th>
+                <th>Rx Packets</th>
+                <th>Tx Packets</th>
+                <th>Bandwidth</th>
+                <th>Link Delay</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Port 1</td>
+                <td>Host Interface</td>
+                <td>14,290</td>
+                <td>14,310</td>
+                <td>100 Mbps</td>
+                <td>1ms</td>
+              </tr>
+              <tr>
+                <td>Port 2</td>
+                <td>Host Interface</td>
+                <td>38,102</td>
+                <td>37,990</td>
+                <td>100 Mbps</td>
+                <td>1ms</td>
+              </tr>
+              <tr>
+                <td>Port 3</td>
+                <td>Primary Core Link (s2-s3)</td>
+                <td>84,192</td>
+                <td>84,001</td>
+                <td>10 Mbps</td>
+                <td>5ms</td>
+              </tr>
+              <tr>
+                <td>Port 4</td>
+                <td>Secondary Core Link (s2-s3)</td>
+                <td>42,501</td>
+                <td>42,490</td>
+                <td>10 Mbps</td>
+                <td>12ms</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } else {
+        modalSubtitle.textContent = `Datapath ID: ${node.dpid} | Live Ryu Controller`;
+        modalBody.innerHTML = `
+          <div style="padding:1.5rem; text-align:center; color:var(--text-secondary); font-size:0.85rem;">
+            <p style="margin-bottom:0.5rem; color:#f87171; font-weight:600;">Live Port Counters Unavailable</p>
+            <p>Switch is registered in controller topology, but live OpenFlow port-statistics polling (<code>/stats/port/&lt;dpid&gt;</code>) is not linked to this dashboard view. No physical packet-transmission telemetry has been verified.</p>
+          </div>
+        `;
+      }
     } else {
       modalTitle.textContent = `Host ${node.id.toUpperCase()} Telemetry`;
       modalSubtitle.textContent = `IPv4: ${node.ip} | MAC: ${node.mac}`;
@@ -837,11 +786,17 @@ class DashboardApp {
 
   updateSparkline(svgId, dataArray, minVal, maxVal) {
     const svg = document.getElementById(svgId);
-    if (!svg || !dataArray || dataArray.length < 2) return;
+    if (!svg) return;
 
     const linePath = svg.querySelector('.sparkline-line');
     const areaPath = svg.querySelector('.sparkline-area');
     if (!linePath || !areaPath) return;
+
+    if (!dataArray || dataArray.length < 2) {
+      linePath.setAttribute('d', '');
+      areaPath.setAttribute('d', '');
+      return;
+    }
 
     const width = 120;
     const height = 28;
@@ -934,6 +889,33 @@ class DashboardApp {
     this.animateNumber(lossEl, lossVal, 1);
     this.animateNumber(linkUtilEl, utilVal, 1);
     this.animateNumber(rewEl, rewVal, 2, rewVal >= 0 ? '+' : '');
+
+    // Dynamic delta calculation for simulation mode
+    const updateDeltaChip = (elId, current, hist, unit, invert = false) => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      if (hist.length < 2) {
+        el.innerHTML = '<span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Baseline</span>';
+        return;
+      }
+      const prev = hist[hist.length - 2];
+      const diff = current - prev;
+      if (Math.abs(diff) < 0.01) {
+        el.innerHTML = `<span class="delta-chip" style="background: rgba(255, 255, 255, 0.06); color: var(--text-secondary);">&plusmn;0.0 ${unit}</span>`;
+      } else if (diff > 0) {
+        const isPositive = !invert;
+        el.innerHTML = `<span class="delta-chip ${isPositive ? 'positive' : 'negative'}">▲ ${Math.abs(diff).toFixed(1)} ${unit}</span>`;
+      } else {
+        const isPositive = invert;
+        el.innerHTML = `<span class="delta-chip ${isPositive ? 'positive' : 'negative'}">▼ ${Math.abs(diff).toFixed(1)} ${unit}</span>`;
+      }
+    };
+
+    updateDeltaChip('metricLatencyDelta', latVal, this.sparklineHistory.latency, 'ms', true);
+    updateDeltaChip('metricThroughputDelta', tpVal, this.sparklineHistory.throughput, 'M', false);
+    updateDeltaChip('metricLossDelta', lossVal, this.sparklineHistory.loss, '%', true);
+    updateDeltaChip('metricLinkUtilDelta', utilVal, this.sparklineHistory.linkUtil, '%', false);
+    updateDeltaChip('metricRewardDelta', rewVal, this.sparklineHistory.reward, 'pts', false);
 
     // Update elephant info status in Topo HUD
     const elephantStatus = document.getElementById('infoElephantStatus');
