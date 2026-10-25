@@ -30,6 +30,9 @@ class MiniLineChart {
       this.setupDPI();
       this.render();
     });
+    window.addEventListener('themechange', () => {
+      this.render();
+    });
   }
 
   setupDPI() {
@@ -109,12 +112,14 @@ class MiniLineChart {
     if (minVal === maxVal) { maxVal += 10; minVal = Math.max(0, minVal - 5); }
     const range = maxVal - minVal || 1;
 
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
     // Draw horizontal grid lines
     ctx.save();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
     ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+    ctx.fillStyle = isLight ? 'rgba(71, 85, 105, 0.85)' : 'rgba(148, 163, 184, 0.6)';
     ctx.textAlign = 'right';
 
     const steps = 4;
@@ -328,6 +333,9 @@ class BenchmarkBarChart {
       this.setupDPI();
       this.render();
     });
+    window.addEventListener('themechange', () => {
+      this.render();
+    });
   }
 
   setupDPI() {
@@ -454,12 +462,14 @@ class BenchmarkBarChart {
     maxVal = maxVal <= 0 ? 1 : maxVal * 1.15;
     const minVal = 0;
 
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
     // Gridlines
     ctx.save();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-    ctx.font = '10px monospace';
+    ctx.fillStyle = isLight ? 'rgba(71, 85, 105, 0.85)' : 'rgba(148, 163, 184, 0.6)';
+    ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -525,7 +535,7 @@ class BenchmarkBarChart {
       if (e.hasCI) {
         const yLow = padding.top + chartH - (e.ciLow / maxVal) * chartH;
         const yHigh = padding.top + chartH - (e.ciHigh / maxVal) * chartH;
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = isLight ? '#0f172a' : '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(centerX, yLow);
@@ -538,15 +548,15 @@ class BenchmarkBarChart {
       }
 
       // Value label
-      ctx.fillStyle = '#f8fafc';
+      ctx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
       ctx.textAlign = 'center';
-      ctx.font = '10px sans-serif';
+      ctx.font = '10px "JetBrains Mono", sans-serif';
       let valStr = e.val.toFixed(this.metric === 'throughput_kbps' ? 1 : 2);
       const topLabelY = e.hasCI ? Math.min(barY, padding.top + chartH - (e.ciHigh / maxVal) * chartH) : barY;
       ctx.fillText(valStr, centerX, topLabelY - 6);
 
       // Controller label below X axis
-      ctx.fillStyle = e.id === 'A4' ? '#00f2fe' : (e.id === 'H2' ? '#f59e0b' : '#cbd5e1');
+      ctx.fillStyle = e.id === 'A4' ? '#00f2fe' : (e.id === 'H2' ? '#f59e0b' : (isLight ? '#475569' : '#cbd5e1'));
       ctx.font = e.id === 'A4' ? 'bold 11px sans-serif' : '10px sans-serif';
       ctx.fillText(e.id, centerX, padding.top + chartH + 16);
     });
@@ -564,7 +574,7 @@ class BenchmarkBarChart {
     else if (this.metric === 'throughput_kbps') unit = 'Mbps';
 
     let html = `<thead>
-      <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary);">
+      <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
         <th style="padding:0.4rem 0.6rem; text-align:left;">ID</th>
         <th style="padding:0.4rem 0.6rem; text-align:left;">Controller Technique</th>
         <th style="padding:0.4rem 0.6rem; text-align:right;">Mean (${unit})</th>
@@ -576,7 +586,7 @@ class BenchmarkBarChart {
 
     entries.forEach(e => {
       const isKey = e.id === 'A4' || e.id === 'H2';
-      const rowStyle = isKey ? 'background: rgba(0, 242, 254, 0.05); font-weight: 600;' : '';
+      const rowStyle = isKey ? 'background: var(--surface-active); font-weight: 600;' : '';
 
       // Mean format: preserve valid 0 as 0.00
       const meanStr = (typeof e.val === 'number' && !isNaN(e.val))
@@ -602,15 +612,15 @@ class BenchmarkBarChart {
       let vetoColor = 'var(--text-secondary)';
       if (typeof e.vetoes === 'number' && !isNaN(e.vetoes)) {
         vetoStr = String(e.vetoes);
-        vetoColor = e.vetoes === 0 ? '#34d399' : '#f87171';
+        vetoColor = e.vetoes === 0 ? '#10b981' : '#ef4444';
       }
 
-      html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.04); ${rowStyle}">
-        <td style="padding:0.4rem 0.6rem; color:${e.id === 'A4' ? '#00f2fe' : (e.id === 'H2' ? '#fbbf24' : '#94a3b8')};">${e.id}</td>
+      html += `<tr style="border-bottom: 1px solid var(--border-color); ${rowStyle}">
+        <td style="padding:0.4rem 0.6rem; color:${e.id === 'A4' ? 'var(--cyan)' : (e.id === 'H2' ? '#f59e0b' : 'var(--text-secondary)')}; font-weight:700;">${e.id}</td>
         <td style="padding:0.4rem 0.6rem;">${e.label}</td>
         <td style="padding:0.4rem 0.6rem; text-align:right;">${meanStr}</td>
-        <td style="padding:0.4rem 0.6rem; text-align:right; color:var(--text-secondary); font-family:monospace;">${ciStr}</td>
-        <td style="padding:0.4rem 0.6rem; text-align:right; font-family:monospace;">${actStr}</td>
+        <td style="padding:0.4rem 0.6rem; text-align:right; color:var(--text-secondary); font-family:var(--font-mono);">${ciStr}</td>
+        <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono);">${actStr}</td>
         <td style="padding:0.4rem 0.6rem; text-align:right; color:${vetoColor};">${vetoStr}</td>
       </tr>`;
     });

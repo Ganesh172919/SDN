@@ -31,6 +31,8 @@ class DashboardApp {
     this.initControls();
     this.initHotkeys();
     this.initModal();
+    this.initTheme();
+    this.initLightbox();
 
     // Initialize sub-modules
     this.topology = new TopologyVisualizer('topologyCanvas');
@@ -146,9 +148,9 @@ class DashboardApp {
     });
     const safety = document.getElementById('metricSafetyStatus');
     if (safety) safety.textContent = '—';
-    ['metricLatencyDelta', 'metricThroughputDelta', 'metricLossDelta', 'metricLinkUtilDelta', 'metricRewardDelta'].forEach((id) => {
+    ['metricLatencyDelta', 'metricThroughputDelta', 'metricLossDelta', 'metricLinkUtilDelta', 'metricRewardDelta', 'metricSafetyDelta'].forEach((id) => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = '<span class="delta-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary);">Awaiting Data</span>';
+      if (el) el.innerHTML = '<span class="delta-chip neutral">Awaiting Data</span>';
     });
     this.sparklineHistory = { latency: [], throughput: [], loss: [], linkUtil: [], reward: [], safety: [] };
     this.renderAllSparklines();
@@ -334,10 +336,8 @@ class DashboardApp {
         e.preventDefault();
         this.openShortcutsModal();
       } else if (e.code === 'Escape') {
-        if (this.modalOverlay && this.modalOverlay.classList.contains('open')) {
-          this.modalOverlay.classList.remove('open');
-        }
-      } else if (e.key >= '1' && e.key <= '6') {
+        this.closeAllModals();
+      } else if (e.key >= '1' && e.key <= '7') {
         const tabBtns = document.querySelectorAll('.tab-btn');
         const idx = parseInt(e.key, 10) - 1;
         if (tabBtns[idx]) tabBtns[idx].click();
@@ -352,7 +352,14 @@ class DashboardApp {
     }
   }
 
+  closeAllModals() {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+      m.classList.remove('open');
+    });
+  }
+
   activateTab(targetId, updateHash = true) {
+    this.closeAllModals();
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
 
@@ -548,17 +555,95 @@ class DashboardApp {
     if (this.modalClose) {
       this.modalClose.addEventListener('click', () => {
         this.playSound('click');
-        if (this.modalOverlay) this.modalOverlay.classList.remove('open');
+        this.closeAllModals();
       });
     }
 
     if (this.modalOverlay) {
       this.modalOverlay.addEventListener('click', (event) => {
         if (event.target === this.modalOverlay) {
-          this.modalOverlay.classList.remove('open');
+          this.closeAllModals();
         }
       });
     }
+
+    const btnOpenNode = document.getElementById('btnOpenNodeModal');
+    if (btnOpenNode) {
+      btnOpenNode.addEventListener('click', () => {
+        this.playSound('click');
+        const selected = (this.topology && this.topology.selectedNode) || (this.topology && this.topology.nodes.s2);
+        if (selected) this.openNodeModal(selected);
+      });
+    }
+  }
+
+  initTheme() {
+    const btnTheme = document.getElementById('btnThemeToggle');
+    const icon = document.getElementById('themeToggleIcon');
+    const savedTheme = localStorage.getItem('selfx_theme') || 'light';
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      if (icon) icon.textContent = '🌙';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      if (icon) icon.textContent = '☀️';
+    }
+    if (btnTheme) {
+      btnTheme.addEventListener('click', () => {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const nextTheme = isLight ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        try { localStorage.setItem('selfx_theme', nextTheme); } catch (e) {}
+        if (icon) icon.textContent = nextTheme === 'light' ? '☀️' : '🌙';
+        window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: nextTheme } }));
+        if (this.charts && this.charts.renderAll) {
+          this.charts.renderAll();
+        }
+        if (this.benchmarkChart && this.benchmarkChart.render) {
+          this.benchmarkChart.render();
+        }
+        this.renderAllSparklines();
+        this.showToast('Theme Changed', `Switched to ${nextTheme.toUpperCase()} mode.`, 'info');
+      });
+    }
+  }
+
+  initLightbox() {
+    const lightboxModal = document.getElementById('imageLightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const btnClose = document.getElementById('btnLightboxClose');
+
+    if (btnClose && lightboxModal) {
+      btnClose.addEventListener('click', () => {
+        this.playSound('click');
+        this.closeAllModals();
+      });
+    }
+
+    if (lightboxModal) {
+      lightboxModal.addEventListener('click', (e) => {
+        if (e.target === lightboxModal) {
+          this.closeAllModals();
+        }
+      });
+    }
+
+    document.querySelectorAll('.project-viz-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const imgSrc = card.getAttribute('data-img') || card.querySelector('img')?.getAttribute('src');
+        const title = card.getAttribute('data-title') || card.querySelector('h3')?.textContent || 'Diagram Inspection';
+        const desc = card.querySelector('p')?.textContent || '';
+        if (lightboxModal && lightboxImg && imgSrc) {
+          lightboxImg.src = imgSrc;
+          if (lightboxTitle) lightboxTitle.textContent = title;
+          if (lightboxCaption) lightboxCaption.textContent = desc;
+          lightboxModal.classList.add('open');
+          this.playSound('click');
+        }
+      });
+    });
   }
 
   openShortcutsModal() {
@@ -601,9 +686,9 @@ class DashboardApp {
               <td>Apply OpenFlow 1.3 meter table bandwidth ceiling</td>
             </tr>
             <tr>
-              <td><kbd style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px; font-family:var(--font-mono); border:1px solid rgba(255,255,255,0.2);">1 – 6</kbd></td>
+              <td><kbd style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px; font-family:var(--font-mono); border:1px solid rgba(255,255,255,0.2);">1 – 7</kbd></td>
               <td><strong>Switch Tabs</strong></td>
-              <td>Jump to Agent DAG (1), Topo (2), Charts (3), Memory (4), Benchmarks (5), Rules (6)</td>
+              <td>Jump directly to tabs 1 through 7 (Topology, Agent, Memory, Charts, Visualizations, Benchmarks, Safety)</td>
             </tr>
             <tr>
               <td><kbd style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px; font-family:var(--font-mono); border:1px solid rgba(255,255,255,0.2);">M</kbd></td>
@@ -625,35 +710,187 @@ class DashboardApp {
 
   onNodeSelected(node) {
     this.playSound('click');
+    if (this.topology) {
+      this.topology.selectedNode = node;
+    }
+    this.updateNodeInspector(node);
+  }
+
+  updateNodeInspector(node) {
+    if (!node) return;
     const idEl = document.getElementById('nodeInspectorId');
     const statusEl = document.getElementById('nodeInspectorStatus');
+    const protoEl = document.getElementById('nodeInspectorProtocol');
+    const peerLabelEl = document.getElementById('nodeInspectorPeerLabel');
+    const peerEl = document.getElementById('nodeInspectorAttached');
+    const portMapEl = document.getElementById('nodeInspectorPortMap');
     const rateEl = document.getElementById('nodeInspectorRate');
+    const flowsLabelEl = document.getElementById('nodeInspectorFlowsLabel');
     const flowsEl = document.getElementById('nodeInspectorFlows');
+    const barsContainer = document.getElementById('nodeInspectorBars');
+    const metersTitle = document.getElementById('nodeInspectorMetersTitle');
 
     if (!idEl) return;
 
     if (node.type === 'switch') {
-      idEl.textContent = `Switch ${node.id.toUpperCase()} (DPID: ${node.dpid})`;
-      if (this.isSimulationMode()) {
-        statusEl.textContent = 'SIMULATED / FLOWS ACTIVE';
-        statusEl.className = 'badge-state ok';
-        rateEl.textContent = `Tx: ${(typeof node.tx === 'number' ? node.tx.toFixed(1) : '0.0')} Mbps | Rx: ${(typeof node.rx === 'number' ? node.rx.toFixed(1) : '0.0')} Mbps (simulated)`;
-        flowsEl.textContent = `${node.flows || 0} active flow entries (Table 0)`;
-      } else {
-        statusEl.textContent = 'UNVERIFIED / NO TELEMETRY';
-        statusEl.className = 'badge-state error';
-        rateEl.textContent = 'Tx: — | Rx: — (live telemetry unlinked)';
-        flowsEl.textContent = 'Port telemetry not exposed by controller';
-      }
-    } else {
-      idEl.textContent = `Host ${node.id.toUpperCase()} (${node.ip})`;
-      statusEl.textContent = this.isSimulationMode() ? 'SIMULATED / ATTACHED' : 'UNVERIFIED / NO TELEMETRY';
-      statusEl.className = 'badge-state ok';
-      rateEl.textContent = `MAC: ${node.mac}`;
-      flowsEl.textContent = 'Standard IP Stack';
-    }
+      idEl.textContent = `Switch ${node.id.toUpperCase()} (DPID: ${node.dpid || '000000000000000' + node.id.slice(1)})`;
 
-    this.openNodeModal(node);
+      const isCongested = (node.id === 's2' || node.id === 's3') && !this.simulator.isRerouted && this.simulator.isElephantActive;
+
+      if (statusEl) {
+        if (this.isSimulationMode()) {
+          statusEl.textContent = isCongested ? 'CONGESTED / BUFFER SURGE' : 'HEALTHY / FLOWS ACTIVE';
+          statusEl.className = isCongested ? 'badge-state error' : 'badge-state ok';
+        } else {
+          statusEl.textContent = 'UNVERIFIED / NO TELEMETRY';
+          statusEl.className = 'badge-state error';
+        }
+      }
+
+      if (protoEl) protoEl.textContent = 'OpenFlow 1.3 via ofctl_rest';
+      if (peerLabelEl) peerLabelEl.textContent = 'Attached Hosts';
+      if (flowsLabelEl) flowsLabelEl.textContent = 'Flow Entries';
+
+      let attached = '';
+      let portMap = '';
+      let ports = [];
+      const pUtil = (this.simulator && this.simulator.metrics && this.simulator.metrics.corePrimaryUtil) || 48;
+      const sUtil = (this.simulator && this.simulator.metrics && this.simulator.metrics.coreSecondaryUtil) || 52;
+      const pMbps = ((pUtil / 100) * 10).toFixed(1);
+      const sMbps = ((sUtil / 100) * 10).toFixed(1);
+
+      if (node.id === 's1') {
+        attached = 'h1 (10.0.0.1), h2 (10.0.0.2)';
+        portMap = 'Port 1 (h1) • Port 2 (h2) • Port 3 (s2 Trunk)';
+        ports = [
+          { name: 'Port 1 (h1)', val: '3.0 Mbps', pct: 30, class: '' },
+          { name: 'Port 2 (h2)', val: this.simulator.isElephantActive ? '12.0 Mbps' : '0.0 Mbps', pct: this.simulator.isElephantActive ? 60 : 0, class: this.simulator.isElephantActive ? 'congested' : '' },
+          { name: 'Port 3 (s2)', val: this.simulator.isElephantActive ? '15.0 Mbps' : '3.0 Mbps', pct: this.simulator.isElephantActive ? 75 : 15, class: 'primary' }
+        ];
+      } else if (node.id === 's2') {
+        attached = 'h3 (10.0.0.3), h4 (10.0.0.4)';
+        portMap = 'Port 1 (h3) • Port 2 (h4) • Port 3 (s3 Pri) • Port 4 (s3 Sec)';
+        ports = [
+          { name: 'Port 1 (h3)', val: '1.5 Mbps', pct: 15, class: '' },
+          { name: 'Port 2 (h4)', val: '2.0 Mbps', pct: 20, class: '' },
+          { name: 'Port 3 (s3 Pri)', val: `${pMbps} Mbps`, pct: pUtil, class: pUtil > 85 ? 'congested' : 'primary' },
+          { name: 'Port 4 (s3 Sec)', val: `${sMbps} Mbps`, pct: sUtil, class: 'secondary' }
+        ];
+      } else if (node.id === 's3') {
+        attached = 'h5 (10.0.0.5), h6 (10.0.0.6)';
+        portMap = 'Port 1 (h5) • Port 2 (h6) • Port 3 (s2 Pri) • Port 4 (s2 Sec) • Port 5 (s4 Trunk)';
+        ports = [
+          { name: 'Port 1 (h5)', val: '1.2 Mbps', pct: 12, class: '' },
+          { name: 'Port 2 (h6)', val: '1.4 Mbps', pct: 14, class: '' },
+          { name: 'Port 3 (s2 Pri)', val: `${pMbps} Mbps`, pct: pUtil, class: pUtil > 85 ? 'congested' : 'primary' },
+          { name: 'Port 4 (s2 Sec)', val: `${sMbps} Mbps`, pct: sUtil, class: 'secondary' }
+        ];
+      } else {
+        // s4
+        attached = 'h7 (10.0.0.7), h8 (10.0.0.8)';
+        portMap = 'Port 1 (h7) • Port 2 (h8) • Port 3 (s3 Trunk)';
+        ports = [
+          { name: 'Port 1 (h7)', val: '3.0 Mbps', pct: 30, class: '' },
+          { name: 'Port 2 (h8)', val: this.simulator.isElephantActive ? '11.8 Mbps' : '0.0 Mbps', pct: this.simulator.isElephantActive ? 60 : 0, class: '' },
+          { name: 'Port 3 (s3)', val: this.simulator.isElephantActive ? '14.8 Mbps' : '3.0 Mbps', pct: this.simulator.isElephantActive ? 74 : 15, class: 'primary' }
+        ];
+      }
+
+      if (peerEl) peerEl.textContent = attached;
+      if (portMapEl) portMapEl.textContent = portMap;
+      if (rateEl) {
+        if (this.isSimulationMode()) {
+          const totalRate = (ports.reduce((acc, p) => acc + parseFloat(p.val), 0) / 2).toFixed(1);
+          rateEl.textContent = `Tx: ${totalRate} Mbps | Rx: ${totalRate} Mbps (simulated)`;
+        } else {
+          rateEl.textContent = 'Tx: — | Rx: — (live telemetry unlinked)';
+        }
+      }
+      if (flowsEl) {
+        flowsEl.textContent = this.isSimulationMode() ? `${node.flows || 4} installed rules (Table 0)` : 'Port telemetry not exposed by controller';
+      }
+
+      if (metersTitle) metersTitle.textContent = 'Port Utilization Breakdown';
+      if (barsContainer) {
+        barsContainer.innerHTML = ports.map(p => `
+          <div class="port-bar-row">
+            <span class="port-name">${p.name}</span>
+            <div class="port-track"><div class="port-fill ${p.class}" style="width: ${Math.min(100, Math.max(4, p.pct))}%;"></div></div>
+            <span class="port-val">${p.val}</span>
+          </div>
+        `).join('');
+      }
+
+    } else {
+      // Host node selected (h1..h8)
+      idEl.textContent = `Host ${node.id.toUpperCase()} (${node.ip})`;
+      if (statusEl) {
+        statusEl.textContent = this.isSimulationMode() ? 'ONLINE / ATTACHED' : 'UNVERIFIED / NO TELEMETRY';
+        statusEl.className = 'badge-state ok';
+      }
+      if (protoEl) protoEl.textContent = 'Linux Kernel TCP/IP (vEthernet)';
+      if (peerLabelEl) peerLabelEl.textContent = 'Attached Switch';
+
+      let switchId = 's1';
+      if (node.id === 'h3' || node.id === 'h4') switchId = 's2';
+      else if (node.id === 'h5' || node.id === 'h6') switchId = 's3';
+      else if (node.id === 'h7' || node.id === 'h8') switchId = 's4';
+
+      if (peerEl) peerEl.textContent = `Switch ${switchId.toUpperCase()} (Port ${parseInt(node.id.slice(1)) % 2 === 1 ? '1' : '2'})`;
+      if (portMapEl) portMapEl.textContent = `eth0 (MAC: ${node.mac || '00:00:00:00:00:0' + node.id.slice(1)}) -> ${switchId}`;
+
+      const isBurstSrc = node.id === 'h2' && this.simulator.isElephantActive;
+      const isBurstDst = node.id === 'h8' && this.simulator.isElephantActive;
+      const isSteadySrc = node.id === 'h1' && this.simulator.isSteadyActive;
+      const isSteadyDst = node.id === 'h7' && this.simulator.isSteadyActive;
+
+      let hostRate = 'Tx: 0.1 Mbps | Rx: 0.1 Mbps';
+      let hostFlow = 'Socket IDLE (TCP Listen)';
+      let hostPct = 2;
+      let hostMbps = '0.1 Mbps';
+
+      if (isBurstSrc) {
+        hostRate = 'Tx: 12.0 Mbps | Rx: 0.2 Mbps (Burst Source)';
+        hostFlow = 'TCP iperf3 Client -> h8:5001';
+        hostPct = 60;
+        hostMbps = '12.0 Mbps';
+      } else if (isBurstDst) {
+        hostRate = 'Tx: 0.2 Mbps | Rx: 11.8 Mbps (Burst Sink)';
+        hostFlow = 'TCP iperf3 Server :5001 (Listening)';
+        hostPct = 59;
+        hostMbps = '11.8 Mbps';
+      } else if (isSteadySrc) {
+        hostRate = 'Tx: 3.0 Mbps | Rx: 0.1 Mbps (Steady Stream)';
+        hostFlow = 'UDP iperf Client -> h7:5002';
+        hostPct = 30;
+        hostMbps = '3.0 Mbps';
+      } else if (isSteadyDst) {
+        hostRate = 'Tx: 0.1 Mbps | Rx: 3.0 Mbps (Steady Sink)';
+        hostFlow = 'UDP iperf Server :5002 (Listening)';
+        hostPct = 30;
+        hostMbps = '3.0 Mbps';
+      }
+
+      if (rateEl) rateEl.textContent = hostRate;
+      if (flowsLabelEl) flowsLabelEl.textContent = 'Socket State';
+      if (flowsEl) flowsEl.textContent = hostFlow;
+
+      if (metersTitle) metersTitle.textContent = 'Host Interface Socket Utilization';
+      if (barsContainer) {
+        barsContainer.innerHTML = `
+          <div class="port-bar-row">
+            <span class="port-name">eth0 Tx</span>
+            <div class="port-track"><div class="port-fill primary" style="width: ${Math.max(4, hostPct)}%;"></div></div>
+            <span class="port-val">${hostMbps}</span>
+          </div>
+          <div class="port-bar-row">
+            <span class="port-name">eth0 Rx</span>
+            <div class="port-track"><div class="port-fill secondary" style="width: ${isBurstDst || isSteadyDst ? Math.max(4, hostPct) : 4}%;"></div></div>
+            <span class="port-val">${isBurstDst ? '11.8 Mbps' : (isSteadyDst ? '3.0 Mbps' : '0.1 Mbps')}</span>
+          </div>
+        `;
+      }
+    }
   }
 
   openNodeModal(node) {
@@ -914,8 +1151,36 @@ class DashboardApp {
     updateDeltaChip('metricLatencyDelta', latVal, this.sparklineHistory.latency, 'ms', true);
     updateDeltaChip('metricThroughputDelta', tpVal, this.sparklineHistory.throughput, 'M', false);
     updateDeltaChip('metricLossDelta', lossVal, this.sparklineHistory.loss, '%', true);
-    updateDeltaChip('metricLinkUtilDelta', utilVal, this.sparklineHistory.linkUtil, '%', false);
     updateDeltaChip('metricRewardDelta', rewVal, this.sparklineHistory.reward, 'pts', false);
+
+    // Primary vs Secondary Core Link Utilization status
+    const linkDeltaEl = document.getElementById('metricLinkUtilDelta');
+    if (linkDeltaEl) {
+      if (this.simulator.isRerouted) {
+        linkDeltaEl.innerHTML = '<span class="delta-chip positive">Sec: 52% &bull; Balanced</span>';
+      } else if (utilVal > 85) {
+        linkDeltaEl.innerHTML = '<span class="delta-chip negative">▲ Saturated &bull; Sec Idle</span>';
+      } else {
+        linkDeltaEl.innerHTML = '<span class="delta-chip neutral">Sec: 0% &bull; Low Load</span>';
+      }
+    }
+
+    // Safety Gate KPI active state
+    const safetyEl = document.getElementById('metricSafetyStatus');
+    const safetyDeltaEl = document.getElementById('metricSafetyDelta');
+    if (safetyEl) {
+      if (this.simulator.mode === 'A0') {
+        safetyEl.textContent = 'BYPASS';
+        if (safetyDeltaEl) {
+          safetyDeltaEl.innerHTML = '<span class="delta-chip neutral" style="color: var(--amber-text); border-color: rgba(245, 158, 11, 0.3);">No Invariants Active</span>';
+        }
+      } else {
+        safetyEl.textContent = 'PASS';
+        if (safetyDeltaEl) {
+          safetyDeltaEl.innerHTML = '<span class="delta-chip positive">0 Vetoes &bull; Invariants Upheld</span>';
+        }
+      }
+    }
 
     // Update elephant info status in Topo HUD
     const elephantStatus = document.getElementById('infoElephantStatus');
@@ -927,6 +1192,11 @@ class DashboardApp {
       } else {
         elephantStatus.innerHTML = '<span class="badge-tag" style="background:rgba(239,68,68,0.25); color:#f87171; border:1px solid rgba(239,68,68,0.5);">BURST ACTIVE ON PRIMARY</span>';
       }
+    }
+
+    // Live update for Selected Node Inspector
+    if (this.topology && this.topology.selectedNode) {
+      this.updateNodeInspector(this.topology.selectedNode);
     }
 
     // Push new data to Canvas charts

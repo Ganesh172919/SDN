@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +12,17 @@
 </head>
 <body>
 
-  <!-- Ambient Dynamic Glow Mesh in Background -->
-  <div class="ambient-glow orb-1"></div>
-  <div class="ambient-glow orb-2"></div>
-  <div class="ambient-glow orb-3"></div>
+  <!-- Subtle Ambient Glow Accents -->
+  <div class="ambient-glow orb-1" aria-hidden="true"></div>
+  <div class="ambient-glow orb-2" aria-hidden="true"></div>
+  <div class="ambient-glow orb-3" aria-hidden="true"></div>
 
   <!-- Top Mission Control Navigation Bar -->
-  <header class="app-header">
+  <header class="app-header" role="banner">
     <div class="brand-section">
       <div class="brand-logo-wrap">
         <div class="brand-logo">
-          <svg viewBox="0 0 24 24" class="logo-icon">
+          <svg viewBox="0 0 24 24" class="logo-icon" aria-hidden="true">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
@@ -30,7 +30,7 @@
       </div>
       <div class="brand-text">
         <div class="brand-title-row">
-          <h1>SELF-X FLOW MANAGER</h1>
+          <h1>SELF-X FLOW CONTROL</h1>
           <span class="version-chip">v2.5 PRO</span>
         </div>
         <p class="brand-sub">
@@ -41,26 +41,20 @@
       </div>
     </div>
 
-    <!-- Live Telemetry Ticker & System Health -->
+    <!-- Live Telemetry Status & Controls -->
     <div class="header-status-bar">
-      <button class="sound-toggle-btn" id="btnShortcutsHelp" title="View Keyboard Shortcuts & Hotkeys [Hotkey: ? or H]">
-        <span>⌨️</span>
-        <span>KEYS</span>
-      </button>
-
       <div class="status-pill simulating" id="connectionStatusPill">
-        <div class="status-pulse-ring"></div>
         <span class="status-dot"></span>
         <span id="connectionStatusText">SIMULATION TESTBED ACTIVE</span>
       </div>
 
-      <div class="app-mode-switcher" role="group" aria-label="Application mode">
-        <span class="mode-label">APP MODE</span>
-        <button class="app-mode-btn active" id="btnAppModeSimulation" data-app-mode="simulation" type="button">SIMULATION</button>
-        <button class="app-mode-btn" id="btnAppModeLive" data-app-mode="live" type="button">LIVE NETWORK</button>
+      <div class="app-mode-switcher" role="group" aria-label="Application operational mode">
+        <span class="mode-label">MODE</span>
+        <button class="app-mode-btn active" id="btnAppModeSimulation" data-app-mode="simulation" type="button" aria-pressed="true">SIMULATION</button>
+        <button class="app-mode-btn" id="btnAppModeLive" data-app-mode="live" type="button" aria-pressed="false">LIVE NETWORK</button>
       </div>
 
-      <div class="cycle-monitor-card">
+      <div class="cycle-monitor-card" title="Current Agent Execution Cycle">
         <div class="cycle-monitor-header">
           <span class="cycle-label">AGENT CYCLE</span>
           <span class="cycle-numbers"><span id="currentCycleCount">14</span><span class="cycle-total"> / 120</span></span>
@@ -70,96 +64,104 @@
         </div>
       </div>
 
-      <div class="clock-badge" id="liveClockBadge">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+      <div class="clock-badge" id="liveClockBadge" title="Coordinated Universal Time (UTC)">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
           <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/>
         </svg>
         <span id="liveClockText">--:--:-- UTC</span>
       </div>
+
+      <button class="sound-toggle-btn" id="btnThemeToggle" type="button" title="Toggle Theme (Dark / Light)">
+        <span id="themeToggleIcon">🌙</span>
+        <span>THEME</span>
+      </button>
+
+      <button class="sound-toggle-btn" id="btnShortcutsHelp" type="button" title="View Keyboard Shortcuts & Hotkeys [Hotkey: ? or H]">
+        <span>⌨️</span>
+        <span>KEYS</span>
+      </button>
     </div>
   </header>
 
+  <!-- Context Mode State Banner -->
   <div class="mode-state-banner simulation-state" id="modeStateBanner" role="status" aria-live="polite">
     <strong id="modeStateTitle">Simulation mode</strong>
     <span id="modeStateMessage">Generated telemetry and actions are local to this browser.</span>
   </div>
 
   <!-- Interactive Control & Experiment Action Deck -->
-  <section class="quick-controls">
-    <div style="width: 100%; margin-bottom: 0.6rem; padding: 0.4rem 0.8rem; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 4px; font-size: 0.73rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
-      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00f2fe; flex-shrink: 0;"></span>
-      <span><strong>LOCAL BROWSER SIMULATION:</strong> Controls below interact with the browser-local queue model only. They do not inject network packets or modify live SDN switches.</span>
-    </div>
-
+  <section class="quick-controls" aria-label="Simulation and Control Toolbar">
     <div class="ctrl-group traffic-group">
-      <span class="group-label">TRAFFIC INGESTION</span>
-      <button class="btn-ctrl btn-steady" id="btnSteadyFlow" title="Toggle background steady traffic h1 -> h7 at 3 Mbps (Local simulation only)">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      <span class="group-label">Traffic Ingestion</span>
+      <button class="btn-ctrl btn-steady" id="btnSteadyFlow" type="button" title="Toggle background steady traffic h1 -> h7 at 3 Mbps [Hotkey: S]">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
         <span>Steady Load (3M)</span>
+      </button>
+      <button class="btn-ctrl btn-elephant" id="btnBurstElephant" type="button" title="Inject elephant traffic burst h2 -> h8 at 12 Mbps [Hotkey: B]">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span>Burst Elephant (12M)</span>
       </button>
     </div>
 
     <div class="ctrl-group actions-group">
-      <span class="group-label">AGENT ACTIONS</span>
-      <button class="btn-ctrl" id="btnTriggerReroute" title="Execute local simulation flow reroute onto secondary link">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+      <span class="group-label">Agent Flow Actions</span>
+      <button class="btn-ctrl" id="btnTriggerReroute" type="button" title="Execute local simulation flow reroute onto secondary link [Hotkey: R]">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
         <span>Reroute Flow</span>
       </button>
 
-      <button class="btn-ctrl" id="btnTriggerRateLimit" title="Apply local simulation meter rate-limiting ceiling">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      <button class="btn-ctrl" id="btnTriggerRateLimit" type="button" title="Apply local simulation meter rate-limiting ceiling [Hotkey: L]">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
         <span>Rate Limit (Meter)</span>
       </button>
 
-      <button class="btn-ctrl" id="btnStepAgent" title="Execute single observe-decide-safety-act-reflect cycle in browser model">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      <button class="btn-ctrl" id="btnStepAgent" type="button" title="Execute single observe-decide-safety-act-reflect cycle in browser model">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         <span>Step Loop</span>
       </button>
     </div>
 
     <div class="ctrl-group runtime-group">
-      <span class="group-label">LOOP RUNTIME</span>
-      <button class="btn-ctrl btn-playback active-play" id="btnTogglePlay" title="Play or Pause continuous agent loop [Hotkey: Space]">
-        <svg id="playPauseIcon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      <span class="group-label">Loop Runtime</span>
+      <button class="btn-ctrl btn-playback active-play" id="btnTogglePlay" type="button" title="Play or Pause continuous agent loop [Hotkey: Space]">
+        <svg id="playPauseIcon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         <span id="playPauseText">Pause Loop</span>
       </button>
 
-      <button class="btn-ctrl btn-reset" id="btnResetSimulation" title="Reset all state, clear flows, and reset counters">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      <button class="btn-ctrl btn-reset" id="btnResetSimulation" type="button" title="Reset all state, clear flows, and reset counters">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
         <span>Reset</span>
       </button>
     </div>
 
     <div class="mode-selector-wrap">
-      <span class="group-label">ABLATION PROFILE</span>
-      <div class="mode-selector">
-        <button class="mode-btn" data-mode="A0" title="Condition A0: Static Ryu L2 Switch baseline">A0: STATIC</button>
-        <button class="mode-btn" data-mode="A1" title="Condition A1: Zero-Shot LLM Agent (no memory)">A1: ZERO-SHOT</button>
-        <button class="mode-btn active" data-mode="A2" title="Condition A2: SELF-X Self-Improving Agent (Reflection + Memory)">A2: SELF-X</button>
+      <span class="group-label">Ablation Profile</span>
+      <div class="mode-selector" role="group" aria-label="Ablation condition profile">
+        <button class="mode-btn" data-mode="A0" type="button" title="Condition A0: Static Ryu L2 Switch baseline">A0: STATIC</button>
+        <button class="mode-btn" data-mode="A1" type="button" title="Condition A1: Zero-Shot LLM Agent (no memory)">A1: ZERO-SHOT</button>
+        <button class="mode-btn active" data-mode="A2" type="button" title="Condition A2: SELF-X Self-Improving Agent (Reflection + Memory)">A2: SELF-X</button>
       </div>
     </div>
   </section>
 
-  <!-- Real-Time Global Telemetry Metrics Strip -->
-  <section class="metrics-strip">
+  <!-- Real-Time Global Telemetry Metrics Strip (6 Responsive KPIs) -->
+  <section class="metrics-strip" aria-label="Real-Time Network Telemetry KPIs">
     <!-- Metric 1: Latency -->
-    <div class="metric-card accent-cyan" id="metricCardLatency">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardLatency">
       <div class="metric-header">
         <span class="metric-title">End-to-End Latency</span>
         <div class="metric-icon-wrap cyan">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
         <span class="metric-val" id="metricLatency">&mdash;</span>
         <span class="metric-unit">ms</span>
       </div>
-      <!-- Mini Sparkline Waveform -->
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineLatency" viewBox="0 0 120 28" preserveAspectRatio="none">
-          <path class="sparkline-area" d="" fill="rgba(0, 242, 254, 0.12)"></path>
-          <path class="sparkline-line" d="" stroke="#00f2fe" stroke-width="2" fill="none"></path>
+        <svg class="metric-sparkline" id="sparklineLatency" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
+          <path class="sparkline-area" d="" fill="rgba(56, 189, 248, 0.12)"></path>
+          <path class="sparkline-line" d="" stroke="#38bdf8" stroke-width="2" fill="none"></path>
         </svg>
       </div>
       <div class="metric-delta" id="metricLatencyDelta">
@@ -168,12 +170,11 @@
     </div>
 
     <!-- Metric 2: Throughput -->
-    <div class="metric-card accent-emerald" id="metricCardThroughput">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardThroughput">
       <div class="metric-header">
         <span class="metric-title">Agg. Throughput</span>
         <div class="metric-icon-wrap emerald">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11h5V5H4v6zm0 7h5v-5H4v5zm6 0h5v-9h-5v9zm6 0h5v-13h-5v13z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 11h5V5H4v6zm0 7h5v-5H4v5zm6 0h5v-9h-5v9zm6 0h5v-13h-5v13z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
@@ -181,7 +182,7 @@
         <span class="metric-unit">Mbps</span>
       </div>
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineThroughput" viewBox="0 0 120 28" preserveAspectRatio="none">
+        <svg class="metric-sparkline" id="sparklineThroughput" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
           <path class="sparkline-area" d="" fill="rgba(16, 185, 129, 0.12)"></path>
           <path class="sparkline-line" d="" stroke="#10b981" stroke-width="2" fill="none"></path>
         </svg>
@@ -192,12 +193,11 @@
     </div>
 
     <!-- Metric 3: Packet Loss -->
-    <div class="metric-card accent-crimson" id="metricCardLoss">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardLoss">
       <div class="metric-header">
         <span class="metric-title">Packet Loss Rate</span>
         <div class="metric-icon-wrap crimson">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
@@ -205,7 +205,7 @@
         <span class="metric-unit">%</span>
       </div>
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineLoss" viewBox="0 0 120 28" preserveAspectRatio="none">
+        <svg class="metric-sparkline" id="sparklineLoss" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
           <path class="sparkline-area" d="" fill="rgba(239, 68, 68, 0.12)"></path>
           <path class="sparkline-line" d="" stroke="#ef4444" stroke-width="2" fill="none"></path>
         </svg>
@@ -216,12 +216,11 @@
     </div>
 
     <!-- Metric 4: Core Link Util -->
-    <div class="metric-card accent-amber" id="metricCardUtil">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardUtil">
       <div class="metric-header">
-        <span class="metric-title">Core Link Util (s2-s3)</span>
+        <span class="metric-title">Primary Core Link (Port 3)</span>
         <div class="metric-icon-wrap amber">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
@@ -229,7 +228,7 @@
         <span class="metric-unit">%</span>
       </div>
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineUtil" viewBox="0 0 120 28" preserveAspectRatio="none">
+        <svg class="metric-sparkline" id="sparklineUtil" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
           <path class="sparkline-area" d="" fill="rgba(245, 158, 11, 0.12)"></path>
           <path class="sparkline-line" d="" stroke="#f59e0b" stroke-width="2" fill="none"></path>
         </svg>
@@ -240,12 +239,11 @@
     </div>
 
     <!-- Metric 5: Cumulative Reward -->
-    <div class="metric-card accent-purple" id="metricCardReward">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardReward">
       <div class="metric-header">
         <span class="metric-title">Cumulative Reward</span>
         <div class="metric-icon-wrap purple">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
@@ -253,7 +251,7 @@
         <span class="metric-unit">pts</span>
       </div>
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineReward" viewBox="0 0 120 28" preserveAspectRatio="none">
+        <svg class="metric-sparkline" id="sparklineReward" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
           <path class="sparkline-area" d="" fill="rgba(168, 85, 247, 0.12)"></path>
           <path class="sparkline-line" d="" stroke="#a855f7" stroke-width="2" fill="none"></path>
         </svg>
@@ -264,12 +262,11 @@
     </div>
 
     <!-- Metric 6: Safety Gate -->
-    <div class="metric-card accent-indigo" id="metricCardSafety">
-      <div class="metric-glass-reflection"></div>
+    <div class="metric-card" id="metricCardSafety">
       <div class="metric-header">
         <span class="metric-title">Safety Gate</span>
         <div class="metric-icon-wrap indigo">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
         </div>
       </div>
       <div class="metric-value-row">
@@ -277,7 +274,7 @@
         <span class="metric-unit"></span>
       </div>
       <div class="metric-sparkline-container">
-        <svg class="metric-sparkline" id="sparklineSafety" viewBox="0 0 120 28" preserveAspectRatio="none">
+        <svg class="metric-sparkline" id="sparklineSafety" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
           <path class="sparkline-area" d="" fill="rgba(99, 102, 241, 0.12)"></path>
           <path class="sparkline-line" d="" stroke="#6366f1" stroke-width="2" fill="none"></path>
         </svg>
@@ -289,42 +286,42 @@
   </section>
 
   <!-- Segmented Navigation Pills -->
-  <nav class="tabs-nav-wrap">
-    <div class="tabs-container">
-      <button class="tab-btn active" data-tab="tab-topo">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
+  <nav class="tabs-nav-wrap" aria-label="Main Dashboard Tabs">
+    <div class="tabs-container" role="tablist">
+      <button class="tab-btn active" data-tab="tab-topo" role="tab" aria-selected="true" id="tabBtnTopo">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
         <span>Topology &amp; Live Flows</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-agent">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.55 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-1.38 0-2.64-.47-3.66-1.25l-.26-.2-1.9 1.9-.71-.71 1.9-1.9-.2-.26C6.47 14.64 6 13.38 6 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6z"/></svg>
+      <button class="tab-btn" data-tab="tab-agent" role="tab" aria-selected="false" id="tabBtnAgent">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.55 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-1.38 0-2.64-.47-3.66-1.25l-.26-.2-1.9 1.9-.71-.71 1.9-1.9-.2-.26C6.47 14.64 6 13.38 6 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6z"/></svg>
         <span>Agent Cognition Loop</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-memory">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+      <button class="tab-btn" data-tab="tab-memory" role="tab" aria-selected="false" id="tabBtnMemory">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
         <span>Episodic Memory Bank</span>
         <span class="tab-badge" id="memoryCountBadge">30</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-charts">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <button class="tab-btn" data-tab="tab-charts" role="tab" aria-selected="false" id="tabBtnCharts">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         <span>Real-Time Charts</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-insights">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3V3zm5 10 3.2-3.2 2.6 2.6L19 7.8V11h2V4h-7v2h3.6l-3.8 3.8-2.6-2.6L6.6 12.4 8 13z"/></svg>
+      <button class="tab-btn" data-tab="tab-insights" role="tab" aria-selected="false" id="tabBtnInsights">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h2v16h16v2H3V3zm5 10 3.2-3.2 2.6 2.6L19 7.8V11h2V4h-7v2h3.6l-3.8 3.8-2.6-2.6L6.6 12.4 8 13z"/></svg>
         <span>Project Visualizations</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-ablation">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+      <button class="tab-btn" data-tab="tab-ablation" role="tab" aria-selected="false" id="tabBtnAblation">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
         <span>Ablation Benchmarks</span>
         <span class="tab-badge" id="resultsCountBadge" style="display:none;">0</span>
       </button>
 
-      <button class="tab-btn" data-tab="tab-safety">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm7 10c0 4.52-3.13 8.7-7 9.88-3.87-1.18-7-5.36-7-9.88V6.3l7-3.11 7 3.11V11z"/></svg>
+      <button class="tab-btn" data-tab="tab-safety" role="tab" aria-selected="false" id="tabBtnSafety">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm7 10c0 4.52-3.13 8.7-7 9.88-3.87-1.18-7-5.36-7-9.88V6.3l7-3.11 7 3.11V11z"/></svg>
         <span>Safety Gate &amp; Rules</span>
       </button>
     </div>
@@ -334,7 +331,7 @@
   <main class="app-main-content">
 
     <!-- VIEW 1: TOPOLOGY & FLOW INSPECTOR -->
-    <div class="tab-pane active" id="tab-topo">
+    <div class="tab-pane active" id="tab-topo" role="tabpanel" aria-labelledby="tabBtnTopo">
       <div class="topo-layout">
         <div class="canvas-panel">
           <div class="panel-header">
@@ -360,7 +357,7 @@
 
           <!-- Canvas Interactive Container -->
           <div class="canvas-wrap">
-            <canvas id="topologyCanvas" width="980" height="520"></canvas>
+            <canvas id="topologyCanvas" width="980" height="520" aria-label="SDN Network Topology Canvas"></canvas>
             
             <!-- Floating Canvas Quick Stats HUD -->
             <div class="canvas-hud-stats">
@@ -379,7 +376,7 @@
             </div>
 
             <div class="canvas-instruction-pill">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
               <span>Click any switch or host node to inspect ports, flow tables, and counters</span>
             </div>
           </div>
@@ -390,7 +387,7 @@
           <div class="info-card inspector-card">
             <div class="card-title-row">
               <div class="card-icon-chip cyan">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
               </div>
               <h3>Selected Node Inspector</h3>
             </div>
@@ -403,56 +400,64 @@
             <table class="detail-table">
               <tr>
                 <th>Protocol</th>
-                <td>OpenFlow 1.3 via ofctl_rest</td>
+                <td id="nodeInspectorProtocol">OpenFlow 1.3 via ofctl_rest</td>
               </tr>
               <tr>
-                <th>Hanging Hosts</th>
-                <td>h3 (10.0.0.3), h4 (10.0.0.4)</td>
+                <th id="nodeInspectorPeerLabel">Attached Hosts</th>
+                <td id="nodeInspectorAttached">h3 (10.0.0.3), h4 (10.0.0.4)</td>
               </tr>
               <tr>
                 <th>Port Mapping</th>
-                <td>Port 1 (h3) &bull; Port 2 (h4) &bull; Port 3 (s3 Pri) &bull; Port 4 (s3 Sec)</td>
+                <td id="nodeInspectorPortMap">Port 1 (h3) &bull; Port 2 (h4) &bull; Port 3 (s3 Pri) &bull; Port 4 (s3 Sec)</td>
               </tr>
               <tr>
                 <th>Tx / Rx Rate</th>
                 <td id="nodeInspectorRate" class="mono-highlight">Tx: 6.8 Mbps | Rx: 6.9 Mbps</td>
               </tr>
               <tr>
-                <th>Flow Entries</th>
+                <th id="nodeInspectorFlowsLabel">Flow Entries</th>
                 <td id="nodeInspectorFlows" class="mono-highlight">4 installed (Table 0)</td>
               </tr>
             </table>
 
             <!-- Port Utilization Meter Bars -->
-            <div class="port-meter-group">
-              <span class="port-meter-title">Port Utilization Breakdown</span>
-              <div class="port-bar-row">
-                <span class="port-name">Port 1 (h3)</span>
-                <div class="port-track"><div class="port-fill" id="portBar1" style="width: 15%;"></div></div>
-                <span class="port-val">1.5 Mbps</span>
+            <div class="port-meter-group" id="nodeInspectorMetersContainer">
+              <span class="port-meter-title" id="nodeInspectorMetersTitle">Port Utilization Breakdown</span>
+              <div id="nodeInspectorBars">
+                <div class="port-bar-row">
+                  <span class="port-name">Port 1 (h3)</span>
+                  <div class="port-track"><div class="port-fill" id="portBar1" style="width: 15%;"></div></div>
+                  <span class="port-val">1.5 Mbps</span>
+                </div>
+                <div class="port-bar-row">
+                  <span class="port-name">Port 2 (h4)</span>
+                  <div class="port-track"><div class="port-fill" id="portBar2" style="width: 20%;"></div></div>
+                  <span class="port-val">2.0 Mbps</span>
+                </div>
+                <div class="port-bar-row">
+                  <span class="port-name">Port 3 (s3 Pri)</span>
+                  <div class="port-track"><div class="port-fill primary" id="portBar3" style="width: 48%;"></div></div>
+                  <span class="port-val" id="portVal3">4.8 Mbps</span>
+                </div>
+                <div class="port-bar-row">
+                  <span class="port-name">Port 4 (s3 Sec)</span>
+                  <div class="port-track"><div class="port-fill secondary" id="portBar4" style="width: 52%;"></div></div>
+                  <span class="port-val" id="portVal4">5.2 Mbps</span>
+                </div>
               </div>
-              <div class="port-bar-row">
-                <span class="port-name">Port 2 (h4)</span>
-                <div class="port-track"><div class="port-fill" id="portBar2" style="width: 20%;"></div></div>
-                <span class="port-val">2.0 Mbps</span>
-              </div>
-              <div class="port-bar-row">
-                <span class="port-name">Port 3 (s3 Pri)</span>
-                <div class="port-track"><div class="port-fill primary" id="portBar3" style="width: 48%;"></div></div>
-                <span class="port-val" id="portVal3">4.8 Mbps</span>
-              </div>
-              <div class="port-bar-row">
-                <span class="port-name">Port 4 (s3 Sec)</span>
-                <div class="port-track"><div class="port-fill secondary" id="portBar4" style="width: 52%;"></div></div>
-                <span class="port-val" id="portVal4">5.2 Mbps</span>
-              </div>
+            </div>
+
+            <div style="margin-top: 0.85rem; text-align: right;">
+              <button class="btn-ctrl" id="btnOpenNodeModal" type="button" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;" title="Open detailed port counters modal for selected node">
+                <span>View Raw Port Table ↗</span>
+              </button>
             </div>
           </div>
 
           <div class="info-card flow-summary-card">
             <div class="card-title-row">
               <div class="card-icon-chip emerald">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-3zm4.41-6.59L11 5.83V16h2V5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41z"/></svg>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-3zm4.41-6.59L11 5.83V16h2V5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41z"/></svg>
               </div>
               <h3>Active Traffic Flows</h3>
             </div>
@@ -484,7 +489,7 @@
     </div>
 
     <!-- VIEW 2: AGENT COGNITION LOOP & LANGGRAPH -->
-    <div class="tab-pane" id="tab-agent">
+    <div class="tab-pane" id="tab-agent" role="tabpanel" aria-labelledby="tabBtnAgent">
       <div class="agent-layout">
         <!-- Authoritative Two-Timescale Architecture & Implementation Status Card -->
         <div class="langgraph-card">
@@ -504,8 +509,79 @@
             </div>
           </div>
 
+          <!-- Interactive 5-Phase DAG Pipeline State Machine -->
+          <div class="dag-pipeline-container" role="region" aria-label="LangGraph State Machine Pipeline">
+            <!-- Phase 1: Observe -->
+            <div class="dag-node-card" id="nodePhaseObserve" data-step="observe" tabindex="0" role="button" aria-label="Phase 1: Telemetry Observation">
+              <div class="dag-node-header">
+                <span class="dag-step-num">PHASE 01</span>
+                <span class="dag-node-status" id="statusObserve">STANDBY</span>
+              </div>
+              <div class="dag-node-title">1. Observe</div>
+              <div class="dag-node-desc">Query Ryu ofctl_rest stats every 5s; parse packet &amp; byte delta counters.</div>
+            </div>
+
+            <!-- Phase 2: Decide -->
+            <div class="dag-node-card" id="nodePhaseDecide" data-step="decide" tabindex="0" role="button" aria-label="Phase 2: LLM Decision">
+              <div class="dag-node-header">
+                <span class="dag-step-num">PHASE 02</span>
+                <span class="dag-node-status" id="statusDecide">STANDBY</span>
+              </div>
+              <div class="dag-node-title">2. Decide</div>
+              <div class="dag-node-desc">LLM evaluates observations + episodic reflections to propose 3-action vector.</div>
+            </div>
+
+            <!-- Phase 3: Safety Gate -->
+            <div class="dag-node-card" id="nodePhaseSafety" data-step="safety" tabindex="0" role="button" aria-label="Phase 3: Fail-Closed Safety Gate">
+              <div class="dag-node-header">
+                <span class="dag-step-num">PHASE 03</span>
+                <span class="dag-node-status" id="statusSafety">STANDBY</span>
+              </div>
+              <div class="dag-node-title">3. Safety Gate</div>
+              <div class="dag-node-desc">Fail-closed invariant validator: drop &le;20%, util &le;90%, rate floor &ge;512 kbps.</div>
+            </div>
+
+            <!-- Phase 4: Act -->
+            <div class="dag-node-card" id="nodePhaseAct" data-step="act" tabindex="0" role="button" aria-label="Phase 4: OpenFlow 1.3 Execution">
+              <div class="dag-node-header">
+                <span class="dag-step-num">PHASE 04</span>
+                <span class="dag-node-status" id="statusAct">STANDBY</span>
+              </div>
+              <div class="dag-node-title">4. Act</div>
+              <div class="dag-node-desc">Installs OpenFlow 1.3 flow modification or meter table bandwidth ceiling.</div>
+            </div>
+
+            <!-- Phase 5: Reflect -->
+            <div class="dag-node-card active-phase" id="nodePhaseReflect" data-step="reflect" tabindex="0" role="button" aria-label="Phase 5: Verbal Reflection & Memory">
+              <div class="dag-node-header">
+                <span class="dag-step-num">PHASE 05</span>
+                <span class="dag-node-status" id="statusReflect">RUNNING...</span>
+              </div>
+              <div class="dag-node-title">5. Reflect</div>
+              <div class="dag-node-desc">Computes multi-objective reward delta and commits to top-30 memory bank.</div>
+            </div>
+          </div>
+
+          <!-- DAG Step Inspector Box -->
+          <div class="dag-inspection-panel">
+            <div class="dag-inspect-header">
+              <h4 id="dagInspectTitle">Phase 5: Verbal Reflection &amp; Multi-Objective Memory</h4>
+              <button class="btn-ctrl" id="btnStepFromDag" type="button" style="padding:0.25rem 0.65rem; font-size:0.72rem;">
+                <span>Step Loop ↗</span>
+              </button>
+            </div>
+            <div id="dagInspectBody">
+              <div class="formula-box">
+                <code>Reward Formula: R = -0.4&middot;&Delta;latency + 0.4&middot;&Delta;throughput - 0.2&middot;&Delta;loss</code>
+              </div>
+              <p style="font-size:0.74rem; color:var(--text-secondary); margin-top:0.4rem;">
+                Evaluates post-action telemetry deltas against previous state, generates verbal reflection critique, and stores successful state-action-reward tuples in top-30 memory bank.
+              </p>
+            </div>
+          </div>
+
           <!-- Architecture & Component Verification Matrix -->
-          <div style="padding: 1rem 1.4rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; margin: 0.8rem 1.2rem; border: 1px solid rgba(255, 255, 255, 0.06);">
+          <div style="padding: 1rem 1.4rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; margin: 0.8rem 0; border: 1px solid rgba(255, 255, 255, 0.06); overflow-x: auto;">
             <table class="detail-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
               <thead>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: left; color: var(--text-secondary);">
@@ -561,7 +637,7 @@
           </div>
         </div>
 
-        <!-- Real-Time Hacker Terminal with Filter Chips -->
+        <!-- Real-Time Reasoning Terminal with Filter Chips -->
         <div class="reasoning-terminal">
           <div class="terminal-header">
             <div class="terminal-dots">
@@ -573,22 +649,22 @@
               <span class="term-prompt">&gt;</span> SELF-X AGENT REASONING STREAM &bull; CYCLE <span id="termCycle">14</span>
             </div>
             <div class="terminal-actions">
-              <button class="term-btn" id="btnAutoScroll" title="Toggle Auto-Scroll">AUTO-SCROLL: ON</button>
-              <button class="term-btn" id="btnClearLogs" title="Clear reasoning history">Clear</button>
+              <button class="term-btn" id="btnAutoScroll" type="button" title="Toggle Auto-Scroll">AUTO-SCROLL: ON</button>
+              <button class="term-btn" id="btnClearLogs" type="button" title="Clear reasoning history">Clear</button>
             </div>
           </div>
 
           <!-- Terminal Filter Strip -->
           <div class="terminal-filters-row">
-            <button class="term-filter active" data-filter="all">ALL</button>
-            <button class="term-filter" data-filter="observe">OBSERVE</button>
-            <button class="term-filter" data-filter="decide">DECIDE</button>
-            <button class="term-filter" data-filter="safety">SAFETY</button>
-            <button class="term-filter" data-filter="act">ACT</button>
-            <button class="term-filter" data-filter="reflect">REFLECT</button>
+            <button class="term-filter active" data-filter="all" type="button">ALL</button>
+            <button class="term-filter" data-filter="observe" type="button">OBSERVE</button>
+            <button class="term-filter" data-filter="decide" type="button">DECIDE</button>
+            <button class="term-filter" data-filter="safety" type="button">SAFETY</button>
+            <button class="term-filter" data-filter="act" type="button">ACT</button>
+            <button class="term-filter" data-filter="reflect" type="button">REFLECT</button>
           </div>
 
-          <div class="terminal-body" id="reasoningLogBody">
+          <div class="terminal-body" id="reasoningLogBody" role="log" aria-live="polite">
             <!-- Dynamically populated entries -->
           </div>
         </div>
@@ -596,7 +672,7 @@
     </div>
 
     <!-- VIEW 3: EPISODIC MEMORY BANK -->
-    <div class="tab-pane" id="tab-memory">
+    <div class="tab-pane" id="tab-memory" role="tabpanel" aria-labelledby="tabBtnMemory">
       <div class="memory-toolbar">
         <div class="panel-title-group">
           <div class="panel-badge-row">
@@ -609,25 +685,25 @@
 
         <div class="memory-actions-row">
           <div class="search-box-wrap">
-            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
-            <input type="text" id="memorySearchInput" class="search-input" placeholder="Filter reflections, actions, DPIDs...">
+            <input type="text" id="memorySearchInput" class="search-input" placeholder="Filter reflections, actions, DPIDs..." aria-label="Search episodic memory">
           </div>
-          <button class="btn-ctrl btn-export" id="btnExportMemory">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <button class="btn-ctrl btn-export" id="btnExportMemory" type="button" title="Export memory records to JSON">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <span>Export JSON</span>
           </button>
         </div>
       </div>
 
       <!-- Action Type Filter Pills -->
-      <div class="memory-filter-strip">
+      <div class="memory-filter-strip" role="group" aria-label="Filter memories by action">
         <span class="filter-label">Filter Action:</span>
-        <button class="filter-pill active" data-filter="all">All (30)</button>
-        <button class="filter-pill" data-filter="reroute">reroute</button>
-        <button class="filter-pill" data-filter="rate_limit">rate_limit</button>
-        <button class="filter-pill" data-filter="no_op">no_op</button>
+        <button class="filter-pill active" data-filter="all" type="button">All (30)</button>
+        <button class="filter-pill" data-filter="reroute" type="button">reroute</button>
+        <button class="filter-pill" data-filter="rate_limit" type="button">rate_limit</button>
+        <button class="filter-pill" data-filter="no_op" type="button">no_op</button>
       </div>
 
       <div class="memory-grid" id="memoryGridContainer">
@@ -636,7 +712,7 @@
     </div>
 
     <!-- VIEW 4: REAL-TIME TELEMETRY CHARTS -->
-    <div class="tab-pane" id="tab-charts">
+    <div class="tab-pane" id="tab-charts" role="tabpanel" aria-labelledby="tabBtnCharts">
       <div class="charts-view-header">
         <div class="panel-title-group">
           <h2>Continuous Telemetry Streams (Sliding 30-Cycle Window)</h2>
@@ -648,79 +724,75 @@
         <!-- Chart 1: Latency -->
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title-wrap">
-              <h4>End-to-End Latency Progression</h4>
-              <span class="chart-sub">Target: &lt; 15 ms under congestion</span>
+            <div>
+              <h3>End-to-End Latency Progression</h3>
+              <p>Target: &lt; 15 ms under congestion</p>
             </div>
-            <div class="chart-kpi-badge cyan">
-              <span class="kpi-val" id="chartLatencyVal">5.2</span>
-              <span class="kpi-unit">ms</span>
+            <div class="chart-stat-chip">
+              <span id="chartLatencyVal">5.2</span> ms
             </div>
           </div>
-          <div class="chart-canvas-wrap">
-            <canvas id="chartLatency" width="540" height="220"></canvas>
+          <div class="canvas-chart-wrap">
+            <canvas id="chartLatency" width="540" height="220" aria-label="End to End Latency chart"></canvas>
           </div>
         </div>
 
         <!-- Chart 2: Throughput -->
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title-wrap">
-              <h4>Aggregate Network Throughput</h4>
-              <span class="chart-sub">Target: &gt; 10 Mbps sustained</span>
+            <div>
+              <h3>Aggregate Network Throughput</h3>
+              <p>Target: &gt; 10 Mbps sustained</p>
             </div>
-            <div class="chart-kpi-badge emerald">
-              <span class="kpi-val" id="chartThroughputVal">11.8</span>
-              <span class="kpi-unit">Mbps</span>
+            <div class="chart-stat-chip" style="color:var(--emerald-text);">
+              <span id="chartThroughputVal">11.8</span> Mbps
             </div>
           </div>
-          <div class="chart-canvas-wrap">
-            <canvas id="chartThroughput" width="540" height="220"></canvas>
+          <div class="canvas-chart-wrap">
+            <canvas id="chartThroughput" width="540" height="220" aria-label="Aggregate Network Throughput chart"></canvas>
           </div>
         </div>
 
         <!-- Chart 3: Loss -->
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title-wrap">
-              <h4>Packet Loss Rate</h4>
-              <span class="chart-sub">Target: &lt; 1.0% under elephant load</span>
+            <div>
+              <h3>Packet Loss Rate</h3>
+              <p>Target: &lt; 1.0% under elephant load</p>
             </div>
-            <div class="chart-kpi-badge crimson">
-              <span class="kpi-val" id="chartLossVal">0.0</span>
-              <span class="kpi-unit">%</span>
+            <div class="chart-stat-chip" style="color:var(--crimson-text);">
+              <span id="chartLossVal">0.0</span> %
             </div>
           </div>
-          <div class="chart-canvas-wrap">
-            <canvas id="chartLoss" width="540" height="220"></canvas>
+          <div class="canvas-chart-wrap">
+            <canvas id="chartLoss" width="540" height="220" aria-label="Packet Loss Rate chart"></canvas>
           </div>
         </div>
 
         <!-- Chart 4: Reward Progression -->
-        <div class="chart-card highlight-card">
+        <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title-wrap">
-              <h4>Multi-Objective Reward Curve (A2 Self-Improvement)</h4>
-              <span class="chart-sub">R = -0.4&middot;&Delta;lat + 0.4&middot;&Delta;tp - 0.2&middot;&Delta;loss</span>
+            <div>
+              <h3>Multi-Objective Reward Curve (A2)</h3>
+              <p>R = -0.4&middot;&Delta;lat + 0.4&middot;&Delta;tp - 0.2&middot;&Delta;loss</p>
             </div>
-            <div class="chart-kpi-badge purple">
-              <span class="kpi-val" id="chartRewardVal">+14.62</span>
-              <span class="kpi-unit">pts</span>
+            <div class="chart-stat-chip" style="color:#c084fc;">
+              <span id="chartRewardVal">+14.62</span> pts
             </div>
           </div>
-          <div class="chart-canvas-wrap">
-            <canvas id="chartReward" width="540" height="220"></canvas>
+          <div class="canvas-chart-wrap">
+            <canvas id="chartReward" width="540" height="220" aria-label="Multi-Objective Reward Curve chart"></canvas>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 4B: PROJECT VISUALIZATIONS -->
-    <div class="tab-pane" id="tab-insights">
+    <!-- VIEW 5: PROJECT VISUALIZATIONS -->
+    <div class="tab-pane" id="tab-insights" role="tabpanel" aria-labelledby="tabBtnInsights">
       <div class="project-viz-header">
         <div class="panel-title-group">
           <h2>Project Visualizations</h2>
-          <p>System overview, simulator results, network models, roadmap, and MVP safety limits.</p>
+          <p>System overview, simulator results, network models, roadmap, and MVP safety limits. Click any figure to view full size.</p>
         </div>
         <div class="project-viz-provenance" role="note">
           <strong>SIMULATED DATA</strong>
@@ -729,61 +801,68 @@
       </div>
 
       <div class="project-viz-grid">
-        <figure class="chart-card project-viz-card project-viz-wide">
+        <figure class="chart-card project-viz-card project-viz-wide" data-img="assets/visualizations/system-overview.png" data-title="SELF-X System Overview">
           <figcaption class="project-viz-caption">
             <div>
               <h3>SELF-X system overview</h3>
               <p>Current MVP, isolated slow-loop simulator prototype, and dashboard data boundaries.</p>
             </div>
+            <span class="project-viz-tag">ZOOM 🔍</span>
           </figcaption>
           <img src="assets/visualizations/system-overview.png" alt="System diagram showing the current safety-gated MVP loop connected to the Ryu and Mininet testbed, a separate slow-loop simulator prototype, and the authenticated dashboard's local-simulation and read-only-live modes." loading="lazy">
         </figure>
 
-        <figure class="chart-card project-viz-card project-viz-wide">
+        <figure class="chart-card project-viz-card project-viz-wide" data-img="assets/visualizations/simulation-performance.png" data-title="Slow-loop simulation comparison">
           <figcaption class="project-viz-caption">
             <div>
               <h3>Slow-loop simulation comparison</h3>
               <p>Governed mock policy compared with a frozen initial policy on the same seeded profile.</p>
             </div>
-            <span class="project-viz-tag">30 MINUTES</span>
+            <div style="display:flex; gap:0.4rem;">
+              <span class="project-viz-tag">30 MINUTES</span>
+              <span class="project-viz-tag">ZOOM 🔍</span>
+            </div>
           </figcaption>
           <img src="assets/visualizations/simulation-performance.png" alt="Four time-series plots comparing mean latency, p95 latency, delivered throughput, and packet loss for governed mock control and the frozen initial policy over 30 simulated minutes." loading="lazy">
         </figure>
 
-        <figure class="chart-card project-viz-card">
+        <figure class="chart-card project-viz-card" data-img="assets/visualizations/topology-models.png" data-title="Network Models">
           <figcaption class="project-viz-caption">
             <div>
               <h3>Network models</h3>
               <p>The MVP testbed and slow-loop path abstraction are shown separately.</p>
             </div>
+            <span class="project-viz-tag">ZOOM 🔍</span>
           </figcaption>
           <img src="assets/visualizations/topology-models.png" alt="Diagram of the four-switch, eight-host MVP testbed beside the slow-loop simulator's separate two-path abstraction." loading="lazy">
         </figure>
 
-        <figure class="chart-card project-viz-card">
+        <figure class="chart-card project-viz-card" data-img="assets/visualizations/implementation-status.png" data-title="Implementation Roadmap">
           <figcaption class="project-viz-caption">
             <div>
               <h3>Implementation roadmap</h3>
               <p>Phase statuses summarized from the repository README.</p>
             </div>
+            <span class="project-viz-tag">ZOOM 🔍</span>
           </figcaption>
           <img src="assets/visualizations/implementation-status.png" alt="Seven roadmap phases: one complete, three partial, and three planned." loading="lazy">
         </figure>
 
-        <figure class="chart-card project-viz-card project-viz-wide">
+        <figure class="chart-card project-viz-card project-viz-wide" data-img="assets/visualizations/safety-guardrails.png" data-title="MVP Safety Guardrails">
           <figcaption class="project-viz-caption">
             <div>
               <h3>MVP safety guardrails</h3>
               <p>Configured drop, projected utilization, and rate-limit bounds.</p>
             </div>
+            <span class="project-viz-tag">ZOOM 🔍</span>
           </figcaption>
           <img src="assets/visualizations/safety-guardrails.png" alt="Safety thresholds: maximum 20 percent flow traffic drop, maximum 90 percent projected link utilization, and a minimum rate limit of 512 kilobits per second." loading="lazy">
         </figure>
       </div>
     </div>
 
-    <!-- VIEW 5: ABLATION BENCHMARKS & EXPERIMENT RESULTS -->
-    <div class="tab-pane" id="tab-ablation">
+    <!-- VIEW 6: ABLATION BENCHMARKS & EXPERIMENT RESULTS -->
+    <div class="tab-pane" id="tab-ablation" role="tabpanel" aria-labelledby="tabBtnAblation">
       <!-- Section Header -->
       <div class="results-view-header">
         <div class="panel-title-group">
@@ -802,9 +881,11 @@
             <span>Refresh Results</span>
           </button>
         </div>
+      </div>
+
       <!-- SECTION 1: PRIMARY OFFLINE BENCHMARK ATLAS (86,400 windows) -->
-      <div class="benchmark-atlas-panel" style="margin-bottom: 2rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.2rem;">
-        <div class="panel-header" style="margin-bottom: 0.8rem;">
+      <div class="benchmark-atlas-panel">
+        <div class="panel-header">
           <div class="panel-title-group">
             <div class="panel-badge-row">
               <span class="live-indicator-dot" style="background:#10b981;"></span>
@@ -816,7 +897,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:0.6rem;">
             <label for="benchmarkScenarioSelect" style="font-size:0.75rem; color:var(--text-secondary);">Scenario:</label>
-            <select id="benchmarkScenarioSelect" style="background:#0f172a; color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:0.3rem 0.6rem; font-size:0.75rem;">
+            <select id="benchmarkScenarioSelect" style="background:#0f172a; color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:0.35rem 0.65rem; font-size:0.75rem;">
               <option value="mixed" selected>mixed (Mixed Traffic)</option>
               <option value="flash">flash (Flash Crowd)</option>
               <option value="alternate">alternate (Alternate Heavy)</option>
@@ -830,15 +911,15 @@
         </div>
 
         <!-- Metric Selector Chips -->
-        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.6rem;">
-          <button class="benchmark-metric-btn active" id="btnMetricLoss" data-metric="loss_pct" type="button" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.4); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Loss Rate (% - lower is better)</button>
-          <button class="benchmark-metric-btn" id="btnMetricLatency" data-metric="latency_ms" type="button" style="background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Network Delay (ms - lower is better)</button>
-          <button class="benchmark-metric-btn" id="btnMetricThroughput" data-metric="throughput_kbps" type="button" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); border-radius:4px; padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;">Throughput (Mbps - higher is better)</button>
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:0.6rem; flex-wrap:wrap;">
+          <button class="benchmark-metric-btn active" id="btnMetricLoss" data-metric="loss_pct" type="button" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.4);">Loss Rate (% - lower is better)</button>
+          <button class="benchmark-metric-btn" id="btnMetricLatency" data-metric="latency_ms" type="button" style="background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25);">Network Delay (ms - lower is better)</button>
+          <button class="benchmark-metric-btn" id="btnMetricThroughput" data-metric="throughput_kbps" type="button" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25);">Throughput (Mbps - higher is better)</button>
         </div>
 
         <!-- Chart Container -->
-        <div style="position:relative; width:100%; height:320px; background:#0b1120; border-radius:6px; border:1px solid rgba(255,255,255,0.04); margin-bottom:1rem;">
-          <canvas id="benchmarkBarCanvas" width="900" height="320" style="width:100%; height:100%;"></canvas>
+        <div style="position:relative; width:100%; height:320px; background:#060910; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:1rem; overflow:hidden;">
+          <canvas id="benchmarkBarCanvas" width="900" height="320" style="width:100%; height:100%;" aria-label="Benchmark summary bar chart"></canvas>
         </div>
 
         <!-- Dynamic Metrics Table -->
@@ -855,7 +936,7 @@
       </div>
 
       <!-- SECTION 1B: LLM API DIAGNOSTICS -->
-      <div class="llm-diagnostics-card" style="margin-bottom: 2rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.2rem;">
+      <div class="llm-diagnostics-card" style="margin-bottom: 2rem; background: var(--bg-surface-card); border-radius: var(--radius-lg); border: 1px solid var(--border-card); padding: 1.25rem;">
         <div class="panel-header" style="margin-bottom: 0.8rem;">
           <div class="panel-title-group">
             <div class="panel-badge-row">
@@ -893,7 +974,7 @@
       <!-- State 2: Error State -->
       <div class="results-state-box error-box" id="resultsErrorState" style="display: none;">
         <div class="empty-icon-circle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
         <h3 style="color: #f87171;">Unable to Load Experiment Results</h3>
         <p id="resultsErrorMessage" style="color: var(--text-secondary); font-size: 0.82rem; margin-top: 0.4rem;">An unexpected error occurred while contacting /api/results.</p>
@@ -905,14 +986,14 @@
       <!-- State 3: Empty State -->
       <div class="results-empty-card" id="resultsEmptyState">
         <div class="empty-icon-circle">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H9V5h6v2z"/></svg>
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H9V5h6v2z"/></svg>
         </div>
         <h3>No saved experiment results yet</h3>
-        <p>No valid experiment result bundles were found in the results archive. Results will appear here after an evaluation run produces a valid result bundle (run.json, metrics.jsonl, and summary.json).</p>
+        <p style="color:var(--text-secondary); max-width:620px; margin:0.4rem auto 0; font-size:0.82rem;">No valid experiment result bundles were found in the results archive. Results will appear here after an evaluation run produces a valid result bundle (run.json, metrics.jsonl, and summary.json).</p>
         <div class="empty-guide-box">
-          <span class="empty-guide-title">How results are generated on a Linux Mininet testbed:</span>
+          <span class="empty-guide-title" style="font-weight:600; color:var(--text-primary); font-size:0.78rem;">How results are generated on a Linux Mininet testbed:</span>
           <code>sudo python -m selfx.eval.run_ablation</code>
-          <span class="empty-guide-desc">The evaluation harness runs conditions A0 (Static Ryu), A1 (Zero-Shot Agent), and A2 (SELF-X Agent) over identical traffic seeds and records structured result bundles to the results archive.</span>
+          <span class="empty-guide-desc" style="font-size:0.72rem; color:var(--text-muted);">The evaluation harness runs conditions A0 (Static Ryu), A1 (Zero-Shot Agent), and A2 (SELF-X Agent) over identical traffic seeds and records structured result bundles to the results archive.</span>
         </div>
       </div>
 
@@ -926,7 +1007,7 @@
           </div>
         </div>
 
-        <div class="results-filter-bar">
+        <div class="results-filter-bar" role="group" aria-label="Filter runs by condition stage">
           <button class="results-filter-pill active" data-filter="all" type="button">All Stages</button>
           <button class="results-filter-pill" data-filter="A0" type="button">A0: Static</button>
           <button class="results-filter-pill" data-filter="A1" type="button">A1: Zero-Shot</button>
@@ -949,212 +1030,165 @@
           </div>
         </div>
 
-        <div class="comparison-notice-box" id="resultsComparisonNotice" style="display: none;"></div>
+        <div id="resultsComparisonSection">
+          <div id="resultsComparisonNotice" class="comparison-notice-box" style="display: none;"></div>
 
-        <div class="ablation-summary" id="resultsComparisonCards">
-          <!-- Dynamic A0, A1, A2 summary cards -->
-        </div>
-
-        <!-- Quantitative Acceptance Matrix Table -->
-        <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
-          <div class="card-title-row">
-            <div class="card-icon-chip purple">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-            </div>
-            <h3>Quantitative Course Acceptance Matrix (EC466 SDN)</h3>
+          <div class="run-kpis-strip" id="resultsComparisonCards">
+            <!-- Rendered dynamically -->
           </div>
 
-          <table class="table-custom">
-            <thead>
-              <tr>
-                <th>Evaluation Metric</th>
-                <th>A0 (Static Baseline)</th>
-                <th>A1 (Zero-Shot Agent)</th>
-                <th>A2 (SELF-X Agent)</th>
-                <th>A2 vs A0 Improvement</th>
-                <th>Course Acceptance Criterion</th>
-              </tr>
-            </thead>
-            <tbody id="resultsComparisonTableBody">
-              <!-- Populated dynamically from actual comparison data -->
-            </tbody>
-          </table>
+          <!-- Quantitative Acceptance Matrix Table -->
+          <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
+            <table class="table-custom">
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th>Run ID</th>
+                  <th>Provenance</th>
+                  <th>Mean Latency</th>
+                  <th>Throughput</th>
+                  <th>Mean Loss</th>
+                  <th>Mean Reward</th>
+                  <th>Improvement vs A0</th>
+                </tr>
+              </thead>
+              <tbody id="resultsComparisonTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- Section B: Selected Run Detail & Metric Time Series -->
-        <div class="selected-run-panel" id="selectedRunDetail">
-          <div class="panel-header" style="margin-bottom: 1rem;">
+        <!-- Section B: Selected Run Details & Metric Progression -->
+        <div id="selectedRunDetail" style="margin-top: 1.5rem; display: none;">
+          <div class="panel-header">
             <div class="panel-title-group">
               <div class="panel-badge-row">
-                <span id="detailStage" class="ablation-tag tag-a2">STAGE A2</span>
-                <span id="detailStatus" class="badge-state ok">COMPLETED</span>
-                <span id="detailProvenance" class="provenance-pill prov-live">PROVENANCE: LIVE</span>
+                <span class="tag-openflow" id="detailStage">A2</span>
+                <span class="tag-dpid" id="detailProvenance">simulation</span>
+                <span class="tag-dpid" id="detailStatus">COMPLETED</span>
               </div>
-              <h3 style="font-family: var(--font-mono); font-size: 1.05rem;" id="detailRunId">--</h3>
+              <h3 id="detailRunId">run-id</h3>
+              <p>
+                Created: <span id="detailCreated" class="mono-highlight"></span> &bull;
+                Duration: <span id="detailDuration" class="mono-highlight"></span> &bull;
+                Git: <code id="detailGitCommit"></code> &bull;
+                Topology: <span id="detailTopology"></span> &bull;
+                Workload: <span id="detailWorkload"></span>
+              </p>
             </div>
           </div>
 
-          <!-- Error notice if run failed or incomplete -->
-          <div class="run-error-notice" id="detailErrorNotice" style="display: none;">
-            <span>⚠️</span>
-            <span id="detailErrorMessage">Run did not complete successfully</span>
+          <!-- Notice if run failed or incomplete -->
+          <div id="detailErrorNotice" class="comparison-notice-box" style="display: none; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
+            <strong>RUN WARNING:</strong> <span id="detailErrorMessage">This run did not complete successfully or is missing required summary data. Metrics may be incomplete.</span>
           </div>
 
-          <!-- Metadata Grid -->
-          <div class="run-meta-grid">
-            <div class="run-meta-item">
-              <span class="run-meta-label">Created At (UTC)</span>
-              <span class="run-meta-val" id="detailCreated">--</span>
-            </div>
-            <div class="run-meta-item">
-              <span class="run-meta-label">Duration</span>
-              <span class="run-meta-val" id="detailDuration">--</span>
-            </div>
-            <div class="run-meta-item">
-              <span class="run-meta-label">Git Commit</span>
-              <span class="run-meta-val" id="detailGitCommit">--</span>
-            </div>
-            <div class="run-meta-item">
-              <span class="run-meta-label">Topology</span>
-              <span class="run-meta-val" id="detailTopology">--</span>
-            </div>
-            <div class="run-meta-item">
-              <span class="run-meta-label">Workload</span>
-              <span class="run-meta-val" id="detailWorkload">--</span>
-            </div>
-          </div>
-
-          <!-- Run Summary KPI Strip -->
+          <!-- KPI Summary Strip -->
           <div class="run-kpis-strip">
-            <div class="metric-card accent-cyan" id="resKpiLatency">
-              <div class="metric-header"><span class="metric-title">Mean Latency</span></div>
-              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">ms</span></div>
+            <div class="run-kpi-card">
+              <span class="metric-title">Mean Latency</span>
+              <span class="metric-val" id="resKpiLatency">&mdash;</span>
             </div>
-            <div class="metric-card accent-emerald" id="resKpiThroughput">
-              <div class="metric-header"><span class="metric-title">Mean Throughput</span></div>
-              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">kbps</span></div>
+            <div class="run-kpi-card">
+              <span class="metric-title">Mean Throughput</span>
+              <span class="metric-val" id="resKpiThroughput">&mdash;</span>
             </div>
-            <div class="metric-card accent-crimson" id="resKpiLoss">
-              <div class="metric-header"><span class="metric-title">Packet Loss Rate</span></div>
-              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit">%</span></div>
+            <div class="run-kpi-card">
+              <span class="metric-title">Mean Loss Rate</span>
+              <span class="metric-val" id="resKpiLoss">&mdash;</span>
             </div>
-            <div class="metric-card accent-purple" id="resKpiReward">
-              <div class="metric-header"><span class="metric-title">Mean Reward</span></div>
-              <div class="metric-value-row"><span class="metric-val kpi-val">--</span><span class="metric-unit kpi-unit"></span></div>
-            </div>
-          </div>
-
-          <!-- Time Series Line Charts -->
-          <div class="panel-header" style="margin-bottom: 0.8rem;">
-            <div class="panel-title-group">
-              <h4>Metric Time Series Progression</h4>
-              <p style="font-size: 0.74rem; color: var(--text-secondary);">Sampled control loop progression from <code>metrics.jsonl</code>. Unavailable metrics are omitted, not plotted as zero.</p>
+            <div class="run-kpi-card">
+              <span class="metric-title">Cumulative Reward</span>
+              <span class="metric-val" id="resKpiReward">&mdash;</span>
             </div>
           </div>
 
+          <!-- Time Series Charts Grid -->
           <div class="run-charts-grid">
-            <!-- Chart 1: Latency -->
             <div class="chart-card">
               <div class="chart-header">
-                <div class="chart-title-wrap">
-                  <h4>End-to-End Latency</h4>
-                  <span class="chart-sub">Ping probe latency (ms)</span>
-                </div>
-                <div class="chart-kpi-badge cyan">
-                  <span class="kpi-val" id="chartRunLatencyVal">--</span>
+                <div>
+                  <h3>Latency Time Series</h3>
+                  <p>Progression across evaluation cycles</p>
                 </div>
               </div>
-              <div class="chart-canvas-wrap">
-                <canvas id="runChartLatency" width="540" height="200"></canvas>
+              <div class="canvas-chart-wrap">
+                <canvas id="runChartLatency" width="540" height="200" aria-label="Latency Time Series"></canvas>
               </div>
             </div>
 
-            <!-- Chart 2: Throughput -->
             <div class="chart-card">
               <div class="chart-header">
-                <div class="chart-title-wrap">
-                  <h4>Network Throughput</h4>
-                  <span class="chart-sub">OpenFlow port byte rate (kbps)</span>
-                </div>
-                <div class="chart-kpi-badge emerald">
-                  <span class="kpi-val" id="chartRunThroughputVal">--</span>
+                <div>
+                  <h3>Throughput Time Series</h3>
+                  <p>Progression across evaluation cycles</p>
                 </div>
               </div>
-              <div class="chart-canvas-wrap">
-                <canvas id="runChartThroughput" width="540" height="200"></canvas>
+              <div class="canvas-chart-wrap">
+                <canvas id="runChartThroughput" width="540" height="200" aria-label="Throughput Time Series"></canvas>
               </div>
             </div>
 
-            <!-- Chart 3: Loss -->
             <div class="chart-card">
               <div class="chart-header">
-                <div class="chart-title-wrap">
-                  <h4>Packet Loss Rate</h4>
-                  <span class="chart-sub">Dropped packet percentage (%)</span>
-                </div>
-                <div class="chart-kpi-badge crimson">
-                  <span class="kpi-val" id="chartRunLossVal">--</span>
+                <div>
+                  <h3>Packet Loss Time Series</h3>
+                  <p>Progression across evaluation cycles</p>
                 </div>
               </div>
-              <div class="chart-canvas-wrap">
-                <canvas id="runChartLoss" width="540" height="200"></canvas>
+              <div class="canvas-chart-wrap">
+                <canvas id="runChartLoss" width="540" height="200" aria-label="Packet Loss Time Series"></canvas>
               </div>
             </div>
 
-            <!-- Chart 4: Reward -->
             <div class="chart-card">
               <div class="chart-header">
-                <div class="chart-title-wrap">
-                  <h4>Cycle Reward Progression</h4>
-                  <span class="chart-sub">Multi-objective reward score</span>
-                </div>
-                <div class="chart-kpi-badge purple">
-                  <span class="kpi-val" id="chartRunRewardVal">--</span>
+                <div>
+                  <h3>Reward Time Series</h3>
+                  <p>Progression across evaluation cycles</p>
                 </div>
               </div>
-              <div class="chart-canvas-wrap">
-                <canvas id="runChartReward" width="540" height="200"></canvas>
+              <div class="canvas-chart-wrap">
+                <canvas id="runChartReward" width="540" height="200" aria-label="Reward Time Series"></canvas>
               </div>
             </div>
           </div>
 
-          <!-- Diagnostic Trace Section -->
-          <div id="resultsTraceSection" style="display: none; margin-top: 1.5rem;">
-            <div class="panel-header" style="margin-bottom: 0.6rem;">
-              <div class="panel-title-group">
-                <h4>Diagnostic Trace Events</h4>
-                <p style="font-size: 0.74rem; color: var(--text-secondary);">Safe event trace records from <code>trace.jsonl</code> (<span id="resultsTraceCountBadge">0</span> events recorded)</p>
-              </div>
+          <!-- Diagnostic Trace Log Panel -->
+          <div id="resultsTraceSection" class="trace-log-panel" style="display: none;">
+            <div class="panel-header" style="margin-bottom: 0.5rem;">
+              <h4>Diagnostic Decision Trace (<span id="resultsTraceCountBadge">0</span> records)</h4>
             </div>
-            <div class="trace-log-panel">
-              <table class="table-custom">
-                <thead>
-                  <tr>
-                    <th>Seq</th>
-                    <th>Timestamp (UTC)</th>
-                    <th>Event</th>
-                    <th>Action</th>
-                    <th>Safety Gate</th>
-                  </tr>
-                </thead>
-                <tbody id="resultsTraceTableBody">
-                  <!-- Populated dynamically -->
-                </tbody>
-              </table>
-            </div>
+            <table class="table-custom">
+              <thead>
+                <tr>
+                  <th>Cycle</th>
+                  <th>Action</th>
+                  <th>Latency</th>
+                  <th>Throughput</th>
+                  <th>Loss</th>
+                  <th>Reward</th>
+                  <th>Reflection / Rationale</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTraceTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 6: SAFETY GATE & RULES -->
-    <div class="tab-pane" id="tab-safety">
+    <!-- VIEW 7: SAFETY GATE & RULES -->
+    <div class="tab-pane" id="tab-safety" role="tabpanel" aria-labelledby="tabBtnSafety">
       <div class="safety-rules-grid">
         <!-- Invariant 1 -->
         <div class="safety-rule-card">
           <div class="rule-header">
             <div class="rule-icon-box cyan">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
             </div>
             <div>
               <h3>Invariant 1: Max Flow Rate Drop</h3>
@@ -1179,7 +1213,7 @@
         <div class="safety-rule-card">
           <div class="rule-header">
             <div class="rule-icon-box amber">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
             </div>
             <div>
               <h3>Invariant 2: Max Link Utilization</h3>
@@ -1204,7 +1238,7 @@
         <div class="safety-rule-card">
           <div class="rule-header">
             <div class="rule-icon-box emerald">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
             </div>
             <div>
               <h3>Invariant 3: Minimum Rate Floor</h3>
@@ -1230,7 +1264,7 @@
       <div class="ablation-table-card">
         <div class="card-title-row">
           <div class="card-icon-chip cyan">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
           </div>
           <h3>Active OpenFlow 1.3 Flow &amp; Meter Tables (ofctl_rest)</h3>
         </div>
@@ -1285,13 +1319,13 @@
     </div>
   </main>
 
-  <!-- Node Deep Inspector Modal -->
-  <div class="modal-overlay" id="nodeModalOverlay">
+  <!-- Node Deep Inspector & Shortcuts Modal -->
+  <div class="modal-overlay" id="nodeModalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
-      <button class="modal-close" id="btnModalClose">&times;</button>
+      <button class="modal-close" id="btnModalClose" aria-label="Close dialog">&times;</button>
       <div class="modal-header-row">
         <div class="card-icon-chip cyan">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
         </div>
         <div>
           <h2 id="modalTitle">Switch Inspection</h2>
@@ -1304,11 +1338,21 @@
     </div>
   </div>
 
+  <!-- Image Lightbox Zoom Modal -->
+  <div class="modal-overlay" id="imageLightboxModal" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="modal-content lightbox-modal">
+      <button class="modal-close" id="btnLightboxClose" aria-label="Close preview">&times;</button>
+      <h3 id="lightboxTitle" style="color:var(--text-primary); font-family:var(--font-heading); margin-bottom:0.75rem; font-size:1.1rem;">Diagram Inspection</h3>
+      <img id="lightboxImg" src="" alt="Enlarged Diagram View">
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+  </div>
+
   <!-- Floating Toast Notifications System -->
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Footer -->
-  <footer class="app-footer">
+  <footer class="app-footer" role="contentinfo">
     <div class="footer-left">
       <strong>SELF-X SDN Flow Manager</strong> &bull; EC466 Software Defined Networks Course Project &bull; Team SDN_07
     </div>

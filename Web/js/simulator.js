@@ -231,10 +231,7 @@ class SDNSimulator {
       this.metrics.loss = this.isElephantActive ? 8.4 : 0.0;
       this.metrics.corePrimaryUtil = this.isElephantActive ? 96.0 : 30.0;
       this.metrics.coreSecondaryUtil = 0.0;
-      return;
-    }
-
-    if (this.isRerouted) {
+    } else if (this.isRerouted) {
       // Balanced across dual links
       this.metrics.latency = +(5.0 + Math.random() * 0.5).toFixed(1);
       this.metrics.throughput = +(11.6 + Math.random() * 0.5).toFixed(1);
@@ -248,6 +245,14 @@ class SDNSimulator {
       this.metrics.loss = +(6.2 + Math.random() * 1.5).toFixed(1);
       this.metrics.corePrimaryUtil = 95.0;
       this.metrics.coreSecondaryUtil = 0.0;
+    }
+
+    if (this.app && this.app.topology && this.app.topology.setLinkUtilization) {
+      this.app.topology.setLinkUtilization(
+        this.metrics.corePrimaryUtil,
+        this.metrics.coreSecondaryUtil,
+        this.isRerouted
+      );
     }
   }
 

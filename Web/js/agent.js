@@ -237,11 +237,11 @@ class AgentManager {
     }
 
     div.innerHTML = `
-      <div>
-        <span class="log-timestamp">[${logItem.timeStr}]</span>
-        <span class="log-phase-tag">[${logItem.phase.toUpperCase()}]</span>
-        <strong style="color:var(--text-primary);">${logItem.title}</strong>: 
-        <span style="color:var(--text-secondary);">${logItem.message}</span>
+      <div class="log-row">
+        <span class="log-time">[${logItem.timeStr}]</span>
+        <span class="log-phase log-${logItem.phase}">[${logItem.phase.toUpperCase()}]</span>
+        <strong class="log-title">${logItem.title}</strong>:
+        <span class="log-msg">${logItem.message}</span>
       </div>
       ${reflectionHtml}
     `;
@@ -384,7 +384,7 @@ class AgentManager {
               actionDetail: item.params ? JSON.stringify(item.params) : (item.action === 'reroute' ? 'OUTPUT: Port 4 (Secondary link)' : (item.action === 'rate_limit' ? 'METER: 6144 kbps' : 'Preserve L2 rules')),
               state: `Cycle #${cycle} | Lat: ${lat} | Tp: ${tp} | Loss: ${loss}`,
               reward: reward,
-              latDelta: state.delta_latency !== undefined ? +state.delta_latency.toFixed(1) : -18.2,
+              latencyDelta: state.delta_latency !== undefined ? +state.delta_latency.toFixed(1) : -18.2,
               tpDelta: state.delta_throughput !== undefined ? +state.delta_throughput.toFixed(1) : +3.2,
               lossDelta: state.delta_loss !== undefined ? +state.delta_loss.toFixed(1) : -7.5,
               reflection: item.reflection || 'Optimal traffic isolation maintained across core links.'
@@ -456,25 +456,25 @@ class AgentManager {
           </span>
         </div>
 
-        <div style="margin: 0.35rem 0;">
+        <div class="mem-action-row">
           <span class="mem-action-badge ${mem.action}"><span class="badge-dot"></span> ${mem.action}</span>
-          <div style="font-size:0.72rem; color:var(--text-muted); font-family:var(--font-mono); margin-top:0.35rem;">
+          <div class="mem-action-detail">
             ${mem.actionDetail}
           </div>
         </div>
 
         <div class="mem-deltas-grid">
-          <div>
+          <div class="mem-delta-col">
             <span class="mem-delta-label">&Delta; LATENCY</span>
-            <span class="mem-delta-val" style="color:#38bdf8">${mem.latencyDelta}ms</span>
+            <span class="mem-delta-val delta-lat">${mem.latencyDelta}ms</span>
           </div>
-          <div>
+          <div class="mem-delta-col">
             <span class="mem-delta-label">&Delta; THROUGHPUT</span>
-            <span class="mem-delta-val" style="color:#10b981">${mem.tpDelta}M</span>
+            <span class="mem-delta-val delta-tp">${mem.tpDelta}M</span>
           </div>
-          <div>
+          <div class="mem-delta-col">
             <span class="mem-delta-label">&Delta; PACKET LOSS</span>
-            <span class="mem-delta-val" style="color:#f87171">${mem.lossDelta}%</span>
+            <span class="mem-delta-val delta-loss">${mem.lossDelta}%</span>
           </div>
         </div>
 

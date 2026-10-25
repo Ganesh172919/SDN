@@ -320,8 +320,9 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         if not isinstance(run_id, str) or not RUN_ID_RE.fullmatch(run_id):
             self.send_json(404, {"error": "result run not found"})
             return None
-        candidate = (RESULTS_ROOT / run_id).resolve()
-        if candidate.parent != RESULTS_ROOT or not candidate.is_dir():
+        root = Path(RESULTS_ROOT).resolve()
+        candidate = (root / run_id).resolve()
+        if candidate.parent != root or not candidate.is_dir():
             self.send_json(404, {"error": "result run not found"})
             return None
         return candidate
@@ -349,8 +350,9 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_results_index(self):
         results = []
         invalid_count = 0
-        if RESULTS_ROOT.is_dir():
-            for child in sorted(RESULTS_ROOT.iterdir()):
+        root = Path(RESULTS_ROOT).resolve()
+        if root.is_dir():
+            for child in sorted(root.iterdir()):
                 if not child.is_dir() or not RUN_ID_RE.fullmatch(child.name):
                     continue
                 try:

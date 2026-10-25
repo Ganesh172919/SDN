@@ -99,18 +99,27 @@ class TopologyVisualizer {
     if (rect.width === 0 || rect.height === 0) return;
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
-    this.ctx.scale(dpr, dpr);
+    this.dpr = dpr;
+    this.scale = Math.min(rect.width / 980, rect.height / 520);
+    this.offsetX = (rect.width - 980 * this.scale) / 2;
+    this.offsetY = (rect.height - 520 * this.scale) / 2;
     this.width = rect.width;
     this.height = rect.height;
   }
 
   initEvents() {
     window.addEventListener('resize', () => this.setupDPI());
+    window.addEventListener('themechange', () => this.setupDPI());
 
     this.canvas.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      const scale = this.scale || 1;
+      const offX = this.offsetX || 0;
+      const offY = this.offsetY || 0;
+      const x = (rawX - offX) / scale;
+      const y = (rawY - offY) / scale;
       this.mousePos = { x, y };
 
       let found = null;
@@ -153,8 +162,8 @@ class TopologyVisualizer {
     const sLink = this.links.find(l => l.id === 'core-secondary');
     if (pLink && sLink) {
       if (rerouted) {
-        pLink.util = 38;
-        sLink.util = 62;
+        pLink.util = 48; // Synchronized with simulator corePrimaryUtil
+        sLink.util = 52; // Synchronized with simulator coreSecondaryUtil
       } else {
         pLink.util = 96; // Overloaded!
         sLink.util = 0;
@@ -162,28 +171,38 @@ class TopologyVisualizer {
     }
   }
 
+  setLinkUtilization(primaryUtil, secondaryUtil, rerouted) {
+    if (rerouted !== undefined) this.isElephantRerouted = !!rerouted;
+    const pLink = this.links.find(l => l.id === 'core-primary');
+    const sLink = this.links.find(l => l.id === 'core-secondary');
+    if (pLink) pLink.util = Math.round(primaryUtil);
+    if (sLink) sLink.util = Math.round(secondaryUtil);
+  }
+
   drawCyberGrid() {
     const ctx = this.ctx;
     ctx.save();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.04)';
     ctx.lineWidth = 1;
 
     const gridSize = 40;
-    for (let x = 0; x < this.width; x += gridSize) {
+    const baseW = 980;
+    const baseH = 520;
+    for (let x = 0; x <= baseW; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, this.height);
+      ctx.lineTo(x, baseH);
       ctx.stroke();
     }
-    for (let y = 0; y < this.height; y += gridSize) {
+    for (let y = 0; y <= baseH; y += gridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(this.width, y);
+      ctx.lineTo(baseW, y);
       ctx.stroke();
     }
 
     // Corner crosshairs
-    ctx.fillStyle = 'rgba(0, 242, 254, 0.2)';
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
     ctx.font = '8px "JetBrains Mono", monospace';
     ctx.fillText('DPID_TOPOLOGY_LAYER // OF1.3', 14, 18);
     ctx.restore();
@@ -197,7 +216,7 @@ class TopologyVisualizer {
     this.ctx.save();
     this.ctx.beginPath();
 
-    let strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    let strokeStyle = 'rgba(148, 163, 184, 0.3)';
     let lineWidth = 2;
 
     if (link.type === 'primary') {
@@ -205,10 +224,10 @@ class TopologyVisualizer {
       strokeStyle = link.util > 85 ? '#ef4444' : '#00f2fe';
     } else if (link.type === 'secondary') {
       lineWidth = 3.5;
-      strokeStyle = link.util > 85 ? '#ef4444' : '#f59e0b';
+      strokeStyle = link.util > 85 ? '#ef4444' : (link.util > 0 ? '#c084fc' : 'rgba(168, 85, 247, 0.35)');
     } else if (link.type === 'trunk') {
       lineWidth = 3;
-      strokeStyle = 'rgba(99, 102, 241, 0.65)';
+      strokeStyle = 'rgba(99, 102, 241, 0.7)';
     }
 
     this.ctx.strokeStyle = strokeStyle;
@@ -230,16 +249,20 @@ class TopologyVisualizer {
 
       // Draw link label with pill background
       const text = `${link.label} [${Math.round(link.util)}%]`;
-      this.ctx.font = '9px "JetBrains Mono", monospace';
+      this.ctx.font = 'bold 9px "JetBrains Mono", monospace';
       const textWidth = this.ctx.measureText(text).width;
       const labelY = midY + (link.curvature < 0 ? -12 : 20);
 
-      this.ctx.fillStyle = 'rgba(10, 14, 23, 0.85)';
-      this.ctx.fillRect(midX - textWidth / 2 - 4, labelY - 10, textWidth + 8, 14);
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      this.ctx.strokeRect(midX - textWidth / 2 - 4, labelY - 10, textWidth + 8, 14);
+      this.ctx.fillStyle = 'rgba(10, 14, 23, 0.9)';
+      this.ctx.fillRect(midX - textWidth / 2 - 5, labelY - 10, textWidth + 10, 15);
+      this.ctx.strokeStyle = link.util > 85
+        ? 'rgba(239, 68, 68, 0.5)'
+        : (link.type === 'secondary' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(56, 189, 248, 0.4)');
+      this.ctx.strokeRect(midX - textWidth / 2 - 5, labelY - 10, textWidth + 10, 15);
 
-      this.ctx.fillStyle = link.util > 85 ? '#fca5a5' : 'rgba(255, 255, 255, 0.75)';
+      this.ctx.fillStyle = link.util > 85
+        ? '#fca5a5'
+        : (link.type === 'secondary' ? '#e9d5ff' : '#ffffff');
       this.ctx.textAlign = 'center';
       this.ctx.fillText(text, midX, labelY);
 
@@ -252,7 +275,7 @@ class TopologyVisualizer {
         const midX = (from.x + to.x) / 2;
         const midY = (from.y + to.y) / 2 - 10;
         this.ctx.font = '9px "JetBrains Mono", monospace';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        this.ctx.fillStyle = 'rgba(203, 213, 225, 0.75)';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(link.label, midX, midY);
       }
@@ -340,7 +363,7 @@ class TopologyVisualizer {
       const pulseSize = size + 10 + Math.sin(this.animTime * 0.05) * 4;
       ctx.beginPath();
       ctx.arc(node.x, node.y, pulseSize / 2, 0, Math.PI * 2);
-      ctx.strokeStyle = isSelected ? 'rgba(0, 242, 254, 0.4)' : 'rgba(56, 189, 248, 0.15)';
+      ctx.strokeStyle = isSelected ? 'rgba(0, 242, 254, 0.45)' : 'rgba(56, 189, 248, 0.18)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 4]);
       ctx.stroke();
@@ -374,12 +397,12 @@ class TopologyVisualizer {
 
       // OF1.3 Subtitle
       ctx.font = '8px "JetBrains Mono", monospace';
-      ctx.fillStyle = isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.5)';
+      ctx.fillStyle = isSelected ? '#00f2fe' : '#38bdf8';
       ctx.fillText('OF1.3', node.x, node.y + 11);
 
       // Below label
       ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.85)';
       ctx.fillText(node.id === 's2' || node.id === 's3' ? 'CORE SWITCH' : 'EDGE SWITCH', node.x, node.y + size / 2 + 14);
 
     } else {
@@ -389,15 +412,15 @@ class TopologyVisualizer {
       // Host glow halo
       ctx.beginPath();
       ctx.arc(node.x, node.y, radius + 4, 0, Math.PI * 2);
-      ctx.fillStyle = isSelected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(16, 185, 129, 0.08)';
+      ctx.fillStyle = isSelected ? 'rgba(16, 185, 129, 0.35)' : 'rgba(16, 185, 129, 0.12)';
       ctx.fill();
 
       // Main host circle
       ctx.beginPath();
       ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
       const hostGrad = ctx.createRadialGradient(node.x, node.y, 2, node.x, node.y, radius);
-      hostGrad.addColorStop(0, '#065f46');
-      hostGrad.addColorStop(1, '#042f2e');
+      hostGrad.addColorStop(0, '#10b981');
+      hostGrad.addColorStop(1, '#047857');
       ctx.fillStyle = hostGrad;
       ctx.fill();
 
@@ -412,14 +435,14 @@ class TopologyVisualizer {
 
       // Host label
       ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
-      ctx.fillStyle = '#d1fae5';
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(node.id, node.x, node.y);
 
       // IP label below
       ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.85)';
       ctx.fillText(node.ip, node.x, node.y + radius + 11);
     }
 
@@ -434,12 +457,12 @@ class TopologyVisualizer {
     ctx.save();
     const tooltipW = 160;
     const tooltipH = 50;
-    const posX = Math.min(this.width - tooltipW - 10, node.x + 25);
+    const posX = Math.min(980 - tooltipW - 10, node.x + 25);
     const posY = Math.max(10, node.y - 30);
 
     // Glass backdrop
-    ctx.fillStyle = 'rgba(10, 14, 23, 0.94)';
-    ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+    ctx.fillStyle = 'rgba(10, 14, 23, 0.95)';
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(posX, posY, tooltipW, tooltipH, 6) : ctx.rect(posX, posY, tooltipW, tooltipH);
@@ -452,7 +475,7 @@ class TopologyVisualizer {
     ctx.fillText(`${node.type === 'switch' ? 'SWITCH ' + node.id.toUpperCase() : 'HOST ' + node.id.toUpperCase()}`, posX + 10, posY + 16);
 
     ctx.font = '8.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.95)';
     if (node.type === 'switch') {
       ctx.fillText(`DPID: ${node.dpid.slice(-6)} | Port Tx/Rx: ~7M`, posX + 10, posY + 31);
       ctx.fillText(`Flow Table Entries: ${node.flows}`, posX + 10, posY + 43);
@@ -466,7 +489,12 @@ class TopologyVisualizer {
 
   animate() {
     this.animTime += 1;
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.save();
+    this.ctx.scale(this.dpr, this.dpr);
+    this.ctx.translate(this.offsetX || 0, this.offsetY || 0);
+    this.ctx.scale(this.scale || 1, this.scale || 1);
 
     // Draw background cyber grid
     this.drawCyberGrid();
@@ -486,6 +514,8 @@ class TopologyVisualizer {
 
     // Draw hover tooltip
     this.drawHoverTooltip();
+
+    this.ctx.restore();
 
     requestAnimationFrame(this.animate);
   }
