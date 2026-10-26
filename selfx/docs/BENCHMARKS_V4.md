@@ -5,7 +5,7 @@
 
 ---
 
-## 📌 Executive Summary
+## Executive Summary
 
 The **Revision 4 Benchmark Suite** represents the primary empirical evaluation of the SELF-X autonomous SDN framework. It establishes a multi-controller, multi-scenario evaluation designed to answer two foundational research questions:
 1. *Does in-context episodic memory improve network quality (delay, goodput, loss, and composite reward) compared to a matched, capacity-aware baseline without memory?*
@@ -15,7 +15,7 @@ The suite executes **86,400 controller windows** across **10 fresh held-out seed
 
 ---
 
-## 🧠 Comprehensive Mindmap Flows
+##  Comprehensive Mindmap Flows
 
 ### 1. V4 Benchmark Suite Architecture Mindmap
 
@@ -87,7 +87,7 @@ flowchart TD
 
 ---
 
-## 🎨 Detailed ASCII Benchmark Flows
+##  Detailed ASCII Benchmark Flows
 
 ### 1. 86,400-Window Matrix Execution Pipeline Flow
 
@@ -198,7 +198,7 @@ All statistics represent grand means across 10 held-out seeds (1900–1909) and 
 
 ---
 
-## 🔬 Critical Scientific Attribution & Discussion
+##  Critical Scientific Attribution & Discussion
 
 ### 1. The True Source of Performance Gains: A4 vs H1 vs H2
 - **Comparison against H1**: Controller `A4` achieves substantial gains over the baseline heuristic `H1` (total loss dropped from 7.391% to 7.075%; reward improved from 0.0776 to 0.0828).
@@ -213,7 +213,7 @@ The floating point rounding fix (+1 kbps) eliminated spurious vetoes on exact 20
 
 ---
 
-## ⏱️ Real Provider Wall-Clock Latency Evaluation
+##  Real Provider Wall-Clock Latency Evaluation
 
 Evaluated over held-out seeds 1980/1981 under 5-second wall-clock observation pacing:
 
