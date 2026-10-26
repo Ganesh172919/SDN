@@ -1,4 +1,4 @@
-param([ValidateSet('dashboard','experiment','test','probe','gemini','openrouter','free-models','benchmark','latency','all')][string]$Mode='dashboard',[int]$Port=8765)
+param([ValidateSet('dashboard','experiment','test','probe','gemini','openrouter','free-models','benchmark','latency','simulator','figures','all')][string]$Mode='dashboard',[int]$Port=8765)
 $ErrorActionPreference='Stop'
 Set-Location -LiteralPath $PSScriptRoot
 $localPython=Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
@@ -16,6 +16,8 @@ switch($Mode) {
     'free-models' { & $taskPython -m scripts.sweep_free_models --profile compact --out output/benchmarks/v4/free_model_checks.json }
     'benchmark' { & $taskPython -m eval.run_v4_benchmarks }
     'latency' { & $taskPython -m eval.run_v4_latency --provider gemini --realtime --seeds 1980 1981 --out-dir output/benchmarks/v4/latency_gemini_pooled }
+    'simulator' { & $taskPython -m live }
+    'figures' { & $taskPython -m scripts.explainer_figures }
     'all' { & $taskPython -m scripts.validate_runtime }
 }
 exit $LASTEXITCODE
