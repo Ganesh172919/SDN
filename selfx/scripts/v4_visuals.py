@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from eval.run_benchmarks import bootstrap_interval
 
@@ -39,7 +40,7 @@ def create():
     d['learning_curve']={c:[mean(float(r['reward']) for r in rows if r['condition']==c and int(r['cycle'])<=i) for i in range(s['cycles'])] for c in ('H1','H2','A4')}
     d['meter_share']={c:dict(Counter(r['rate_limit_kbps'] for r in rows if r['condition']==c and r['installed_action']=='rate_limit')) for c in ('H2','A4')}
     FIG.mkdir(parents=True,exist_ok=True);inventory=[]
-    plt.rcParams.update({'font.family':'DejaVu Sans','font.size':11,'text.color':'#15343b','axes.labelcolor':'#15343b','axes.spines.top':False,'axes.spines.right':False,'figure.facecolor':'white','savefig.facecolor':'white'})
+    plt.rcParams.update({'font.family':'DejaVu Sans','font.size':11,'pdf.fonttype':42,'ps.fonttype':42,'text.color':'#15343b','axes.labelcolor':'#15343b','axes.spines.top':False,'axes.spines.right':False,'figure.facecolor':'white','savefig.facecolor':'white'})
     def canvas(n=1):
         fig,axs=plt.subplots(1,n,figsize=(12.4,7.0),squeeze=False);fig.subplots_adjust(left=.08,right=.96,top=.84,bottom=.21,wspace=.28);return fig,axs[0]
     with PdfPages(ROOT/'output/submission/SELF_X_Benchmark_Atlas.pdf') as atlas:
@@ -67,7 +68,7 @@ def create():
         save(fig,'paired_memory_effect','A4 versus H1: loss improves, delay has a tradeoff','A4 minus H1 with paired 95% seed bootstrap intervals (4,000 draws). Negative favors A4. Improvements over H1 include capacity-aware meter logic, not only memory.')
         fig,axes=canvas(2)
         for ax,k,label in zip(axes,('reward','loss_pct'),('Reward difference','Total loss difference (pp)')):
-            vals=[s['paired_comparisons'][sc]['A4_minus_H2'][k] for sc in scenarios];v=np.array([x['mean_difference'] for x in vals]);ci=np.array([x['ci95'] for x in vals]);ax.errorbar(v,np.arange(8),xerr=[np.maximum(0,v-ci[:,0]),np.maximum(0,ci[:,1]-v)],fmt='o',color=COLORS['A4'],capsize=3);ax.axvline(0,color='#999',lw=1);ax.set_yticks(range(8),[SHORT[sc] for sc in scenarios]);ax.invert_yaxis();ax.set_xlabel(label)
+            vals=[s['paired_comparisons'][sc]['A4_minus_H2'][k] for sc in scenarios];v=np.array([x['mean_difference'] for x in vals]);ci=np.array([x['ci95'] for x in vals]);ax.errorbar(v,np.arange(8),xerr=[np.maximum(0,v-ci[:,0]),np.maximum(0,ci[:,1]-v)],fmt='o',color=COLORS['A4'],capsize=3);ax.axvline(0,color='#999',lw=1);ax.set_yticks(range(8),[SHORT[sc] for sc in scenarios]);ax.invert_yaxis();ax.set_xlabel(label);ax.xaxis.set_major_locator(MaxNLocator(5))
         save(fig,'guard_ablation','Matched H2 ablation isolates episodic parameter selection','H2 shares the capacity-aware meter and uses a fixed 0.1 Mbps headroom. A4 explores 0, 0.1 and 0.3 Mbps, then selects using observed prior reward. Cold-start exploration stays in results.')
         fig,axes=canvas(3)
         for ax,k,label,scale in zip(axes,('latency_ms','loss_pct','throughput_kbps'),('Delay (ms)','Total loss (%)','Goodput (Mbps)'),(1,1,.001)):
@@ -83,7 +84,7 @@ def create():
         for action,color in [('no_op','#93a5a0'),('reroute','#467d91'),('rate_limit','#007d64')]:
             counts=[sum(s['groups'][sc][c]['actions'].get(action,0) for sc in scenarios) for c in order]
             bottom=getattr(axes[0],'_selfx_bottom',np.zeros(len(order)));axes[0].bar(order,counts,bottom=bottom,label=action,color=color);axes[0]._selfx_bottom=bottom+counts
-        axes[0].legend(frameon=False,fontsize=9);axes[0].set_ylabel('Installed windows');axes[1].bar(order,[overall[c]['vetoes'] for c in order],color=[COLORS[c] for c in order]);axes[1].set_ylabel('Safety vetoes')
+        axes[0].legend(frameon=False,fontsize=9,loc='lower center',bbox_to_anchor=(.5,1.02),ncol=3);axes[0].set_ylabel('Installed windows');axes[1].bar(order,[overall[c]['vetoes'] for c in order],color=[COLORS[c] for c in order]);axes[1].set_ylabel('Safety vetoes')
         save(fig,'actions_and_vetoes','Installed actions and independent safety checks','The unchanged safety limits enforce exact target/route, alternate utilization ≤90%, rate reduction ≤20% and minimum meter 512 kbps.')
         fig,axes=canvas();ax=axes[0]
         for c in ('H1','H2','A4'):
@@ -122,8 +123,8 @@ def create():
         fig,axes=canvas();ax=axes[0]
         for c,curve in d['learning_curve'].items():ax.plot(range(1,len(curve)+1),curve,label=c,color=COLORS[c])
         ax.legend(frameon=False);ax.set_xlabel('Prefix length (windows)');ax.set_ylabel('Mean reward over all scenario/seed prefixes')
-        save(fig,'memory_learning','Memory learning includes its cold-start exploration cost','Primary evaluation, all eight scenarios and ten seeds. Higher reward is better. H2 is the matched no-memory ablation; an A4 advantage over H1 alone cannot prove an extra memory benefit.')
-        fig,axes=canvas(2)
+        save(fig,'memory_learning','Episodic learning includes cold-start exploration cost','Primary evaluation, all eight scenarios and ten seeds. Higher reward is better. H2 is the matched no-memory ablation; an A4 advantage over H1 alone cannot prove an extra memory benefit.')
+        fig,axes=canvas(2);fig.subplots_adjust(right=.91,wspace=.45)
         for ax,p in zip(axes,live):
             records=[json.loads(l) for l in (FOLDER/f'latency_{p}_pooled/trace.jsonl').read_text(encoding='utf-8').splitlines()];records=[r for r in records if r['metrics']['mode']=='bounded' and r['metrics']['seed']==1980]
             x=[r['metrics']['cycle'] for r in records];ax.step(x,[r['rule_event']['effective_output_port'] for r in records],where='post',label='Output port',color='#467d91');ax.set_yticks([2,3],['2 primary','3 alternate']);ax.set_xlabel('Window (rules expire after 5 s)');ax.set_title(p.capitalize(),loc='left')
@@ -132,7 +133,7 @@ def create():
         fig,axes=canvas();ax=axes[0];cs=['H1','H2','A4'];meter=[];overflow=[]
         for c in cs:
             selected=[r for r in rows if r['condition']==c];offered=sum(float(r['offered_mbit']) for r in selected);m=sum(float(r['meter_dropped_mbit']) for r in selected);total=sum(float(r['dropped_mbit']) for r in selected);meter.append(100*m/offered);overflow.append(100*(total-m)/offered)
-        ax.bar(cs,meter,label='Meter drops',color='#d28244');ax.bar(cs,overflow,bottom=meter,label='Buffer overflow',color='#467d91');ax.legend(frameon=False);ax.set_ylabel('Pooled loss / all offered traffic (%)')
+        ax.bar(cs,meter,label='Meter drops',color='#d28244');ax.bar(cs,overflow,bottom=meter,label='Buffer overflow',color='#467d91');ax.set_ylim(0,max(np.array(meter)+np.array(overflow))*1.23);ax.legend(frameon=False);ax.set_ylabel('Pooled loss / all offered traffic (%)')
         save(fig,'loss_breakdown','Loss accounting keeps deliberate drops visible','Pooled volume loss differs from the arithmetic mean of window loss reported in primary tables. Conservation: prior queues + offered = delivered + all dropped + final queues.')
     sources=['output/benchmarks/v4/summary.json','output/benchmarks/v4/metrics.csv','output/runtime_validation.json','output/benchmarks/v4/free_model_checks.json']
     sources += [f'output/benchmarks/v4/latency_{p}_pooled/{n}' for p in live for n in ('summary.json','metrics.csv','trace.jsonl')]

@@ -51,6 +51,10 @@ def test_capacity_aware_meter_reduces_avoidable_drops():
     new=capacity_policy(s,d);old=decision_for('rate_limit',d,'old')
     assert net.validate(d,new).allowed and new.rate_limit_kbps==4900
     assert net.evaluate(d,new).loss_pct<net.evaluate(d,old).loss_pct
+    boundary={'primary_background_mbps':8.6722,'alternate_background_mbps':7.5781,'elephant_mbps':8.06}
+    for h in (0,.1,.3):
+        candidate=meter_decision(net.summary(boundary),boundary,h)
+        assert candidate.rate_limit_kbps==6449 and net.validate(boundary,candidate).allowed
 
 def test_memory_preserves_parameters_and_prior_cycles(tmp_path):
     net=FluidNetwork();d={'primary_background_mbps':5,'alternate_background_mbps':8,'elephant_mbps':5.2};s=net.summary(d)

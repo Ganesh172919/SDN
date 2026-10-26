@@ -78,7 +78,7 @@ Improve loss and bounded control waiting while separating better meter rules fro
 
 Development seeds: 1880/1881. Fresh held-out seeds: 1900–1909. Eight scenarios, 120 windows, nine controllers, 86,400 controller windows. Each condition begins with empty queues and memory and sees the same demand. The path capacity is 10 Mbps, buffer 0.5 Mbit and interval 5 seconds. Prior queues carry over.
 
-A4 retains at most 128 parameter-conditioned episodes, six per action/parameter/context cell. Three prior neighbors per candidate are needed for supported choice. Headroom candidates are 0, 0.1 and 0.3 Mbps. Equivalent clipped caps are one candidate. No candidate simulator outcome is queried by A4. The loss-aware meter never reduces a flow by more than 20%; existing target, port, utilization and minimum-rate checks are unchanged.
+A4 retains at most 128 parameter-conditioned episodes, six per action/parameter/context cell. Three prior neighbors per candidate are needed for supported choice. Headroom candidates are 0, 0.1 and 0.3 Mbps. Equivalent clipped caps are one candidate. No candidate simulator outcome is queried by A4. A post-run implementation audit repaired binary rounding at the exact 20% cap by admitting one extra kbps when needed by the unchanged strict guard. The complete suite was rerun; pre-repair CSV/summary are retained in pre_numeric_repair. No outcome-driven hyperparameter tuning was performed. The loss-aware meter never reduces a flow by more than 20%; existing target, port, utilization and minimum-rate checks are unchanged.
 
 H1 uses the previous fixed 80%-of-flow meter. V3 preserves the previous A4 policy. H2 shares the improved meter and uses fixed 0.1 Mbps headroom without memory. O2 chooses among the same candidate set using privileged current outcomes and is not a deployable or long-horizon bound.
 
@@ -159,6 +159,8 @@ Observe generated traffic, retrieve completed experiences, propose an action, va
 | scripts/verify_v4_submission.py | Data, artifact, browser and credential checks; ZIP |
 
 ## Complete flow
+
+![Complete control and evidence flow](images/architecture.png)
 
 ```mermaid
 flowchart TD

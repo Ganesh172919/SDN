@@ -76,6 +76,7 @@ def run(folder,cycles=120,seeds=tuple(range(1900,1910)),scenarios=tuple(SCENARIO
         window_count=len(rows),wall_seconds=time.perf_counter()-started,traffic_sha256=hashes,groups=groups,paired_comparisons=paired,provenance='simulation',backend='offline',
         environment={'isolated':sys.prefix!=sys.base_prefix,'virtual_environment':sys.prefix},
         protocol={'frozen_before_primary':True,'development_seeds':[1880,1881],'headrooms_mbps':list(HEADROOMS),'support':3,'memory_limit':128,
+            'implementation_repair':'A post-run audit found binary rounding at the exact 20% meter floor. Meter construction admits one extra kbps when needed by the unchanged strict guard. Pre-repair CSV/summary are preserved in pre_numeric_repair; no outcome-driven parameter tuning.',
             'statistics':'4000-draw paired seed percentile bootstrap, RNG 4099; exploratory, no multiplicity adjustment',
             'ablation':'H2 has identical capacity-aware meter candidates; fixed 0.1 Mbps headroom, no memory. A4 explores then selects headroom using prior observed reward.',
             'limits':['Fluid simulation, not packet capture or real OpenFlow deployment','Network benchmarks use local policies, not LLM calls','H1 improvements can come from new meter logic; H2 isolates the extra memory effect','O2 is a privileged immediate-reward reference, not a deployable or long-horizon bound','Final memory flush excluded from per-window local timings']} )

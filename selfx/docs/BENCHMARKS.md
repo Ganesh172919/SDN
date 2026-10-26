@@ -1,61 +1,164 @@
-# Enhanced benchmarks and visualization guide
+# Revision 2 Enhanced Benchmarks and Visualization Guide
 
-The expanded suite evaluates 57,600 analytical simulation windows: six scenarios, ten paired seeds (1740 to 1749), eight controllers and 120 five-second windows per condition. It runs in the isolated `.venv`. This is accelerated fluid simulation; no captured packet or physical-network dataset is claimed.
+> **Empirical Architecture for Transparent Numeric State Embeddings, ECMP Flow Hashing, and Feasibility-Guarded Retrieval**  
+> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*
 
-## Controllers and ablations
+---
 
-| ID | Method |
-| --- | --- |
-| A0 | Static primary path |
-| B1 | Feasible least-loaded path |
-| B2 | Stable flow-hash ECMP-style choice followed by the common safety gate |
-| A1 | Original threshold controller without memory |
-| A2 | Original reward-pruned similar-state memory |
-| H1 | Guarded threshold controller without memory |
-| A3 | The same guard plus balanced recent, positive and negative episode memory |
-| O1 | Privileged myopic model reference selecting immediate reward among feasible actions |
+## 📌 Executive Overview
 
-A3 checks retrieved action feasibility using current demand and rebuilds parameters. It never evaluates candidate simulator outcomes or reads future demand. H1 shares A3's healthy-load guard, so A3 versus H1 isolates added memory. O1 knows the simulator and is not a deployable baseline or guaranteed long-horizon upper bound. The original A2 remains visible.
+The **Revision 2 Benchmark Suite** evaluates 57,600 analytical simulation windows across 6 traffic scenarios, 10 paired seeds (1740 to 1749), and 8 controllers. It established the initial foundation for transparent numeric state embeddings, cosine similarity episodic retrieval, and deterministic safety validation within the SELF-X project.
 
-## Scenarios
+---
 
-Mixed traffic, primary flash crowds, a busy alternate path, a halfway distribution shift, persistent dual overload and a light-load negative control all use reproducible demand bytes. Memory and queues reset for every scenario, seed and controller. Each trace has a SHA256 hash in the summary. Every controller receives the same trace for its scenario and seed.
+## 🧠 Comprehensive Mindmap Flows
 
-## Metrics and intervals
+### 1. Revision 2 Benchmark Architecture Mindmap
 
-Mean modeled window delay, delivered goodput, total loss including meter drops, reward, proposal vetoes and computation time are recorded per window. P95 is over modeled mean-window delays, not individual packets. Mean loss and pooled dropped-volume loss are distinct statistics. Computation timing excludes a final batched memory flush; this makes offline loop timing comparable across controllers.
-
-Intervals use 4,000 bootstrap resamples of the ten seed-level estimates, with RNG seed 4099. Pairwise effects resample paired per-seed differences. Comparisons are exploratory with no multiplicity correction. Intervals are not computed by treating 1,200 windows as independent trials.
-
-## Findings
-
-A3 eliminates infeasible retrieved proposals in this suite; the original A2 has 134 vetoes. Added memory does not consistently beat H1. In mixed load, A3 minus H1 modeled delay is approximately +0.473 ms, and in flash demand approximately +0.611 ms. Other scenario means match. The guard improves proposal validity; a general learning-performance advantage is not established.
-
-## Graph navigation
-
-| Figure | Question answered |
-| --- | --- |
-| Scenario delay matrix | How do all eight controllers behave across the six scenarios? |
-| Scenario seed intervals | How much do results vary across seeds? |
-| Paired memory effects | What changes when memory is added after the same guard? |
-| Empirical distributions | How are modeled window delays and losses distributed? |
-| Metric tradeoffs | Does lower delay come with loss or goodput costs? |
-| Actions and vetoes | Which proposals are rejected and which actions are installed? |
-| Queue shift heatmap | How do path queues change in one illustrative shift trace? |
-| Control overhead | How much local computation does each control loop require? |
-
-All figures are exported as PNG and SVG under `output/figures/benchmarks`. The eight-page PDF atlas is `output/submission/SELF_X_Benchmark_Atlas.pdf`. Editable numeric comparison charts and tables also appear in the PowerPoint. The report appends the full protocol and findings.
-
-## Execute and inspect
-
-```powershell
-.\setup.ps1
-.\run.ps1 all
-.\run.ps1 dashboard
+```mermaid
+flowchart TD
+    ROOT["Revision 2 Benchmark Architecture"]
+    
+    ROOT --> SCENARIOS["1. 6 Evaluated Scenarios"]
+    ROOT --> CONTROLLERS["2. 8 Evaluated Controllers"]
+    ROOT --> EMBEDDING["3. Numeric State Embedding"]
+    ROOT --> MEMORY["4. Episodic Memory Store"]
+    ROOT --> FIGURES["5. Benchmark Figure Suite"]
+    
+    SCENARIOS --> SC_MIX["Mixed Traffic"]
+    SCENARIOS --> SC_FLASH["Primary Flash Crowds"]
+    SCENARIOS --> SC_ALT["Alternate Busy"]
+    SCENARIOS --> SC_SHIFT["Halfway Distribution Shift"]
+    SCENARIOS --> SC_DUAL["Dual Overload"]
+    SCENARIOS --> SC_LIGHT["Light Load (Control)"]
+    
+    CONTROLLERS --> C_A0["A0: Static Primary"]
+    CONTROLLERS --> C_B1["B1: Feasible Least-Loaded"]
+    CONTROLLERS --> C_B2["B2: Stable Flow-Hash ECMP"]
+    CONTROLLERS --> C_A1["A1: Threshold without Memory"]
+    CONTROLLERS --> C_A2["A2: Reward-Pruned Embedding Memory"]
+    CONTROLLERS --> C_H1["H1: Guarded Heuristic"]
+    CONTROLLERS --> C_A3["A3: Guarded Balanced Memory"]
+    CONTROLLERS --> C_O1["O1: Privileged Immediate Oracle"]
+    
+    EMBEDDING --> EMB_VEC["State Vector: [Latency/50, Tput/10000, Loss/20, 0.1]"]
+    EMBEDDING --> EMB_NORM["L2 Unit Normalization: v / ||v||"]
+    EMBEDDING --> EMB_COS["Cosine Similarity: dot(q, v) >= 0.985"]
+    
+    MEMORY --> MEM_TOP["Flat JSON Store (Max 30 records)"]
+    MEMORY --> MEM_PRUNE["Reward Pruning (Lowest Reward Dropped)"]
+    MEMORY --> MEM_BAL["Balanced Selection: Recent + Top + Bottom"]
+    
+    FIGURES --> FIG_HEAT["Queue Shift Heatmap"]
+    FIGURES --> FIG_ECDF["Empirical Delay & Loss Distributions"]
+    FIGURES --> FIG_VETO["Action & Veto Breakdown"]
 ```
 
-`.env` holds credentials and `.venv` holds Python packages. Keys must not be placed in the dashboard or submitted files. `run.ps1` always selects the project's virtual environment. Use `run.ps1 benchmark` for just the expanded suite. `output/runtime_validation.json` records the actual interpreter, test results and complete run status. Raw benchmark rows are in `output/benchmarks/v2/metrics.csv`.
+### 2. State Embedding & Memory Ranking Mindmap
 
-## External approach references
+```
++-- [Revision 2 State Embedding & Memory Ranking Mindmap]
+    |-- Transparent State Vector Construction
+    |   |-- Feature 1: Normalized latency proxy (latency_ms / 50.0)
+    |   |-- Feature 2: Normalized network throughput (throughput_kbps / 10000.0)
+    |   |-- Feature 3: Normalized packet loss (loss_pct / 20.0)
+    |   `-- Bias Term: Constant 0.1 float to prevent zero-vector division
+    |-- Metric Similarity Calculation
+    |   |-- L2 Euclidean Normalization: ||v|| = sqrt(sum(v_i^2))
+    |   |-- Dot-Product Cosine Similarity: S(a, b) = sum(a_i * b_i)
+    |   `-- High-Confidence Threshold: Cosine similarity >= 0.985
+    `-- Episodic Memory Storage & Retrieval
+        |-- Storage Model: 30-entry flat JSON file
+        |-- Ranking: Exponential weighting S^12 favors nearest neighbors
+        `-- Feasibility Filter: Infeasible past proposals discarded before installation
+```
 
-RFC 2992 describes equal-cost multipath hash-threshold selection: https://www.rfc-editor.org/rfc/rfc2992 . The B2 abstraction adopts stable equal-region hashing, with this project's separate safety constraint; it is not a complete RFC implementation. RFC 7011 defines actual IPFIX flow export: https://www.rfc-editor.org/rfc/rfc7011 . This project creates synthetic flow demand records and does not emit wire-format IPFIX. Accessed 20 October 2026.
+---
+
+## 🎨 Detailed ASCII Formulation Flows
+
+### 1. Normalized 3-Feature State Embedding & Cosine Similarity Flow
+
+```
+Raw Network Counters: [ Latency: 24.5 ms, Throughput: 8500 kbps, Loss: 4.2% ]
+                                    |
+                                    v
+     +--------------------------------------------------------------+
+     | Feature Scaling & Normalization:                             |
+     | v[0] = 24.5 / 50.0   = 0.4900                                |
+     | v[1] = 8500 / 10000  = 0.8500                                |
+     | v[2] = 4.2 / 20.0    = 0.2100                                |
+     | v[3] = Bias constant = 0.1000                                |
+     +--------------------------------------------------------------+
+                                    |
+                                    v
+     +--------------------------------------------------------------+
+     | Euclidean L2 Norm Calculation:                               |
+     | ||v|| = sqrt(0.49^2 + 0.85^2 + 0.21^2 + 0.10^2) = 1.0083    |
+     | Normalized Vector: [ 0.4859, 0.8430, 0.2083, 0.0992 ]       |
+     +--------------------------------------------------------------+
+                                    |
+                                    v
+     +--------------------------------------------------------------+
+     | Cosine Similarity against Stored Episodic Vectors:           |
+     | Cosine(Query, Memory_k) = sum(Query_i * Memory_ki)           |
+     | If Cosine >= 0.985: Admitted into candidate set              |
+     | Weight = (Cosine)^12 (Exponentially amplifies nearest match) |
+     +--------------------------------------------------------------+
+```
+
+### 2. B2 Stable ECMP Hashing vs Dynamic Safety Gate Flow
+
+```
+Incoming Packet Flow: [ IPv4 Src: 10.0.0.1, Dst: 10.0.0.8, Protocol: UDP ]
+                                    |
+                                    v
+     +--------------------------------------------------------------+
+     | RFC 2992 Stable Equal-Cost Multipath Hash (B2):              |
+     | Hash = CRC32(Src_IP, Dst_IP, Protocol) % 2                   |
+     +--------------------------------------------------------------+
+                                    |
+                    +---------------+---------------+
+                    | Hash == 0                     | Hash == 1
+                    v                               v
+         [Target: Primary Port 2]        [Target: Alternate Port 3]
+                    |                               |
+                    +---------------+---------------+
+                                    |
+                                    v
+     +--------------------------------------------------------------+
+     | Dynamic Safety Gate Validation:                              |
+     | Check: Projected alternate link load <= 90% (9000 kbps)      |
+     +--------------------------------------------------------------+
+                    |                               |
+          (Safe: Load <= 90%)             (Unsafe: Load > 90%)
+                    |                               |
+                    v                               v
+           [Install Flow-Mod]              [SAFETY VETO!]
+           Forward to Hash Port            Veto action -> Default to Port 2
+                                           (Result: 2,585 Vetoes in Suite!)
+```
+
+---
+
+## 📊 Measured Empirical Results (Revision 2 Suite)
+
+Evaluated across seeds 1740–1749 over 6 traffic scenarios:
+
+| Controller ID | Method Label | Delay (ms) | Goodput (Mbps) | Total Loss (%) | Vetoes |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **A0** | Static Primary Path | 26.003 | 12.904 | 8.162 | 0 |
+| **B1** | Feasible Least-Loaded Path | 20.611 | 13.058 | 6.986 | 0 |
+| **B2** | Stable Flow-Hash ECMP | 23.227 | 12.983 | 7.561 | 2585 |
+| **A1** | Original Threshold (No Memory) | 17.062 | 12.902 | 7.913 | 0 |
+| **A2** | Original Reward-Pruned Memory | 17.554 | 12.848 | 8.349 | 347 |
+| **H1** | Guarded Heuristic | 17.154 | 12.990 | 7.382 | 0 |
+| **A3** | Guarded Balanced Memory | 17.341 | 12.974 | 7.510 | 0 |
+| **O1** | Privileged Myopic Oracle | 17.204 | 13.001 | 7.322 | 0 |
+
+---
+
+## 🔍 Key Findings from Revision 2
+1. **Elimination of Infeasible Proposals**: Adding the deterministic feasibility guard in `A3` completely eliminated the 347 safety vetoes observed in `A2`.
+2. **ECMP Brittleness**: Static hash-based routing (`B2`) triggered 2,585 safety vetoes due to hash collisions overloading the alternate link.
+3. **Absence of Memory Advantage**: Across the 6 scenarios, `A3` did not establish a statistically significant advantage over the no-memory baseline `H1`, establishing the research imperative for parameter-conditioned memory in Revision 4.

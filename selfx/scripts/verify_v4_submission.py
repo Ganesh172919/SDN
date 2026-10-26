@@ -98,8 +98,27 @@ def rules_and_timing(folder,offline=False):
             for k in ('api_calls','api_successes','deadline_miss','local_timeouts','deferred'):assert g[k]==sum(r[k] for r in records)
     return {'windows':len(details),'origins':dict(origins),'request_audits':len(calls),'rules_replayed':True}
 
+def current_normal_runs():
+    result={}
+    for name in ('venv_v4','gemini_v4','openrouter_v4'):
+        folder=OUT/'experiments'/name;s=read(folder/'summary.json')
+        rows=list(csv.DictReader((folder/'metrics.csv').open(encoding='utf-8')))
+        details=[json.loads(l) for l in (folder/'trace.jsonl').read_text(encoding='utf-8').splitlines()]
+        assert len(rows)==len(details)
+        for seed,digest in s['trace_sha256'].items():assert hashlib.sha256((folder/f'traffic_{seed}.json').read_bytes()).hexdigest()==digest
+        for c,g in s['conditions'].items():
+            selected=[r for r in rows if r['condition']==c];assert len(selected)==g['windows']
+            for k in ('latency_ms','throughput_kbps','loss_pct','reward'):close(g[k],mean(float(r[k]) for r in selected))
+        previous={}
+        for d in details:
+            m=d['metrics'];out=d['outcome'];key=(m['condition'],m['seed'])
+            close(sum(previous.get(key,[0,0]))+out['offered_mbit'],out['delivered_mbit']+out['dropped_mbit']+sum(out['queue_mbit']),1e-6)
+            previous[key]=out['queue_mbit'];assert all(n<m['cycle'] for n in d['retrieved_cycles'])
+        result[name]={'windows':len(rows),'conditions':list(s['conditions']),'provider_audits':sum(len(d['provider_calls']) for d in details)}
+    return result
+
 def main():
-    evidence={'primary_v4':primary(),'normal_experiments_preserved':verify_evidence(),'v3_preserved':verify_benchmark('v3',86400),'v2_preserved':verify_benchmark()}
+    evidence={'primary_v4':primary(),'normal_current':current_normal_runs(),'normal_experiments_preserved':verify_evidence(),'v3_preserved':verify_benchmark('v3',86400),'v2_preserved':verify_benchmark()}
     evidence['rule_learning']=rules_and_timing(B/'rule_demo_offline',True)
     evidence['providers']={}
     for provider in ('gemini','openrouter'):

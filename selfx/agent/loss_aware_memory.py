@@ -18,6 +18,11 @@ def meter_decision(summary, demand, headroom=.1, reason='Capacity-aware meter'):
     cap=min(e,cap)
     d=decision_for('rate_limit',demand,reason)
     d.rate_limit_kbps=math.ceil(cap*1000)
+    # Use the guard's arithmetic too: an exact decimal 80% cap can produce
+    # 20.000000000000004% after binary subtraction. Admit one extra kbps;
+    # never weaken the independent guard or discard beyond its strict limit.
+    if 100*(e*1000-d.rate_limit_kbps)/(e*1000)>20:
+        d.rate_limit_kbps+=1
     return d
 
 
