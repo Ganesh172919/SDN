@@ -4,6 +4,17 @@
 > *Course Project — EC466: Software Defined Networks | Team ID: SDN_07 | IIIT Dharwad*  
 > *Empirical Scope: 86,400 Control Windows | 9 Controllers | 8 Traffic Scenarios | 4,000-Draw Paired Bootstrap Resampling*
 
+SELF-X watches traffic in a small network and decides every five seconds whether a large
+burst should be left alone, moved to a second path, or slowed down. Every decision passes
+an independent safety check before it is applied. The system remembers what happened after
+each decision and uses that record to choose better next time. An AI language model can
+suggest an action, but ordinary code validates the suggestion and builds the final rule.
+
+![The SELF-X network operations console](selfx/output/explainer/07_live_console.png)
+
+*The simulator console (`.\run.ps1 simulator`) shows traffic moving through the network,
+the controller's step-by-step reasoning, and a comparison with a non-reactive network.*
+
 ---
 
 ## 📌 Master Documentation Portal
