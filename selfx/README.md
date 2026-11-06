@@ -1,104 +1,88 @@
 # SELF-X: Loss-Aware SDN Flow-Management Agent with Episodic Memory
 
 > **Autonomous Software-Defined Networking with LLM In-Context Adaptation, Bounded Control Deadlines, Capacity-Aware OpenFlow Interventions, and Verifiable Benchmark Evidence**  
-> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*
+> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*  
+> *Module Directory: `selfx/` | Python Environment: Python 3.12+ Standard Library, LangGraph, Pydantic*
 
 ---
 
 ## 📌 Executive Summary
 
-**SELF-X** is an autonomous flow-management framework designed to solve network bottleneck congestion through in-context LLM reasoning and parameter-conditioned episodic memory. Operating over 5-second control windows, SELF-X observes network traffic telemetry, queries past completed experiences, proposes bounded interventions (reroute, rate-limit, or no-op), enforces strict deterministic safety bounds (<= 20% flow throttling, <= 90% link utilization), installs simulated OpenFlow 1.3 rules with 5-second hard timeouts, and measures counterfactual reward to refine its local policy.
+Ganesh's T20-T25 replay-to-LoRA pipeline is now implemented under
+`agent/self_improvement/`: CPU training, frozen stress evaluation, atomic adapter
+promotion/rejection, automatic rollback and held-out weight attribution.
+See [the setup, commands and scope](docs/SELF_IMPROVEMENT.md). Live integration
+and the full multi-agent/DPP comparison remain separate team workstreams.
 
-The validated Windows backend uses a finite-buffer two-path fluid simulation model with persistent queues, while real-time API integrations with Google Gemini and OpenRouter free models demonstrate live LLM decision synthesis under a 3.8-second process-isolated wait budget.
+**SELF-X** is an autonomous flow-management framework designed to solve network bottleneck congestion through in-context LLM reasoning, process-isolated inference, and parameter-conditioned episodic memory. Operating over 5-second control windows, SELF-X observes network traffic telemetry, queries past completed experiences, proposes bounded interventions (reroute, rate-limit, or no-op), enforces strict deterministic safety bounds ($\le 20\%$ flow throttling, $\le 90\%$ link utilization), installs simulated OpenFlow 1.3 rules with 5-second hard timeouts, and measures counterfactual reward to refine its local policy.
+
+The validated backend uses a finite-buffer two-path fluid simulation model with persistent queues, while real-time API integrations with Google Gemini and OpenRouter free models demonstrate live LLM decision synthesis under a 3.8-second process-isolated wait budget.
 
 ---
 
-## 🧠 Comprehensive Mindmap Flows
-
-### 1. High-Level System Architecture Mindmap
+## 🎨 Colourful Architecture Mindmap
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1E88E5', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#F3F4F6'}}}%%
 flowchart TD
-    ROOT["SELF-X System Architecture"]
-    
-    ROOT --> TELEMETRY["1. Observation & Telemetry"]
-    ROOT --> MEMORY["2. Parameter-Conditioned Memory"]
-    ROOT --> CONTROLLER["3. Decision Engine & Providers"]
-    ROOT --> SAFETY["4. Independent Safety Guard"]
-    ROOT --> SWITCHING["5. Rule Lifecycle Engine"]
-    ROOT --> EVALUATION["6. Counterfactual Evaluation & Reward"]
-    ROOT --> BENCHMARKS["7. Paired Multi-Scenario Benchmarks"]
-    
-    TELEMETRY --> TELE_DEMAND["Seeded Traffic Generator (Fluid / NetFlow CSV)"]
-    TELEMETRY --> TELE_QUEUES["Persistent Finite Buffers (0.5 Mbit)"]
-    TELEMETRY --> TELE_METRICS["Rate Deltas, Hot Ports & Flow Match Signatures"]
-    
-    MEMORY --> MEM_STORE["LossAwareMemory (128-record bound)"]
-    MEMORY --> MEM_RETRIEVE["Caliper Distance & Kernel Weighting"]
-    MEMORY --> MEM_HEADROOM["Headroom Candidates: 0.0, 0.1, 0.3 Mbps"]
-    MEMORY --> MEM_PRUNE["Action / Parameter / Regime Cell Pruning (Max 6/cell)"]
-    
-    CONTROLLER --> CTRL_HYBRID["Hybrid Fast / Bounded Controller"]
-    CONTROLLER --> CTRL_BYPASS["Healthy-Load Bypass (Zero Queue, Under-Capacity)"]
-    CONTROLLER --> CTRL_CACHE["Exact-Context Action Cache (64-slot, 12-window TTL)"]
-    CONTROLLER --> CTRL_DEADLINE["DeadlineProvider (3.8s Subprocess Isolation)"]
-    CONTROLLER --> CTRL_FALLBACK["Deterministic Loss-Aware Fallback Policy"]
-    
-    SAFETY --> SAFE_DROP["Max Flow Throttling <= 20% (with +1 kbps Float Repair)"]
-    SAFETY --> SAFE_UTIL["Max Target Link Utilization <= 90%"]
-    SAFETY --> SAFE_FLOOR["Minimum Rate Limit Floor >= 512 kbps"]
-    SAFETY --> SAFE_VETO["Silent Fail-Closed Veto to no_op"]
-    
-    SWITCHING --> SW_SIM["Simulated OpenFlow 1.3 Table"]
-    SWITCHING --> SW_ADD["ADD Flow-Mod (Match, Priority 100, Port 2/3)"]
-    SWITCHING --> SW_METER["METER Table (KBPS Flag, DROP Band)"]
-    SWITCHING --> SW_EXPIRY["5-Second hard_timeout Automatic Teardown"]
-    
-    EVALUATION --> EVAL_SAME["Same-Window Counterfactual No-Op Reference"]
-    EVALUATION --> EVAL_REWARD["Normalized Weighted Reward: Latency(-0.4), Tput(+0.4), Loss(-0.2)"]
-    EVALUATION --> EVAL_REFLECT["Deterministic & LLM Semantic Reflection"]
-    
-    BENCHMARKS --> BENCH_SUITE["8 Scenarios x 10 Seeds x 9 Controllers (86,400 windows)"]
-    BENCHMARKS --> BENCH_BOOTSTRAP["4,000-Draw Paired Seed Percentile Bootstrap"]
-    BENCHMARKS --> BENCH_DASH["Loopback Replay Web Dashboard (Port 8766)"]
-```
+    classDef teleNode fill:#00897B,stroke:#004D40,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef memNode fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef ctrlNode fill:#1E88E5,stroke:#0D47A1,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef safeNode fill:#E53935,stroke:#B71C1C,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef switchNode fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef evalNode fill:#3949AB,stroke:#1A237E,stroke-width:2px,color:#ffffff,font-weight:bold;
 
-### 2. Cognitive Control Loop Mindmap
+    subgraph SensingPhase ["1. Observation & Telemetry (selfx/agent/metrics.py)"]
+        DEMAND["Seeded Traffic Generator<br/>Fluid Dynamics / NetFlow CSV"]:::teleNode
+        QUEUES["Persistent Finite Buffers<br/>0.5 Mbit Capacity per Port"]:::teleNode
+        VECTOR["8D State Embedding S(t)<br/>Utilizations, Queue Ratios, Skew"]:::teleNode
+    end
 
-```
-+-- [SELF-X 5-Second Cognitive Control Loop]
-    |-- [1. OBSERVE]
-    |   |-- Read offered traffic: Primary Background (p), Alternate Background (a), Elephant (e)
-    |   |-- Query persistent queue states: [queue_primary, queue_alternate]
-    |   `-- Assemble context vector: [p/C, a/C, e/C, primary_headroom, alternate_headroom, ...]
-    |-- [2. RETRIEVE]
-    |   |-- Filter completed episodes: cycle < current_cycle, identical congestion regime
-    |   |-- Evaluate distance metric across 6 primary dimensions + 2 queue dimensions
-    |   `-- Compute support count & lower confidence bound for headroom candidates (0.0, 0.1, 0.3)
-    |-- [3. SUGGEST / DECIDE]
-    |   |-- Tier 1: Healthy Bypass (if p + e <= Capacity and queues == 0 -> no_op)
-    |   |-- Tier 2: Supported Episodic Memory (if candidate support >= 3 and lower bound > 0.005)
-    |   |-- Tier 3: Validated Context Cache (if exact context seen within 12 cycles)
-    |   |-- Tier 4: Deadline-Bounded LLM Call (Gemini / OpenRouter via 3.8s isolated worker)
-    |   `-- Tier 5: Deterministic Fallback (Capacity-aware heuristic selection)
-    |-- [4. VALIDATE]
-    |   |-- Structural schema check (well-formed fields, known target dpid, exact match dict)
-    |   |-- Check rate_limit: flow drop <= 20% and rate >= 512 kbps
-    |   |-- Check reroute: alternate path projected utilization <= 90%
-    |   `-- If invalid: reject proposal, log veto reason, fall back to local rule
-    |-- [5. INSTALL & EXPIRE]
-    |   |-- Expire previous 5-second rule at virtual boundary
-    |   |-- Install OpenFlow ADD: cookie=cycle+1, priority=100, hard_timeout=5s
-    |   `-- Set data plane instructions: METER id + OUTPUT port 2 or 3
-    |-- [6. MEASURE & REFLECT]
-    |   |-- Advance fluid network simulation over 5-second interval
-    |   |-- Measure delivered throughput, average queue delay, overflow drops, and meter drops
-    |   |-- Compare against same-window no-op counterfactual baseline
-    |   `-- Calculate normalized composite reward r in [-1.0, 1.0]
-    `-- [7. MEMORIZE]
-        |-- Store tuple: (cycle, state_summary, action, params, reward, reflection, context_v3)
-        |-- Cluster records into action / headroom / regime / density cells
-        `-- Prune cells exceeding 6 records; enforce global 128-record memory bound
+    subgraph MemoryPhase ["2. Parameter-Conditioned Memory (selfx/agent/loss_aware_memory.py)"]
+        STORE["LossAwareMemory Store<br/>128-Record Stratified Bound"]:::memNode
+        CALIPER["Caliper Filter & Kernel<br/>Delta <= 0.15, Exponential Weights"]:::memNode
+        LCB_OPT["Headroom Candidates: {0.0, 0.1, 0.3}M<br/>LCB: mu - 1.96*sigma"]:::memNode
+    end
+
+    subgraph DecisionPhase ["3. Bounded Decision Engine (selfx/agent/bounded_control.py)"]
+        BYPASS["Tier 1: Healthy Bypass<br/>Zero Queue -> Immediate no_op"]:::ctrlNode
+        MEM_DEC["Tier 2: Supported Episodic Memory<br/>Support >= 3 -> Local Rule"]:::ctrlNode
+        CACHE["Tier 3: Exact Context Cache<br/>64-Slot LRU (12-Cycle TTL)"]:::ctrlNode
+        WORKER["Tier 4: DeadlineProvider<br/>3.8s Subprocess Watchdog (SIGKILL)"]:::ctrlNode
+        FALLBACK["Tier 5: Capacity-Aware Fallback<br/>H2 Matched Heuristic"]:::ctrlNode
+    end
+
+    subgraph SafetyPhase ["4. Deterministic Safety Verification (selfx/safety.py)"]
+        SAFE_DROP["Max Flow Throttling <= 20.0%<br/>(+1 kbps IEEE-754 Repair)"]:::safeNode
+        SAFE_UTIL["Max Target Link Load <= 90%<br/>Prevents Secondary Spillover"]:::safeNode
+        SAFE_FLOOR["Minimum Rate Floor >= 512 kbps<br/>Prevents Flow Starvation"]:::safeNode
+        VETO["Fail-Closed Veto to no_op"]:::safeNode
+    end
+
+    subgraph ActuationPhase ["5. Rule Lifecycle & OpenFlow 1.3 (selfx/ryu_client.py)"]
+        TCAM_ADD["OpenFlow ADD Flow-Mod<br/>Priority 100, Port 2/3"]:::switchNode
+        METER_ADD["OpenFlow 1.3 METER Mod<br/>Token Bucket Ingress Clamping"]:::switchNode
+        LEASE["Virtual Lease Expiry<br/>5s hard_timeout Auto-Teardown"]:::switchNode
+    end
+
+    subgraph EvaluationPhase ["6. Counterfactual Evaluation (selfx/agent/reward.py)"]
+        SAME_WIN["Same-Window Counterfactual Baseline<br/>Unmodified No-Op Reference"]:::evalNode
+        REWARD["Normalized Weighted Reward R(t)<br/>-0.4*dLat + 0.4*dTput - 0.2*dLoss"]:::evalNode
+        REFLECT["Verbal Semantic Reflection<br/>Self-Critique & JSON Serialization"]:::evalNode
+    end
+
+    DEMAND & QUEUES --> VECTOR
+    VECTOR --> STORE & CALIPER
+    CALIPER --> LCB_OPT
+    LCB_OPT --> BYPASS & MEM_DEC & CACHE & WORKER & FALLBACK
+    BYPASS & MEM_DEC & CACHE & WORKER & FALLBACK --> SAFE_DROP & SAFE_UTIL & SAFE_FLOOR
+    SAFE_DROP & SAFE_UTIL & SAFE_FLOOR -->|Pass| TCAM_ADD & METER_ADD
+    SAFE_DROP & SAFE_UTIL & SAFE_FLOOR -.->|Veto| VETO
+    TCAM_ADD & METER_ADD --> LEASE
+    LEASE --> SAME_WIN
+    SAME_WIN --> REWARD
+    REWARD --> REFLECT
+    REFLECT --> STORE
 ```
 
 ---
@@ -196,40 +180,7 @@ flowchart TD
           [Episodic Memory Update]
 ```
 
-### 2. Dual-Path Fluid Network Queue Dynamics Flow
-
-```
-              Offered Load (Primary): Primary Background (p) + Elephant (e)
-                                      |
-                                      v
-                             +-----------------+
-                             | Rate Limiter /  | ----> [Deliberate Meter Drop]
-                             | OpenFlow Meter  |       (if e > rate_limit_kbps)
-                             +-----------------+
-                                      |
-                                      v Admitted Rate (R)
-                         +-------------------------+
-                         | Primary Queue Buffer    |
-                         | Capacity: C = 10 Mbps   |
-                         | Buffer Limit: B = 0.5Mb |
-                         +-------------------------+
-                          /                       \
-        (If R + Q_prev/T > C):                  (If R + Q_prev/T <= C):
-       Queue fills / saturates                 Queue drains to zero
-                 |                                       |
-                 v                                       v
-      +---------------------+                  +---------------------+
-      | Overflow Drop:      |                  | Delivered Goodput:  |
-      | max(0, Q + net*T-B) |                  | Fully forwarded     |
-      +---------------------+                  +---------------------+
-                 |                                       |
-                 +-------------------+-------------------+
-                                     |
-                                     v
-                        [Delivered to Egress Switch]
-```
-
-### 3. Subprocess Deadline Provider Isolation Flow
+### 2. Subprocess Deadline Provider Isolation Flow
 
 ```
 Parent Control Loop Thread               Child Worker Subprocess (Spawned)
@@ -261,55 +212,88 @@ Parent Control Loop Thread               Child Worker Subprocess (Spawned)
   +------------------------------+                       |
 ```
 
-### 4. Parameter-Conditioned Episodic Memory Lifecycle Flow
+---
 
+## 💻 Key Implementation Modules & Annotated Code Snippets
+
+### 1. Bounded Decision Engine (`selfx/agent/bounded_control.py`)
+
+The `BoundedController.decide` method resolves the multi-tiered decision cascade:
+
+```python
+def decide(self, net, summary, demand, memory, cycle):
+    # Tier 1: Local recommendation & signature extraction
+    local, used = loss_aware_policy(net, summary, demand, memory, cycle)
+    s = summary['simulation']
+    signature = tuple(s[k] for k in ('capacity_mbps', 'buffer_mbit', 'primary_background_mbps',
+                                     'alternate_background_mbps', 'elephant_mbps',
+                                     'valid_reroute_out_port', 'current_output_port')) + tuple(s['queues_mbit'])
+    if self.hybrid:
+        if local.action == 'no_op':
+            return local, 'healthy_bypass', used, ''
+        # Tier 2: Check episodic memory support
+        scores, matched = memory.meter_estimates(summary, cycle)
+        chosen = min(HEADROOMS, key=lambda h: abs(meter_decision(summary, demand, h).rate_limit_kbps - (local.rate_limit_kbps or 0)))
+        supported = scores.get(chosen, {})
+        if local.action == 'rate_limit' and supported.get('support', 0) >= 3 and supported.get('lower', 0) > .005:
+            return local, 'episodic_memory', used, ''
+        # Tier 3: Check exact-context cache (12-window TTL)
+        cached = self.cache.get(signature)
+        if cached and cycle - cached['cycle'] <= 12:
+            candidate = local if cached['action'] == 'rate_limit' and local.action == 'rate_limit' else decision_for(cached['action'], demand, 'Exact-context cached action')
+            if net.validate(demand, candidate).allowed:
+                return candidate, 'api_cache' if cached.get('source', 'api') == 'api' else 'local_rule_cache', used, ''
+    
+    # Tier 4: Process-isolated LLM call with 3.8s watchdog
+    try:
+        choice = self.llm.choose(suggestion_messages(summary, memory.few_shot_examples(k=3, query=summary), local))
+        decision = local.model_copy(update={'rationale': choice['rationale']}) if choice['action'] == 'rate_limit' else decision_for(choice['action'], demand, choice['rationale'])
+        guard = net.validate(demand, decision)
+        if not guard.allowed:
+            return local, 'validation_fallback', used, 'invalid_action_from_provider'
+        return decision, 'api', used, ''
+    except ProviderError as exc:
+        return local, 'deadline_fallback' if str(exc) == 'local_deadline' else 'provider_fallback', used, str(exc)
 ```
-State Vector (Query): [ p/C, a/C, e/C, Margin_P, Margin_A, Margin_M, Q_p/B, Q_a/B ]
-                                |
-                                v
-               +----------------------------------+
-               |  Regime Check: sign(Margins)     |
-               +----------------------------------+
-                                |
-             +------------------+------------------+
-             | Matches Regime                      | Regime Mismatch
-             v                                     v
-+-------------------------------+             [Skip Episode]
-| Caliper Filter:               |
-| max(delta[:6]) <= 0.12        |
-| max(delta[6:]) <= 0.51        |
-+-------------------------------+
-             |
-             v (Admitted Candidates)
-+-------------------------------------------------------------+
-| Distance & Exponential Kernel Weighting:                    |
-| dist = sum(delta[:6]^2) + 0.08 * sum(delta[6:]^2)           |
-| w = exp(-dist / 0.02) * exp(-(current_cycle - cycle) / 120) |
-+-------------------------------------------------------------+
-             |
-             v
-+-------------------------------------------------------------+
-| Parameter Clustering & Uncertainty Estimation:              |
-| Group by Headroom h in {0.0, 0.1, 0.3} Mbps                 |
-| Take top-6 nearest entries                                  |
-| mu = sum(w * reward) / sum(w)                               |
-| lower_bound = mu - 1.96 * sqrt(var / N)                     |
-+-------------------------------------------------------------+
-             |
-      +------+------+
-      |             |
-      v             v
-[Support < 3]   [Support >= 3]
-Explore candidate   Select candidate with max(lower_bound)
+
+### 2. Parameter-Conditioned Episodic Memory (`selfx/agent/loss_aware_memory.py`)
+
+The `LossAwareMemory` class indexes past rate-limiting headroom choices and computes the Lower Confidence Bound (LCB):
+
+```python
+def meter_estimates(self, state, cycle):
+    q = context(state)
+    candidates = defaultdict(list)
+    for r in self._records:
+        if r['cycle'] >= cycle or r['action'] != 'rate_limit':
+            continue
+        v = r.get('context_v3') or context(r['state_summary'])
+        delta = [abs(a - b) for a, b in zip(q, v)]
+        # Caliper filtering: regime match and bounded delta
+        if regime(q) != regime(v) or max(delta[:6]) > 0.12 or max(delta[6:]) > 0.51:
+            continue
+        distance = sum(x * x for x in delta[:6]) + 0.08 * sum(x * x for x in delta[6:])
+        w = math.exp(-distance / 0.02) * math.exp(-(cycle - r['cycle']) / 120)
+        candidates[parameter_key(r)].append((distance, w, r))
+    
+    scores = {}
+    used = []
+    for h, entries in candidates.items():
+        entries = sorted(entries, key=lambda x: x[0])[:6]
+        weight = sum(w for _, w, _ in entries)
+        mu = sum(w * r['reward'] for _, w, r in entries) / weight
+        variance = sum(w * (r['reward'] - mu) ** 2 for _, w, r in entries) / weight
+        margin = 1.96 * math.sqrt(variance / len(entries)) + 0.002
+        scores[h] = {'mean': mu, 'lower': mu - margin, 'upper': mu + margin, 'support': len(entries)}
+        used.extend(r['cycle'] for _, _, r in entries)
+    return scores, sorted(set(used))
 ```
 
 ---
 
 ## 📊 Measured Benchmark Results (Revision 4 Suite)
 
-The primary benchmark suite evaluates **86,400 controller windows** across **8 diverse scenarios**, **10 fresh held-out seeds (1900–1909)**, and **9 controllers** on a two-path topology with 10 Mbps bottleneck capacity and 0.5 Mbit buffers.
-
-### Primary Multi-Controller Performance Comparison
+The primary benchmark suite evaluates **86,400 controller windows** across **8 diverse scenarios**, **10 fresh held-out seeds (1900–1909)**, and **9 controllers** on a two-path topology with 10 Mbps bottleneck capacity and 0.5 Mbit buffers:
 
 | Controller ID | Controller Name & Description | Modeled Delay (ms) | Delivered Goodput (Mbps) | Total Loss (%) | Mean Reward | Safety Vetoes |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -323,52 +307,39 @@ The primary benchmark suite evaluates **86,400 controller windows** across **8 d
 | **A4** | Loss-Aware Parameter Episodic Memory | 17.452 | 13.011 | **7.075** | 0.082764 | 0 |
 | **O2** | Privileged Immediate-Reward Oracle | **17.096** | **13.016** | 7.050 | 0.086096 | 0 |
 
-### Critical Scientific Attribution
+### Scientific Attribution Analysis
 - **A4 vs H1**: A4 significantly improves loss (7.075% vs 7.391%) and reward (0.0828 vs 0.0776) over the earlier fixed-meter baseline H1.
-- **A4 vs H2**: H2 shares the exact capacity-aware meter logic without episodic memory, achieving a slightly higher reward (0.0833 vs 0.0828). This proves that the performance gain over H1 stems primarily from capacity-aware meter synthesis rather than memory alone.
-- **Cold-Start Exploration**: A4 retains all 15 initial cold-start exploration windows in its averages without post-hoc cherry-picking.
+- **A4 vs H2**: Matched heuristic H2 shares identical capacity-aware rate-limiting logic without memory, achieving reward 0.0833. This proves that the gain over H1 is driven by capacity-aware rate synthesis, not memory alone.
 
 ---
 
-## ⏱️ Real Provider Latency & Execution Deadlines
+## 🛠️ Step-by-Step Developer Guide: Building on `selfx/`
 
-Evaluated over seeds 1980/1981 under 5-second wall-clock observation arrivals:
+### 1. Adding a New Unit Test
+All unit tests reside in [`selfx/tests/`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/tests/). To add a new test verifying a custom invariant:
+```python
+# selfx/tests/test_custom_invariant.py
+import pytest
+from agent.safety import SafetyContext, check
 
-| Provider / Mode | Mean Time (s) | P95 Time (s) | Max Time (s) | Answered / Requests | Timeouts | 5s Deadline Misses |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Gemini / Previous (v3)** | 0.486 | 1.087 | 2.482 | 12 / 12 | 0 | 0 / 24 |
-| **Gemini / Bounded (v4)** | 0.487 | 1.511 | 1.765 | 10 / 10 | 0 | 0 / 24 |
-| **OpenRouter / Previous (v3)** | 0.524 | 2.094 | 2.466 | 3 / 8 | 0 | 0 / 24 |
-| **OpenRouter / Bounded (v4)** | 1.222 | 3.620 | 3.621 | 5 / 10 | 5 | 0 / 24 |
+def test_custom_rate_floor():
+    ctx = SafetyContext(action="rate_limit", target_flow_rate_kbps=8000, proposed_rate_limit_kbps=256)
+    result = check(ctx)
+    assert not result.allowed
+    assert "floor" in result.reason
+```
+Run tests with:
+```powershell
+Push-Location selfx; New-Item -ItemType Directory -Force -Path tmp; ..\selfx\.venv\Scripts\python.exe -m pytest tests/ -v; Pop-Location
+```
+
+### 2. Tuning Safety Guardrail Parameters
+Modify [`selfx/config.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/config.py):
+```python
+SAFETY_MAX_FLOW_DROP_PCT = 15      # Tighten throttling cap to 15%
+SAFETY_MAX_LINK_UTIL_PCT = 85      # Tighten projected link ceiling to 85%
+SAFETY_MIN_RATE_LIMIT_KBPS = 1024  # Raise minimum rate floor to 1 Mbps
+```
 
 ---
-
-## 🛠️ Reproduction & Verification Guide
-
-### 1. Environment Setup
-```powershell
-.\setup.ps1
-```
-Creates `.venv` using Python 3.12/3.13, installs pinned dependencies, and configures environment variables.
-
-### 2. Comprehensive Test & Benchmark Execution
-```powershell
-# Run all unit and integration tests
-.\run.ps1 test
-
-# Execute full primary benchmark suite (86,400 windows)
-.\run.ps1 benchmark
-
-# Execute real-provider latency pilots
-.\run.ps1 gemini
-.\run.ps1 openrouter
-
-# Start the interactive replay web dashboard
-.\run.ps1 dashboard -Port 8766
-```
-
-### 3. Submission Verification
-```powershell
-.\.venv\Scripts\python.exe -m scripts.verify_v4_submission
-```
-Recomputes all mathematical balances, checks SHA256 hashes of synthetic traffic and figure manifests, verifies zero credential leaks, and builds the submission ZIP.
+*Authored by Team SDN_07 — EC466: Software Defined Networks*

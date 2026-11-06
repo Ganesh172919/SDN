@@ -1,7 +1,8 @@
 # Revision 4 Benchmark Protocol and Comprehensive Empirical Results
 
 > **Rigorous Paired Network Evaluation across 86,400 Windows, 8 Scenarios, 9 Controllers, Process-Isolated Provider Timing, and Verified Arithmetic Repairs**  
-> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*
+> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*  
+> *Empirical Dataset: `selfx/output/benchmarks/v4/` | 10 Held-Out Seeds (1900–1909)*
 
 ---
 
@@ -15,74 +16,59 @@ The suite executes **86,400 controller windows** across **10 fresh held-out seed
 
 ---
 
-## 🧠 Comprehensive Mindmap Flows
-
-### 1. V4 Benchmark Suite Architecture Mindmap
+## 🎨 Colourful Architecture Mindmap
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1E88E5', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#F3F4F6'}}}%%
 flowchart TD
-    ROOT["Revision 4 Benchmark Suite"]
-    
-    ROOT --> SCENARIOS["1. 8 Traffic Scenarios"]
-    ROOT --> CONTROLLERS["2. 9 Evaluated Controllers"]
-    ROOT --> PROTOCOL["3. Evaluation Protocol"]
-    ROOT --> METRICS["4. Evaluated Metrics"]
-    ROOT --> STATISTICS["5. Bootstrap Statistics"]
-    ROOT --> PROVIDERS["6. Live Provider Latency"]
-    
-    SCENARIOS --> SC_MIX["Mixed Traffic (Standard Workload)"]
-    SCENARIOS --> SC_FLASH["Primary Flash Crowds"]
-    SCENARIOS --> SC_ALT["Alternate Busy (Path B Saturated)"]
-    SCENARIOS --> SC_SHIFT["Distribution Shift (Halfway Step)"]
-    SCENARIOS --> SC_DUAL["Dual Overload (Both Paths Saturated)"]
-    SCENARIOS --> SC_LIGHT["Light Load (Negative Control)"]
-    SCENARIOS --> SC_REC["Recurring Contexts (Repeated Archetypes)"]
-    SCENARIOS --> SC_VOL["Volatile Dynamics (High-Variance Noise)"]
-    
-    CONTROLLERS --> C_A0["A0: Static Primary Path (Default)"]
-    CONTROLLERS --> C_B1["B1: Greedy Least-Loaded Route"]
-    CONTROLLERS --> C_A2["A2: Original Embedding Memory"]
-    CONTROLLERS --> C_H1["H1: Guarded Heuristic (Fixed 20% Meter)"]
-    CONTROLLERS --> C_A3["A3: Guarded Balanced Memory"]
-    CONTROLLERS --> C_V3["V3: Revision 3 Adaptive Policy"]
-    CONTROLLERS --> C_H2["H2: Capacity-Aware Meter (No Memory)"]
-    CONTROLLERS --> C_A4["A4: Loss-Aware Parameter Memory"]
-    CONTROLLERS --> C_O2["O2: Privileged Immediate-Reward Oracle"]
-    
-    PROTOCOL --> PR_SEEDS["Held-Out Seeds: 1900 to 1909 (10 Seeds)"]
-    PROTOCOL --> PR_WINDOWS["120 Windows per Run (600 Simulated Seconds)"]
-    PROTOCOL --> PR_PARALLEL["Identical Offered Bytes across Conditions"]
-    PROTOCOL --> PR_REPAIR["Post-Run 1-kbps Floating Point Repair"]
-    
-    METRICS --> M_DELAY["Modeled Delay (ms, Weighted Queue Area + 8ms)"]
-    METRICS --> M_TPUT["Delivered Goodput (Mbps)"]
-    METRICS --> M_LOSS["Total Loss (%: Buffer Drops + Meter Drops)"]
-    METRICS --> M_REWARD["Normalized Composite Reward [-1.0, 1.0]"]
-    METRICS --> M_VETO["Safety Veto Count (Proposal Rejections)"]
-    
-    STATISTICS --> ST_SEED["Seed Means as Units of Inference"]
-    STATISTICS --> ST_BOOT["4,000-Draw Paired Seed Percentile Bootstrap"]
-    STATISTICS --> ST_CI["95% Confidence Intervals (RNG Seed 4099)"]
-```
+    classDef mainNode fill:#1E88E5,stroke:#0D47A1,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef scNode fill:#00897B,stroke:#004D40,stroke-width:2px,color:#ffffff;
+    classDef ctrlNode fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#ffffff;
+    classDef protoNode fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#ffffff;
+    classDef statNode fill:#3949AB,stroke:#1A237E,stroke-width:2px,color:#ffffff;
 
-### 2. Evaluated Controllers & Scientific Lineage Mindmap
-
-```
-+-- [SELF-X Controller Hierarchy & Scientific Lineage]
-    |-- Unmanaged & Classic Baselines
-    |   |-- A0 (Static Primary): Standard OpenFlow forwarding, port 2 default
-    |   `-- B1 (Greedy Least-Loaded): Reroutes whenever primary load > 10 Mbps
-    |-- Early Episodic Implementations
-    |   |-- A2 (Original Embedding): Reward-pruned JSON store, transparent state vector
-    |   `-- A3 (Guarded Balanced): Guarded base policy + recent/positive/negative records
-    |-- Revision 3 Adaptive Baseline
-    |   `-- V3 (Previous A4): Magnitude-preserving adaptive memory, fixed 20% meter cap
-    |-- Revision 4 Matched Ablation Core
-    |   |-- H1 (Guarded Fixed Meter): Fixed 20% cap (0.80 * elephant), no memory
-    |   |-- H2 (Capacity-Aware Heuristic): Capacity-aware meter, fixed 0.1M headroom, NO memory
-    |   `-- A4 (Loss-Aware Memory): Parameter-conditioned memory, learns headroom in {0.0, 0.1, 0.3}M
-    `-- Upper Reference Bound
-        `-- O2 (Privileged Immediate Oracle): Simulates all candidates before committing; not deployable
+    ROOT["Revision 4 Benchmark Suite"]:::mainNode
+    
+    ROOT --> SCENARIOS["1. 8 Traffic Scenarios"]:::scNode
+    ROOT --> CONTROLLERS["2. 9 Evaluated Controllers"]:::ctrlNode
+    ROOT --> PROTOCOL["3. Evaluation Protocol"]:::protoNode
+    ROOT --> METRICS["4. Evaluated Metrics"]:::mainNode
+    ROOT --> STATISTICS["5. Bootstrap Statistics"]:::statNode
+    ROOT --> PROVIDERS["6. Live Provider Latency"]:::mainNode
+    
+    SCENARIOS --> SC_MIX["Mixed Traffic (Standard Workload)"]:::scNode
+    SCENARIOS --> SC_FLASH["Primary Flash Crowds"]:::scNode
+    SCENARIOS --> SC_ALT["Alternate Busy (Path B Saturated)"]:::scNode
+    SCENARIOS --> SC_SHIFT["Distribution Shift (Halfway Step)"]:::scNode
+    SCENARIOS --> SC_DUAL["Dual Overload (Both Paths Saturated)"]:::scNode
+    SCENARIOS --> SC_LIGHT["Light Load (Negative Control)"]:::scNode
+    SCENARIOS --> SC_REC["Recurring Contexts (Repeated Archetypes)"]:::scNode
+    SCENARIOS --> SC_VOL["Volatile Dynamics (High-Variance Noise)"]:::scNode
+    
+    CONTROLLERS --> C_A0["A0: Static Primary Path (Default)"]:::ctrlNode
+    CONTROLLERS --> C_B1["B1: Greedy Least-Loaded Route"]:::ctrlNode
+    CONTROLLERS --> C_A2["A2: Original Embedding Memory"]:::ctrlNode
+    CONTROLLERS --> C_H1["H1: Guarded Heuristic (Fixed 20% Meter)"]:::ctrlNode
+    CONTROLLERS --> C_A3["A3: Guarded Balanced Memory"]:::ctrlNode
+    CONTROLLERS --> C_V3["V3: Revision 3 Adaptive Policy"]:::ctrlNode
+    CONTROLLERS --> C_H2["H2: Capacity-Aware Meter (No Memory)"]:::ctrlNode
+    CONTROLLERS --> C_A4["A4: Loss-Aware Parameter Memory"]:::ctrlNode
+    CONTROLLERS --> C_O2["O2: Privileged Immediate-Reward Oracle"]:::ctrlNode
+    
+    PROTOCOL --> PR_SEEDS["Held-Out Seeds: 1900 to 1909 (10 Seeds)"]:::protoNode
+    PROTOCOL --> PR_WINDOWS["120 Windows per Run (600 Simulated Seconds)"]:::protoNode
+    PROTOCOL --> PR_PARALLEL["Identical Offered Bytes across Conditions"]:::protoNode
+    PROTOCOL --> PR_REPAIR["Post-Run 1-kbps Floating Point Repair"]:::protoNode
+    
+    METRICS --> M_DELAY["Modeled Delay (ms, Weighted Queue Area + 8ms)"]:::mainNode
+    METRICS --> M_TPUT["Delivered Goodput (Mbps)"]:::mainNode
+    METRICS --> M_LOSS["Total Loss (%: Buffer Drops + Meter Drops)"]:::mainNode
+    METRICS --> M_REWARD["Normalized Composite Reward [-1.0, 1.0]"]:::mainNode
+    METRICS --> M_VETO["Safety Veto Count (Proposal Rejections)"]:::mainNode
+    
+    STATISTICS --> ST_SEED["Seed Means as Units of Inference"]:::statNode
+    STATISTICS --> ST_BOOT["4,000-Draw Paired Seed Percentile Bootstrap"]:::statNode
+    STATISTICS --> ST_CI["95% Confidence Intervals (RNG Seed 4099)"]:::statNode
 ```
 
 ---
@@ -160,22 +146,6 @@ flowchart TD
 +--------------------------------------------------------------------------------------------------+
 ```
 
-### 3. Realtime Pooled-Worker 5-Second Wall-Clock Flow
-
-```
-Wall-Clock Time:  0s             5s             10s            15s            20s
-Schedule Ticks:   T=0s           T=5s           T=10s          T=15s          T=20s
-----------------------------------------------------------------------------------------------------
-Idle Observation: [Wait 0.0s]    [Wait 2.9s]    [Wait 3.1s]    [Wait 1.2s]    [Wait 3.4s]
-Work Window:      |== Work ==|   |== Work ==|   |== Work ==|   |== Work ==|   |== Work ==|
-Elapsed Work:     2.10 s         1.88 s         3.78 s         1.56 s         1.42 s
-Deadline Limit:   [< 5.0s OK]    [< 5.0s OK]    [< 5.0s OK]    [< 5.0s OK]    [< 5.0s OK]
-----------------------------------------------------------------------------------------------------
-Worker State:     [Active]       [Active]       [Active]       [Active]       [Active]
-Session Pooling:  Reuse HTTPS    Reuse HTTPS    Reuse HTTPS    Reuse HTTPS    Reuse HTTPS
-Missed Deadlines: 0 / 24         0 / 24         0 / 24         0 / 24         0 / 24
-```
-
 ---
 
 ## 📊 Comprehensive Empirical Results
@@ -227,3 +197,20 @@ Evaluated over held-out seeds 1980/1981 under 5-second wall-clock observation pa
 ### Pipeline Highlights
 - **Subprocess Worker Reuse**: Child processes remain idle between completed calls, reusing existing HTTPS connection pools and saving up to $1.2\text{ s}$ of TLS handshake latency.
 - **Strict Budget**: All requests exceeding the 3.8-second wait budget are terminated cleanly, guaranteeing zero 5-second control deadline misses.
+
+---
+
+## 💻 Reproduction Commands
+
+Run the full benchmark suite across all scenarios:
+```powershell
+.\selfx\.venv\Scripts\python.exe selfx/eval/run_v4_benchmarks.py --all-scenarios
+```
+
+Run non-parametric paired bootstrap resampling:
+```powershell
+.\selfx\.venv\Scripts\python.exe selfx/eval/paired_bootstrap_resampling.py --draws 4000
+```
+
+---
+*Authored by Team SDN_07 — EC466: Software Defined Networks*

@@ -30,8 +30,8 @@ def parse_json(text: str) -> dict:
 class RestLLM:
     _last_request: dict[str, float] = {}
     def __init__(self, provider: str = "auto", model: str | None = None, profile: str = "legacy"):
-        if provider not in {"auto", "gemini", "openrouter"}:
-            raise ValueError("provider must be auto, gemini or openrouter")
+        if provider not in {"auto", "gemini", "openrouter", "local_lora"}:
+            raise ValueError("provider must be auto, gemini, openrouter or local_lora")
         self.provider, self.model = provider, model
         if profile not in {'legacy','compact'}:raise ValueError('unknown provider profile')
         self.profile=profile
@@ -39,11 +39,32 @@ class RestLLM:
         self.request_stats={}
         self.audit: list[dict] = []
         self.failures: dict[str, int] = {}
+        self._local = None
 
     def with_structured_output(self, schema):
         return SimpleNamespace(invoke=lambda messages: self._invoke(schema, messages))
 
     def _invoke(self, schema, messages):
+        if self.provider == "local_lora":
+            start = time.perf_counter()
+            record = {"provider": "local_lora", "schema": schema.__name__, "network_request": False}
+            try:
+                if self._local is None:
+                    from agent.self_improvement.runtime import LocalAdapterLLM
+                    registry = self.model or os.environ.get("SDN_LORA_REGISTRY")
+                    if not registry:
+                        raise ProviderError("missing_local_adapter_registry")
+                    self._local = LocalAdapterLLM(registry)
+                result = self._local.invoke(schema, messages)
+                event = self._local.policy.last_event
+                record.update(status="error" if event.get("error_code") else "ok", **event)
+                return result
+            except Exception as exc:
+                record.update(status="error", error_code=type(exc).__name__)
+                raise ProviderError("local_adapter_unavailable") from exc
+            finally:
+                record["elapsed_ms"] = round(1000*(time.perf_counter()-start),2)
+                self.audit.append(record)
         schema_prompt = "\nReturn one JSON object matching this schema: " + json.dumps(schema.model_json_schema(),separators=(',',':') if self.profile=='compact' else None)
         augmented = [dict(m) for m in messages]
         augmented[-1]["content"] += schema_prompt

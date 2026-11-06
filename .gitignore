@@ -1,12 +1,59 @@
 # Environment variables and secrets
 .env
 .env.*
+*.env
+.envrc
+.envrc.*
 !.env.example
+!.env.*.example
+.secrets/
+secrets/
+credentials/
+credentials.json
+*credentials*.json
+client_secret*.json
+service-account*.json
+service_account*.json
+token.json
+token.pickle
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+.netrc
+.npmrc
+.pypirc
+.ssh/
+.aws/
+.azure/
+.config/gcloud/
+cookies*.json
+*.har
+
+# Codex local state and generated working directories
+.codex/
+.codex-*/
+codex-build/
+codex_build/
+codex-output/
+codex_output/
 
 # Python virtual environments
 .venv/
 venv/
 env/
+.deps/
+node_modules/
+.eggs/
+*.egg-info/
+.tox/
+.nox/
 
 # Python cache
 __pycache__/
@@ -17,6 +64,11 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+.coverage.*
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
 
 # Logs
 *.log
@@ -24,6 +76,32 @@ htmlcov/
 # Generated temporary files
 *.tmp
 *.bak
+tmp/
+temp/
+.tmp/
+.cache/
+build/
+dist/
+output/
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+
+# Downloaded models, fitted weights and captured network traffic
+.models/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.gguf
+pytorch_model*.bin
+adapter_model.bin
+*.pcap
+*.pcapng
 
 # Generated presentations
 *.pptx
@@ -35,6 +113,10 @@ selfx/scripts/*docs*.py
 
 # New Markdown documentation
 *.md
+!selfx/docs/SELF_IMPROVEMENT.md
+!selfx/docs/GANESH_TASK_COMPLETION.md
+!selfx/docs/GANESH_SUBMISSION_README.md
+!selfx/docs/GANESH_SUBMISSION_AND_DEMO.md
 
 # OS files
 .DS_Store

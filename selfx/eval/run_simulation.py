@@ -33,6 +33,8 @@ def local_path(path: str | Path) -> Path:
 
 
 def run_condition(condition, trace, seed, provider, out_dir, model=None):
+    if provider == "local_lora" and condition == "A4":
+        raise ValueError("local_lora uses the structured A1/A2 backend")
     net = FluidNetwork()
     memory_cls=AdaptiveMemory if condition=='A4' else MemoryStore
     memory = memory_cls(str(out_dir / f"{condition}_{seed}_memory.json"), enabled=condition in {"A2","A4"},autosave=condition!='A4')
@@ -65,6 +67,10 @@ def run_condition(condition, trace, seed, provider, out_dir, model=None):
                         if not decision.is_well_formed():
                             raise ValueError("malformed_decision")
                         origin, error = "api", ""
+                        if provider == "local_lora":
+                            event = llm.audit[-1]
+                            origin = event.get("origin", "local_lora")
+                            error = event.get("error_code", "")
                         break
                     except Exception as exc:
                         error = str(exc) if type(exc).__name__ == "ProviderError" else type(exc).__name__
@@ -79,10 +85,12 @@ def run_condition(condition, trace, seed, provider, out_dir, model=None):
         reward = compute_reward(before.metrics(), outcome.metrics()).reward
         reflection_origin = "deterministic"
         reflection = f"{installed.action} changed modeled latency by {outcome.latency_ms - before.latency_ms:.2f} ms and total loss by {outcome.loss_pct - before.loss_pct:.2f} percentage points; reward {reward:.4f}."
-        if llm and origin == "api" and condition!='A4':
+        if llm and origin in {"api", "local_lora", "local_base"} and condition!='A4':
             try:
                 reflected = llm.with_structured_output(ReflectionOutput).invoke(prompts.build_reflect_messages(summary, installed.action, decision.model_dump(), outcome.metrics().__dict__, reward))
                 reflection, reflection_origin = reflected.reflection, "api"
+                if provider == "local_lora":
+                    reflection_origin = "deterministic_local_reflection"
             except Exception:
                 reflection_origin = "deterministic_after_api_failure"
         memory.add_record(cycle, summary, installed.action, installed.model_dump(), reward, reflection)
@@ -122,7 +130,7 @@ def summarize(rows, seeds, provider, cycles, hashes, elapsed):
                              **{k: mean(r[k] for r in selected) for k in ("latency_ms", "throughput_kbps", "loss_pct", "reward", "control_elapsed_ms")},
                              "pooled_loss_pct": 100 * sum(r["dropped_mbit"] for r in selected) / sum(r["offered_mbit"] for r in selected),
                              "safety_vetoes": sum(not r["safety_allowed"] for r in selected),
-                             "fallback_windows": sum(r["decision_origin"] in {"fallback_no_op","fallback_heuristic","deadline_fallback","provider_fallback","validation_fallback"} for r in selected),
+                             "fallback_windows": sum(r["decision_origin"] in {"fallback_no_op","fallback_heuristic","deadline_fallback","provider_fallback","validation_fallback","local_lora_fail_closed"} for r in selected),
                              "decision_origins":dict(Counter(r['decision_origin'] for r in selected)),
                              "api_decision_windows": sum(r["decision_origin"] == "api" for r in selected),
                              "api_reflection_windows": sum(r["reflection_origin"] == "api" for r in selected),
@@ -156,13 +164,15 @@ def summarize(rows, seeds, provider, cycles, hashes, elapsed):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--provider", choices=["offline", "auto", "gemini", "openrouter"], default="offline")
+    parser.add_argument("--provider", choices=["offline", "auto", "gemini", "openrouter", "local_lora"], default="offline")
     parser.add_argument("--model")
     parser.add_argument("--cycles", type=int, default=120)
     parser.add_argument("--seeds", nargs="+", type=int, default=[1729, 1730, 1731, 1732, 1733])
     parser.add_argument("--conditions", nargs="+", choices=list(LABELS), default=list(LABELS))
     parser.add_argument("--out-dir", default=str(config.PROJECT_ROOT / "output" / "experiments" / "adaptive"))
     args = parser.parse_args()
+    if args.provider == "local_lora" and "A4" in args.conditions:
+        parser.error("local_lora uses the structured A1/A2 path; select --conditions A0 A1 A2")
     if args.cycles < 1 or args.cycles > 10000 or len(set(args.seeds)) != len(args.seeds) or "A0" not in args.conditions:
         parser.error("use 1..10000 cycles, unique seeds, and include A0")
     out = local_path(args.out_dir)

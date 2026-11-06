@@ -14,7 +14,7 @@ from pypdf import PdfReader
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"output"
 FINAL=OUT/"submission"
-EXCLUDE={".deps",".venv","__pycache__",".pytest_cache","tmp",".git","history","builds"}
+EXCLUDE={".deps",".venv",".models","__pycache__",".pytest_cache","tmp",".git","history","builds"}
 SECRET=re.compile(rb"sk-or-v1-[A-Za-z0-9]{30,}|AQ\.[A-Za-z0-9_-]{30,}|AIza[A-Za-z0-9_-]{25,}|sk-ant-[A-Za-z0-9_-]{20,}")
 
 

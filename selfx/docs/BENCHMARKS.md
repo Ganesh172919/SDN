@@ -1,76 +1,123 @@
-# Revision 2 Enhanced Benchmarks and Visualization Guide
+# Revision 2 Enhanced Benchmarks and Retrospective Specification
 
-> **Empirical Architecture for Transparent Numeric State Embeddings, ECMP Flow Hashing, and Feasibility-Guarded Retrieval**  
+> **Empirical Architecture for Transparent Numeric State Embeddings, ECMP Flow Hashing, Feasibility-Guarded Retrieval, Implementation Code Snippets, and Historical Lineage**  
 > *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*
 
 ---
 
-## 📌 Executive Overview
+## 📌 Executive Overview & Research Lineage
 
-The **Revision 2 Benchmark Suite** evaluates 57,600 analytical simulation windows across 6 traffic scenarios, 10 paired seeds (1740 to 1749), and 8 controllers. It established the initial foundation for transparent numeric state embeddings, cosine similarity episodic retrieval, and deterministic safety validation within the SELF-X project.
+The **Revision 2 Benchmark Suite** represents the historical foundation of the SELF-X empirical framework. It evaluated 57,600 analytical simulation windows across 6 distinct traffic scenarios, 10 paired seeds (1740 to 1749), and 8 controller configurations.
+
+Revision 2 introduced three fundamental architectural concepts:
+1. **Deterministic Numeric State Embeddings**: Replaced opaque vector embeddings with a transparent 4-element L2-normalized feature vector derived directly from telemetry counters.
+2. **Deterministic Cosine Similarity Retrieval**: Filtered past episodic transitions using a high-precision cosine cutoff ($S \ge 0.985$) with exponential distance sharpening ($S^{12}$).
+3. **Safety Gate Arbitration**: Demonstrated why open-loop LLM proposals and static ECMP hashing fail without downstream physical invariant checking.
 
 ---
 
-## 🧠 Comprehensive Mindmap Flows
+## 🧠 Colourful Benchmark Mindmaps
 
-### 1. Revision 2 Benchmark Architecture Mindmap
+### 1. Revision 2 Architectural Mindmap
+
+```mermaid
+mindmap
+  root((Revision 2 Architecture))
+    :::r2Root
+    Evaluated Scenarios
+      :::scenStyle
+      Mixed Traffic
+      Primary Flash Crowds
+      Alternate Busy
+      Halfway Distribution Shift
+      Dual Link Overload
+      Light Load Baseline
+    Evaluated Controllers
+      :::ctrlStyle
+      A0 Static Primary
+      B1 Least-Loaded Path
+      B2 Stable Flow-Hash ECMP
+      A1 Threshold No-Memory
+      A2 Reward-Pruned Memory
+      H1 Guarded Heuristic
+      A3 Guarded Balanced Memory
+      O1 Privileged Oracle
+    Numeric State Embedding
+      :::embStyle
+      Telemetry Features
+        Latency ms / 50.0
+        Throughput kbps / 10000.0
+        Loss Pct / 20.0
+      Bias Term Constant 0.1
+      L2 Euclidean Unit Norm
+      Cosine Dot Product
+    Episodic Memory Store
+      :::memStyle
+      Flat JSON Serialization
+      Capacity Ceiling 30 Records
+      Exponential Weighting S^12
+      Feasibility Pre-Filter
+
+classDef r2Root fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
+classDef scenStyle fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
+classDef ctrlStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
+classDef embStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
+classDef memStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
+```
+
+---
+
+### 2. State Embedding & Memory Ranking Pipeline
 
 ```mermaid
 flowchart TD
-    ROOT["Revision 2 Benchmark Architecture"]
-    
-    ROOT --> SCENARIOS["1. 6 Evaluated Scenarios"]
-    ROOT --> CONTROLLERS["2. 8 Evaluated Controllers"]
-    ROOT --> EMBEDDING["3. Numeric State Embedding"]
-    ROOT --> MEMORY["4. Episodic Memory Store"]
-    ROOT --> FIGURES["5. Benchmark Figure Suite"]
-    
-    SCENARIOS --> SC_MIX["Mixed Traffic"]
-    SCENARIOS --> SC_FLASH["Primary Flash Crowds"]
-    SCENARIOS --> SC_ALT["Alternate Busy"]
-    SCENARIOS --> SC_SHIFT["Halfway Distribution Shift"]
-    SCENARIOS --> SC_DUAL["Dual Overload"]
-    SCENARIOS --> SC_LIGHT["Light Load (Control)"]
-    
-    CONTROLLERS --> C_A0["A0: Static Primary"]
-    CONTROLLERS --> C_B1["B1: Feasible Least-Loaded"]
-    CONTROLLERS --> C_B2["B2: Stable Flow-Hash ECMP"]
-    CONTROLLERS --> C_A1["A1: Threshold without Memory"]
-    CONTROLLERS --> C_A2["A2: Reward-Pruned Embedding Memory"]
-    CONTROLLERS --> C_H1["H1: Guarded Heuristic"]
-    CONTROLLERS --> C_A3["A3: Guarded Balanced Memory"]
-    CONTROLLERS --> C_O1["O1: Privileged Immediate Oracle"]
-    
-    EMBEDDING --> EMB_VEC["State Vector: [Latency/50, Tput/10000, Loss/20, 0.1]"]
-    EMBEDDING --> EMB_NORM["L2 Unit Normalization: v / ||v||"]
-    EMBEDDING --> EMB_COS["Cosine Similarity: dot(q, v) >= 0.985"]
-    
-    MEMORY --> MEM_TOP["Flat JSON Store (Max 30 records)"]
-    MEMORY --> MEM_PRUNE["Reward Pruning (Lowest Reward Dropped)"]
-    MEMORY --> MEM_BAL["Balanced Selection: Recent + Top + Bottom"]
-    
-    FIGURES --> FIG_HEAT["Queue Shift Heatmap"]
-    FIGURES --> FIG_ECDF["Empirical Delay & Loss Distributions"]
-    FIGURES --> FIG_VETO["Action & Veto Breakdown"]
-```
+    classDef rawNode fill:#1E88E5,stroke:#0D47A1,stroke-width:2px,color:#FFFFFF;
+    classDef normNode fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
+    classDef compNode fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
+    classDef outNode fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 
-### 2. State Embedding & Memory Ranking Mindmap
+    subgraph TELEMETRY ["1. Telemetry Counters"]
+        T1["Latency: latency_ms"]:::rawNode
+        T2["Throughput: throughput_kbps"]:::rawNode
+        T3["Packet Loss: loss_pct"]:::rawNode
+    end
 
-```
-+-- [Revision 2 State Embedding & Memory Ranking Mindmap]
-    |-- Transparent State Vector Construction
-    |   |-- Feature 1: Normalized latency proxy (latency_ms / 50.0)
-    |   |-- Feature 2: Normalized network throughput (throughput_kbps / 10000.0)
-    |   |-- Feature 3: Normalized packet loss (loss_pct / 20.0)
-    |   `-- Bias Term: Constant 0.1 float to prevent zero-vector division
-    |-- Metric Similarity Calculation
-    |   |-- L2 Euclidean Normalization: ||v|| = sqrt(sum(v_i^2))
-    |   |-- Dot-Product Cosine Similarity: S(a, b) = sum(a_i * b_i)
-    |   `-- High-Confidence Threshold: Cosine similarity >= 0.985
-    `-- Episodic Memory Storage & Retrieval
-        |-- Storage Model: 30-entry flat JSON file
-        |-- Ranking: Exponential weighting S^12 favors nearest neighbors
-        `-- Feasibility Filter: Infeasible past proposals discarded before installation
+    subgraph NORMALIZATION ["2. Feature Normalization & Unit Embedding"]
+        F1["v0 = latency_ms / 50.0"]:::normNode
+        F2["v1 = throughput_kbps / 10000.0"]:::normNode
+        F3["v2 = loss_pct / 20.0"]:::normNode
+        F4["v3 = 0.1 (Bias Constant)"]:::normNode
+        L2["Norm: ||v|| = sqrt(sum(vi^2))"]:::normNode
+        UNIT["Unit Vector: u = v / ||v||"]:::normNode
+        T1 --> F1
+        T2 --> F2
+        T3 --> F3
+        F1 --> L2
+        F2 --> L2
+        F3 --> L2
+        F4 --> L2
+        L2 --> UNIT
+    end
+
+    subgraph RETRIEVAL ["3. Cosine Retrieval & Kernel Sharpening"]
+        STORE[("30-Record Episodic Store<br/>agent_memory.json")]:::compNode
+        COS["Dot Product: S = dot(u, u_stored)"]:::compNode
+        THRESH{"S >= 0.985 ?"}:::compNode
+        WEIGHT["Sharpening: W = S^12"]:::compNode
+        FEAS{"Feasible in Current State?"}:::compNode
+        UNIT --> COS
+        STORE --> COS
+        COS --> THRESH
+        THRESH -- Yes --> WEIGHT
+        WEIGHT --> FEAS
+    end
+
+    subgraph SELECTION ["4. Candidate Proposal"]
+        ACTION["Install Stored Action & Rebuild Parameters"]:::outNode
+        FEAS -- Pass --> ACTION
+        FEAS -- Fail --> FALLBACK["Guarded Heuristic Fallback"]:::outNode
+        THRESH -- No --> FALLBACK
+    end
 ```
 
 ---
@@ -107,6 +154,8 @@ Raw Network Counters: [ Latency: 24.5 ms, Throughput: 8500 kbps, Loss: 4.2% ]
      +--------------------------------------------------------------+
 ```
 
+---
+
 ### 2. B2 Stable ECMP Hashing vs Dynamic Safety Gate Flow
 
 ```
@@ -141,24 +190,106 @@ Incoming Packet Flow: [ IPv4 Src: 10.0.0.1, Dst: 10.0.0.8, Protocol: UDP ]
 
 ---
 
-## 📊 Measured Empirical Results (Revision 2 Suite)
+## 💻 Core Implementation Code Walkthrough
 
-Evaluated across seeds 1740–1749 over 6 traffic scenarios:
+### 1. Transparent Embedding Engine ([`agent/embedding.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/embedding.py))
 
-| Controller ID | Method Label | Delay (ms) | Goodput (Mbps) | Total Loss (%) | Vetoes |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **A0** | Static Primary Path | 26.003 | 12.904 | 8.162 | 0 |
-| **B1** | Feasible Least-Loaded Path | 20.611 | 13.058 | 6.986 | 0 |
-| **B2** | Stable Flow-Hash ECMP | 23.227 | 12.983 | 7.561 | 2585 |
-| **A1** | Original Threshold (No Memory) | 17.062 | 12.902 | 7.913 | 0 |
-| **A2** | Original Reward-Pruned Memory | 17.554 | 12.848 | 8.349 | 347 |
-| **H1** | Guarded Heuristic | 17.154 | 12.990 | 7.382 | 0 |
-| **A3** | Guarded Balanced Memory | 17.341 | 12.974 | 7.510 | 0 |
-| **O1** | Privileged Myopic Oracle | 17.204 | 13.001 | 7.322 | 0 |
+```python
+# File: selfx/agent/embedding.py
+import math
+
+def embed_state(state: dict) -> list[float]:
+    """Compute transparent L2-normalized embedding vector without neural networks."""
+    if "embedding_features" in state:
+        values = state["embedding_features"]
+    else:
+        values = [
+            state.get("latency_ms", 0.0) / 50.0,
+            state.get("throughput_kbps", 0.0) / 10000.0,
+            state.get("loss_pct", 0.0) / 20.0,
+        ]
+    # Append constant bias to prevent division by zero on idle states
+    vector = [float(v) for v in values] + [0.1]
+    
+    if not all(math.isfinite(v) for v in vector):
+        raise ValueError("embedding features must be finite")
+        
+    norm = math.sqrt(sum(v * v for v in vector))
+    return [v / norm for v in vector]
+
+def cosine(a: list[float], b: list[float]) -> float:
+    """Compute dot product cosine similarity between two unit vectors."""
+    return sum(x * y for x, y in zip(a, b)) if len(a) == len(b) else 0.0
+```
 
 ---
 
-## 🔍 Key Findings from Revision 2
-1. **Elimination of Infeasible Proposals**: Adding the deterministic feasibility guard in `A3` completely eliminated the 347 safety vetoes observed in `A2`.
-2. **ECMP Brittleness**: Static hash-based routing (`B2`) triggered 2,585 safety vetoes due to hash collisions overloading the alternate link.
-3. **Absence of Memory Advantage**: Across the 6 scenarios, `A3` did not establish a statistically significant advantage over the no-memory baseline `H1`, establishing the research imperative for parameter-conditioned memory in Revision 4.
+### 2. Balanced Episodic Memory Selection ([`agent/memory.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/memory.py))
+
+```python
+# File: selfx/agent/memory.py
+def prune_and_balance_memory(records: list[dict], max_entries: int = 30) -> list[dict]:
+    """Maintain balanced memory store preserving recency, highest rewards, and failures."""
+    if len(records) <= max_entries:
+        return records
+
+    # Sort by reward descending
+    sorted_by_reward = sorted(records, key=lambda r: r["reward"], reverse=True)
+    
+    # 10 highest reward episodes (successful adaptations)
+    top_positives = sorted_by_reward[:10]
+    
+    # 5 lowest reward episodes (instructive negative examples)
+    negatives = sorted_by_reward[-5:]
+    
+    # 15 most recent episodes (temporal locality)
+    recent = sorted(records, key=lambda r: r["cycle"], reverse=True)[:15]
+    
+    # Merge and deduplicate by cycle ID
+    seen_cycles = set()
+    balanced = []
+    for ep in top_positives + negatives + recent:
+        if ep["cycle"] not in seen_cycles:
+            seen_cycles.add(ep["cycle"])
+            balanced.append(ep)
+            
+    return balanced[:max_entries]
+```
+
+---
+
+## 📊 Measured Empirical Results (Revision 2 Suite)
+
+The table below summarizes the 57,600 simulation windows evaluated across seeds 1740–1749:
+
+| Controller ID | Method Label | Delay (ms) | Goodput (Mbps) | Total Loss (%) | Vetoes | Key Finding |
+| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| **A0** | Static Primary Path | 26.003 | 12.904 | 8.162 | 0 | Unmanaged negative baseline |
+| **B1** | Feasible Least-Loaded Path | 20.611 | 13.058 | 6.986 | 0 | Standard SDN greedy rerouting |
+| **B2** | Stable Flow-Hash ECMP | 23.227 | 12.983 | 7.561 | 2,585 | Hash collisions cause frequent vetoes |
+| **A1** | Original Threshold (No Memory) | 17.062 | 12.902 | 7.913 | 0 | Reactive thresholding without memory |
+| **A2** | Original Reward-Pruned Memory | 17.554 | 12.848 | 8.349 | 347 | Unchecked memory installs infeasible actions |
+| **H1** | Guarded Heuristic | 17.154 | 12.990 | 7.382 | 0 | Fixed 20% rate-limiting baseline |
+| **A3** | Guarded Balanced Memory | 17.341 | 12.974 | 7.510 | 0 | Feasibility filter eliminates all vetoes |
+| **O1** | Privileged Myopic Oracle | 17.204 | 13.001 | 7.322 | 0 | Single-window counterfactual ceiling |
+
+---
+
+## 🔍 Key Findings & Architectural Evolution
+
+1. **Elimination of Infeasible Proposals**:  
+   Adding the deterministic feasibility check in `A3` completely eliminated the 347 safety vetoes observed in `A2`. When an episodic record suggested an action that would violate capacity in the current network state, it was rejected before submission to OpenFlow.
+2. **ECMP Brittleness**:  
+   Static hash-based routing (`B2`) triggered 2,585 safety vetoes due to hash collisions overloading the alternate link.
+3. **Absence of Memory Advantage**:  
+   Across the 6 scenarios, `A3` did not establish a statistically significant advantage over the no-memory baseline `H1`. This crucial finding motivated the transition to **magnitude-preserving contexts in Revision 3** and **parameter-conditioned loss-aware memory in Revision 4**.
+
+---
+
+## 🔗 Cross-Reference Navigation
+
+- **Master Portal**: [`README.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/README.md)
+- **Revision 3 Guide**: [`selfx/docs/BENCHMARKS_V3.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/BENCHMARKS_V3.md)
+- **Revision 4 Specification**: [`selfx/docs/BENCHMARKS_V4.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/BENCHMARKS_V4.md)
+- **Experimental Formulations**: [`selfx/docs/EXPERIMENTS.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/EXPERIMENTS.md)
+- **Evaluator Handbook**: [`selfx/docs/PROJECT_GUIDE.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/PROJECT_GUIDE.md)
