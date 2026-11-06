@@ -527,4 +527,4 @@ python Web/server.py
 - **Course:** EC466 — Software Defined Networks
 - **Institution:** Indian Institute of Information Technology (IIIT) Dharwad
 - **Team ID:** SDN_07 (SELF-X Project)
-- **Academic Session:** Autumn 2026
+- **Academic Session:**  2026
