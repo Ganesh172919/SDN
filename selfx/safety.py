@@ -17,6 +17,8 @@ Two concrete rules, both named directly in the spec:
 no_op is always safe by construction.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 import config

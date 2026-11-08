@@ -63,6 +63,10 @@ PORT = int(os.environ.get("SDN_WEB_PORT", 5000))
 RYU_BASE_URL = os.environ.get("RYU_REST_BASE", "http://127.0.0.1:8080")
 RESULTS_ROOT = Path(os.environ.get("SELFX_RESULTS_ROOT", Path(PROJECT_ROOT) / "results")).resolve()
 BENCHMARKS_V4_SUMMARY = (Path(PROJECT_ROOT) / "selfx" / "output" / "benchmarks" / "v4" / "summary.json").resolve()
+TABLE2_SUMMARY_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "ablation_table2" / "table2_ablation_summary.json").resolve()
+TABLE5_SUMMARY_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "baseline_table5" / "table5_comparison_summary.json").resolve()
+DPP_ACCEPTANCE_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "dpp_validation" / "dpp_acceptance_summary.json").resolve()
+TRANSFER_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "transfer_evaluation" / "zero_shot_transfer_report.json").resolve()
 EXPERIMENTS_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "experiments").resolve()
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
@@ -104,6 +108,26 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         # API: Real Ablation Benchmark Logs (A0 vs A1 vs A2 CSVs)
         if path == '/api/ablation':
             self.handle_ablation()
+            return
+
+        # API: Table 2 6-stage ablation (A0..A5)
+        if path == '/api/ablation/table2':
+            self.handle_ablation_table2()
+            return
+
+        # API: Table 5 baseline comparison matrix
+        if path == '/api/benchmarks/table5':
+            self.handle_benchmarks_table5()
+            return
+
+        # API: DPP formal bound acceptance
+        if path == '/api/dpp/acceptance':
+            self.handle_dpp_acceptance()
+            return
+
+        # API: Zero-shot transfer evaluation
+        if path == '/api/transfer':
+            self.handle_transfer()
             return
 
         if path == '/api/results':
@@ -203,9 +227,57 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "team": "SDN_07",
             "testbed_mode": "live" if ryu_online else "offline",
             "testbed_message": "Live Ryu controller connected." if ryu_online else "Live testbed disconnected. No live packet measurements currently available.",
-            "benchmarks_available": BENCHMARKS_V4_SUMMARY.is_file()
+            "benchmarks_available": BENCHMARKS_V4_SUMMARY.is_file(),
+            "table2_available": TABLE2_SUMMARY_PATH.is_file(),
+            "table5_available": TABLE5_SUMMARY_PATH.is_file(),
+            "dpp_acceptance_available": DPP_ACCEPTANCE_PATH.is_file(),
+            "transfer_available": TRANSFER_PATH.is_file()
         }
         self.send_json(200, data)
+
+    def handle_ablation_table2(self):
+        if not TABLE2_SUMMARY_PATH.is_file():
+            self.send_json(404, {"error": "Table 2 ablation summary not found", "available": False})
+            return
+        try:
+            with open(TABLE2_SUMMARY_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load Table 2 summary: {str(e)}"})
+
+    def handle_benchmarks_table5(self):
+        if not TABLE5_SUMMARY_PATH.is_file():
+            self.send_json(404, {"error": "Table 5 benchmark summary not found", "available": False})
+            return
+        try:
+            with open(TABLE5_SUMMARY_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load Table 5 summary: {str(e)}"})
+
+    def handle_dpp_acceptance(self):
+        if not DPP_ACCEPTANCE_PATH.is_file():
+            self.send_json(404, {"error": "DPP acceptance summary not found", "available": False})
+            return
+        try:
+            with open(DPP_ACCEPTANCE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load DPP acceptance summary: {str(e)}"})
+
+    def handle_transfer(self):
+        if not TRANSFER_PATH.is_file():
+            self.send_json(404, {"error": "Zero-shot transfer report not found", "available": False})
+            return
+        try:
+            with open(TRANSFER_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load zero-shot transfer report: {str(e)}"})
 
     def handle_benchmarks_summary(self):
         if not BENCHMARKS_V4_SUMMARY.is_file():

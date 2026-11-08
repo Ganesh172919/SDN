@@ -1,0 +1,164 @@
+{
+  "id": "linear",
+  "name": "Linear 4-Switch Dual-Core Bottleneck Topology",
+  "category": "training_and_benchmark",
+  "switch_count": 4,
+  "host_count": 8,
+  "switches": [
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "hosts": [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "h7",
+    "h8"
+  ],
+  "links": [
+    {
+      "src": "h1",
+      "dst": "s1",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h2",
+      "dst": "s1",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h3",
+      "dst": "s2",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h4",
+      "dst": "s2",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h5",
+      "dst": "s3",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h6",
+      "dst": "s3",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h7",
+      "dst": "s4",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "h8",
+      "dst": "s4",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "loss_pct": 0.0,
+      "type": "access"
+    },
+    {
+      "src": "s1",
+      "dst": "s2",
+      "bw_mbps": 20,
+      "delay_ms": 2,
+      "loss_pct": 0.0,
+      "type": "trunk"
+    },
+    {
+      "src": "s3",
+      "dst": "s4",
+      "bw_mbps": 20,
+      "delay_ms": 2,
+      "loss_pct": 0.0,
+      "type": "trunk"
+    },
+    {
+      "src": "s2",
+      "dst": "s3",
+      "src_port": 3,
+      "dst_port": 3,
+      "bw_mbps": 10,
+      "delay_ms": 2,
+      "loss_pct": 0.0,
+      "max_queue": 40,
+      "name": "primary_bottleneck",
+      "type": "core_bottleneck"
+    },
+    {
+      "src": "s2",
+      "dst": "s3",
+      "src_port": 4,
+      "dst_port": 4,
+      "bw_mbps": 10,
+      "delay_ms": 12,
+      "loss_pct": 0.0,
+      "max_queue": 40,
+      "name": "secondary_reroute",
+      "type": "core_bottleneck"
+    }
+  ],
+  "core_bottlenecks": [
+    {
+      "path": "s2:3-s3:3",
+      "bw_mbps": 10,
+      "delay_ms": 2,
+      "role": "primary"
+    },
+    {
+      "path": "s2:4-s3:4",
+      "bw_mbps": 10,
+      "delay_ms": 12,
+      "role": "secondary"
+    }
+  ],
+  "default_routes": {
+    "h1->h7": [
+      "s1",
+      "s2:3",
+      "s3",
+      "s4"
+    ],
+    "h2->h8": [
+      "s1",
+      "s2:3",
+      "s3",
+      "s4"
+    ],
+    "h2->h8_rerouted": [
+      "s1",
+      "s2:4",
+      "s3",
+      "s4"
+    ]
+  },
+  "reachability_verified": true
+}
