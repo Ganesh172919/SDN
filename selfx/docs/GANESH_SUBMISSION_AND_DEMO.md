@@ -1,5 +1,11 @@
 # Ganesh: submission, run steps, demonstration and presentation
 
+**Status correction - 07 November:** T20-T24 are complete in CPU/replay scope.
+T25's final weight comparison is verified; target-quality, reward-convergence and
+iterations-to-target evidence remains pending. Present T25 as partial. The
+historical completion record still says `completed`; its validation does not
+cover this missing metric. See [the current pending-work check](GANESH_PENDING_WORK_CHECK.md).
+
 Verified on 06 November 2026. Assigned tasks: **T20-T25**.
 
 Ganesh's work is the **replay-to-LoRA self-improvement component of SELF-X**.

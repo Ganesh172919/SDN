@@ -1,5 +1,9 @@
 # Ganesh: replay-trained LoRA and adapter lifecycle (T20-T25)
 
+Status correction, 07 November: T20-T24 are complete in CPU/replay scope. T25 has
+verified final weight attribution, with target-quality, reward-convergence and
+iterations-to-target evidence pending. See [the current check](GANESH_PENDING_WORK_CHECK.md).
+
 This adds an executable CPU training and deployment path under
 `agent/self_improvement/`. It uses a real pretrained causal language model,
 freezes its base parameters and trains LoRA matrices in `q_proj` and `v_proj`.

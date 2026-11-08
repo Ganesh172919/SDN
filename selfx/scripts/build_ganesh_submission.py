@@ -95,7 +95,7 @@ def build(include_model=True,stage_only=False):
     copy(ROOT/'scripts/setup_ganesh_submission.py',stage/'setup_submission.py')
     copy(ROOT/'scripts/verify_ganesh_bundle.py',stage/'tools/verify_bundle.py')
     copy(ROOT/'scripts/check_ganesh_portability.py',stage/'tools/check_portability.py')
-    for name in ('SELF_IMPROVEMENT.md','GANESH_TASK_COMPLETION.md'):
+    for name in ('SELF_IMPROVEMENT.md','GANESH_TASK_COMPLETION.md','GANESH_PENDING_WORK_CHECK.md'):
         copy(ROOT/'docs'/name,stage/'selfx/docs'/name)
     for path in EVIDENCE.rglob('*'):
         if path.is_file() and path.name not in {'writer.lock','handoff.json'} and not path.name.endswith('.tmp'):

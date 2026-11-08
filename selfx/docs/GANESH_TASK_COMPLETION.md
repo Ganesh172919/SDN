@@ -1,9 +1,12 @@
-# Ganesh task completion - 06 November 2026
+# Ganesh task status - reviewed 07 November 2026
 
-T20-T25 are implemented and verified in the project's CPU/frozen-replay path.
-The approved policy is active in its local registry. This completes Ganesh's
-assigned adapter work; it does not close the other students' live integration,
-DPP, website, six-stage ablation or topology-transfer work.
+T20-T24 are implemented and verified in the project's CPU/frozen-replay path.
+T25 is partial: the final weight-attribution comparison is verified, while the
+target-quality, reward-convergence and iterations-to-target measurement remains
+pending. The approved policy is active in its local registry. See
+[the pending-work check](GANESH_PENDING_WORK_CHECK.md) for the remaining criterion.
+The other students retain live integration, DPP, website, exact ablation and
+topology-transfer work.
 
 | Task | Delivered evidence |
 | --- | --- |
@@ -12,7 +15,7 @@ DPP, website, six-stage ablation or topology-transfer work.
 | T22: LoRA training | One 120-step fitting cycle; 460,800 trainable LoRA parameters out of 134,975,808 total. Reloaded base hashes match before/after; adapter weights changed and reload correctly. |
 | T23: stress gate | Frozen 576-case incumbent/candidate comparison; raw metrics replayed independently; unchanged thresholds, training-only lineage, safety and stale-report checks. |
 | T24: lifecycle | Successful bounded-adoption promotion, rejection of a weaker trained checkpoint, unchanged pointer on rejection and automatic rollback after a controlled load failure. Approved adapter restored. Six hash-linked registry events. |
-| T25: weight attribution | Six independent holdout seeds, three profiles, 864 observations, same prompt and memory disabled. Mean per-seed cumulative reward gain 1.020074; paired p = 0.0006203; 95% CI [0.675774, 1.364374]. Twenty-four actual on-policy episodes retained for a later cycle. |
+| T25: weight attribution - partial | Six independent holdout seeds, three profiles, 864 observations, same prompt and memory disabled. Mean per-seed cumulative reward gain 1.020074; paired p = 0.0006203; 95% CI [0.675774, 1.364374]. Target-quality, reward convergence and iterations-to-target evidence is pending; one recorded fit is not that full measurement. |
 
 ## Retained evidence
 
@@ -61,7 +64,7 @@ individual observation.
 
 ## Validation and handoff
 
-The project tests passed: 77 selfx core/evaluation tests (plus four subtests),
+The retained 06 November project tests passed: 77 selfx core/evaluation tests (plus four subtests),
 14 slow-loop tests and 15 Web tests, for 106 tests total. The 22 focused tests
 exercise dataset rejection/leakage, actual LoRA weight updates, frozen base
 weights, stress metric replay, holdout exclusion, atomic activation, stale

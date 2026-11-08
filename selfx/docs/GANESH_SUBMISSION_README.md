@@ -1,5 +1,11 @@
 # SELF-X - Ganesh submission (T20-T25)
 
+Status correction, 07 November: T20-T24 are complete in CPU/replay scope; T25 is
+partial. Its final reward comparison is verified, while explicit target-quality,
+reward-convergence and iterations-to-target evidence remains pending. See
+`selfx/docs/GANESH_PENDING_WORK_CHECK.md`. Earlier six-complete wording in the
+frozen 06 November release is superseded by the current task assessment.
+
 This is Ganesh's verified replay-to-LoRA component, with source, trained adapters,
 raw evidence, tests and a submission report. The supported claim is CPU-trained,
 safety-gated language-model adaptation evaluated using frozen fluid-network
