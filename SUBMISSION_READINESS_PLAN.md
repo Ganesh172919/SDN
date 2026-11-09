@@ -60,15 +60,6 @@ mindmap
       86,400 Simulation Windows
       10 Paired Random Seeds
       4,000 Bootstrap Resampling Draws
-
-classDef planRoot fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef ws0Style fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef ws1Style fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef ws2Style fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
-classDef ws3Style fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
-classDef ws4Style fill:#3949AB,stroke:#1A237E,stroke-width:2px,color:#FFFFFF;
-classDef ws5Style fill:#E53935,stroke:#B71C1C,stroke-width:2px,color:#FFFFFF;
-classDef ws6Style fill:#00ACC1,stroke:#006064,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---

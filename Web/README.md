@@ -52,7 +52,7 @@ flowchart TD
         RES_STORE[("Results Archive Directory<br/>output/benchmarks/v4/")]:::dataNode
     end
 
-    CYTO & CHARTS & EXP_EXP <-->|HTTP GET (1Hz Polling)| ROUTER
+    CYTO & CHARTS & EXP_EXP <-->|"HTTP GET (1Hz Polling)"| ROUTER
     ROUTER --> SEC_GATE
     SEC_GATE --> API_STAT & API_MEM & API_RES & API_BENCH
     

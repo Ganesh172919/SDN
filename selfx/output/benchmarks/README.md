@@ -76,7 +76,7 @@ mindmap
         Exact Data Checksums
         Deterministic Matplotlib Generation
       Vector Formats
-        Dual PNG (170 DPI) and SVG
+        ["Dual PNG (170 DPI) and SVG"]
     Version Isolation
       :::isoStyle
       Revision 4 Current
@@ -88,11 +88,6 @@ mindmap
       Revision 2 Archive
         Cosine Similarity Retrieval
         30-Entry Flat JSON Store
-
-classDef evRoot fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef dsStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef figStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef isoStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---

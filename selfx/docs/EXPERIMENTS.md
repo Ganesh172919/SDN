@@ -48,7 +48,7 @@ mindmap
         Bottleneck C = 10.0 Mbps
       Piecewise Integration
         Exact Average Queue Area
-        Modeled Delay Proxy (8ms + Queue/C)
+        ["Modeled Delay Proxy (8ms + Queue/C)"]
     Conservation Laws
       :::lawStyle
       Volume Balance
@@ -60,16 +60,10 @@ mindmap
     Statistical Inference
       :::statStyle
       Paired Seeds
-        10 Seeds (1900-1909) as Units
+        ["10 Seeds (1900-1909) as Units"]
       Bootstrap Resampling
         4,000 Monte Carlo Draws
         95% Confidence Intervals
-
-classDef expRoot fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef condStyle fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
-classDef calcStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef lawStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef statStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---

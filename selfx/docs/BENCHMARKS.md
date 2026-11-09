@@ -57,12 +57,6 @@ mindmap
       Capacity Ceiling 30 Records
       Exponential Weighting S^12
       Feasibility Pre-Filter
-
-classDef r2Root fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef scenStyle fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
-classDef ctrlStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef embStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef memStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---

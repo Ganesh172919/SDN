@@ -55,12 +55,6 @@ mindmap
       Legacy 2-Call Mode 8.30s
       Compact 1-Call Mode 4.19s
       Hybrid Cached Mode 2.10s
-
-classDef r3Root fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef ctxStyle fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
-classDef retStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef ctrlStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef diagStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---

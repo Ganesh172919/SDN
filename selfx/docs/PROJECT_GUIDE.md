@@ -78,12 +78,6 @@ mindmap
         86,400 Window Metrics CSV
         9,600 Synthetic NetFlow Records
         SHA256 Cryptographic Checksums
-
-classDef evalRoot fill:#1E88E5,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF;
-classDef hypoStyle fill:#D81B60,stroke:#880E4F,stroke-width:2px,color:#FFFFFF;
-classDef archStyle fill:#00897B,stroke:#004D40,stroke-width:2px,color:#FFFFFF;
-classDef evalStyle fill:#FB8C00,stroke:#E65100,stroke-width:2px,color:#FFFFFF;
-classDef artStyle fill:#8E24AA,stroke:#4A148C,stroke-width:2px,color:#FFFFFF;
 ```
 
 ---
