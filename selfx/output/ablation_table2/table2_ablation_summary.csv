@@ -1,0 +1,7 @@
+stage,description,latency_ms,p95_latency_ms,throughput_mbps,packet_loss_pct,cumulative_reward,queue_mbit,cpu_overhead_pct
+A0,Static Ryu/POX (hand-crafted rules) [Non-learning floor],8.89,25.0,5.879,12.48,-304.88,3.8308,2.1
+A1,Single non-specialist LLM; no reflection [Raw LLM reasoning],6.31,25.0,6.337,9.49,-172.24,2.21,18.5
+A2,A1 + verbal reflection (no weight update) [Verbal reflection alone],4.46,12.74,7.313,3.06,72.79,1.2075,22.0
+A3,A2 + safety-gated LoRA self-fine-tuning [Internalised in weights],4.82,12.75,7.532,1.64,117.67,1.7059,14.0
+A4,A3 + multi-agent decomposition (6 specialists) [Task specialization],4.35,12.7,7.122,4.08,37.94,0.5209,16.5
+A5,A4 + Lyapunov DPP fast timescale [Full two-timescale system],3.48,12.7,6.832,6.33,-29.63,0.3988,8.5

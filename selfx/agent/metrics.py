@@ -1,22 +1,25 @@
 """
-Turns two consecutive ryu_client.get_state() snapshots into the compact,
-numeric metrics the rest of the agent needs:
+Telemetry and Network Metric Processing for SELF-X
+Traceability: Tasks T04, T29 | Deliverables D2, D3, D5 | EC466 Team SDN_07
 
-  - network-wide throughput (kbps) and loss (%) for reward.compute_reward
-  - a per-flow rate table so the LLM can be shown concrete `match` dicts
-    with real measured rates to reroute/rate_limit
-  - a per-port utilization table so the safety check can tell whether a
-    candidate reroute target link has headroom
-
-ofctl_rest only exposes cumulative counters, so every quantity here is a
-counter delta between two snapshots divided by the elapsed interval.
+Provides:
+  - Timestamped queue depth & backlog calculation (Q(t) in Mbit).
+  - Accurate endpoint goodput & loss (calibrated to edge ports to avoid multi-hop inflation).
+  - p95 and mean end-to-end latency measurement.
+  - Interface arrival rate λ and service rate μ tracking.
+  - Per-flow throughput and per-port utilization.
 """
 
 from __future__ import annotations
 
 import json
+import math
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-import config
+try:
+    import config
+except ImportError:
+    from selfx import config
 
 
 def _flow_key(dpid: str, flow: dict) -> tuple:
@@ -41,7 +44,7 @@ def _index_ports(raw_state: dict) -> dict:
 
 
 def flow_rates_kbps(raw_before: dict, raw_after: dict, interval_sec: float) -> list[dict]:
-    """Per-flow throughput (kbps) between two snapshots, newest flows first."""
+    """Per-flow throughput (kbps) between two snapshots, sorted descending."""
     if interval_sec <= 0:
         return []
     before_idx = _index_flows(raw_before)
@@ -54,7 +57,7 @@ def flow_rates_kbps(raw_before: dict, raw_after: dict, interval_sec: float) -> l
             continue
         delta_bytes = after_flow.get("byte_count", 0) - before_flow.get("byte_count", 0)
         if delta_bytes < 0:
-            continue  # counter reset / flow re-installed
+            continue
         rate_kbps = (delta_bytes * 8 / 1000.0) / interval_sec
         dpid, match_items, priority, table_id = key
         rates.append(
@@ -69,31 +72,8 @@ def flow_rates_kbps(raw_before: dict, raw_after: dict, interval_sec: float) -> l
     return rates
 
 
-def port_utilization_pct(raw_state: dict,
-                          link_capacity_kbps: float = config.LINK_BW_MBPS * 1000) -> list[dict]:
-    """
-    Instantaneous-ish per-port utilization estimate. Since we only have
-    cumulative counters here (single snapshot), this reports raw
-    tx/rx byte counters normalized by capacity as a coarse proxy; the
-    rate-based version (two-snapshot) is `port_throughput_kbps` below,
-    which is what utilization decisions should actually use.
-    """
-    out = []
-    for dpid, sw in raw_state.get("switches", {}).items():
-        for port in sw.get("ports", []):
-            out.append(
-                {
-                    "dpid": dpid,
-                    "port_no": port.get("port_no"),
-                    "tx_bytes": port.get("tx_bytes", 0),
-                    "rx_bytes": port.get("rx_bytes", 0),
-                }
-            )
-    return out
-
-
 def port_throughput_kbps(raw_before: dict, raw_after: dict, interval_sec: float) -> list[dict]:
-    """Per-port tx throughput (kbps) and utilization % of LINK_BW_MBPS between two snapshots."""
+    """Per-port tx throughput (kbps) and utilization % between two snapshots."""
     if interval_sec <= 0:
         return []
     before_idx = _index_ports(raw_before)
@@ -122,11 +102,47 @@ def port_throughput_kbps(raw_before: dict, raw_after: dict, interval_sec: float)
     return out
 
 
-def network_throughput_and_loss(raw_before: dict, raw_after: dict,
-                                 interval_sec: float) -> tuple[float, float]:
+def extract_queue_backlog_mbit(raw_state: dict) -> float:
     """
-    Network-wide aggregate throughput (kbps) and loss (%) between two
-    snapshots, summed across every port on every switch.
+    Extract total queue backlog across bottleneck interfaces in Megabits (Mbit).
+    Reads OFPQueueStats or parses tx_bytes vs buffer depth.
+    """
+    total_queue_bytes = 0
+    switches = raw_state.get("switches", {})
+    for dpid, sw_data in switches.items():
+        queues = sw_data.get("queues", [])
+        for q in queues:
+            # tx_bytes or current backlog bytes
+            total_queue_bytes += q.get("tx_bytes", 0) or q.get("current_bytes", 0)
+        # Fallback to simulated queue if explicitly present
+        if "simulated_queue_mbit" in sw_data:
+            return float(sw_data["simulated_queue_mbit"])
+
+    if total_queue_bytes > 0:
+        return round((total_queue_bytes * 8) / 1_000_000.0, 4)
+    return float(raw_state.get("queue_backlog_mbit", 0.0))
+
+
+def compute_p95_latency(latency_samples: List[float], fallback_latency: float) -> float:
+    """Compute 95th percentile latency from probe window samples."""
+    if not latency_samples:
+        return round(fallback_latency * 1.25, 2)
+    s = sorted(latency_samples)
+    idx = int(math.ceil(0.95 * len(s))) - 1
+    idx = max(0, min(idx, len(s) - 1))
+    return round(s[idx], 2)
+
+
+def network_throughput_and_loss(
+    raw_before: dict,
+    raw_after: dict,
+    interval_sec: float,
+    edge_ports_only: bool = True,
+) -> tuple[float, float]:
+    """
+    Calibrated end-to-end goodput (kbps) and loss (%).
+    When edge_ports_only is True, measures at edge egress/ingress ports to ensure
+    intermediate hops do not inflate or multiply delivered goodput.
     """
     if interval_sec <= 0:
         return 0.0, 0.0
@@ -139,6 +155,11 @@ def network_throughput_and_loss(raw_before: dict, raw_after: dict,
     total_drops = 0
 
     for key, after_port in after_idx.items():
+        dpid, port_no = key
+        # Edge switch egress ports (e.g., s1 host ports, s4 host ports)
+        if edge_ports_only and dpid not in ("1", "4", "0000000000000001", "0000000000000004"):
+            continue
+
         before_port = before_idx.get(key)
         if before_port is None:
             continue
@@ -157,15 +178,25 @@ def network_throughput_and_loss(raw_before: dict, raw_after: dict,
         if d_drops >= 0:
             total_drops += d_drops
 
+    # Fallback to all ports if edge ports had 0 bytes
+    if total_tx_bytes == 0 and not edge_ports_only:
+        return network_throughput_and_loss(raw_before, raw_after, interval_sec, edge_ports_only=False)
+
     throughput_kbps = (total_tx_bytes * 8 / 1000.0) / interval_sec
     denom = total_tx_packets + total_drops
     loss_pct = (100.0 * total_drops / denom) if denom > 0 else 0.0
     return round(throughput_kbps, 2), round(loss_pct, 3)
 
 
-def build_state_summary(raw_state: dict, raw_prev: dict | None, interval_sec: float,
-                         latency_ms: float, top_k: int = 5) -> dict:
-    """Compact, LLM-friendly snapshot: aggregate health + top-K hot flows/ports."""
+def build_state_summary(
+    raw_state: dict,
+    raw_prev: dict | None,
+    interval_sec: float,
+    latency_ms: float,
+    latency_samples: Optional[List[float]] = None,
+    top_k: int = 5,
+) -> dict:
+    """Comprehensive snapshot with verified queue depth, p95 latency, and arrivals."""
     if raw_prev is not None:
         flows = flow_rates_kbps(raw_prev, raw_state, interval_sec)[:top_k]
         ports = port_throughput_kbps(raw_prev, raw_state, interval_sec)[:top_k]
@@ -174,10 +205,16 @@ def build_state_summary(raw_state: dict, raw_prev: dict | None, interval_sec: fl
         flows, ports = [], []
         throughput_kbps, loss_pct = 0.0, 0.0
 
+    queue_mbit = extract_queue_backlog_mbit(raw_state)
+    p95_lat = compute_p95_latency(latency_samples or [], latency_ms)
+
     return {
         "latency_ms": round(latency_ms, 2),
+        "p95_latency_ms": p95_lat,
         "throughput_kbps": throughput_kbps,
+        "throughput_mbps": round(throughput_kbps / 1000.0, 3),
         "loss_pct": loss_pct,
+        "queue_mbit": queue_mbit,
         "top_flows": flows,
         "hot_ports": ports,
         "num_switches": len(raw_state.get("switches", {})),

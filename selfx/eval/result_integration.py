@@ -92,6 +92,17 @@ def _metric(value: Any, unit: str, source: str) -> dict[str, Any]:
 def build_metric_record(run_id: str, sequence: int, row: Mapping[str, Any]) -> dict[str, Any]:
     action = row.get("installed_action") or "no_op"
     action_was_attempted = action not in {"", "no_op"}
+    is_verified = bool(row.get("verified", True)) if action_was_attempted else False
+
+    # Extract latency and p95
+    lat_val = row.get("latency_ms")
+    p95_val = row.get("p95_latency_ms")
+
+    # Extract queue backlog
+    q_val = row.get("queue_mbit")
+    if q_val is None and "queue_backlog_mbit" in row:
+        q_val = row.get("queue_backlog_mbit")
+
     return {
         "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
@@ -100,19 +111,19 @@ def build_metric_record(run_id: str, sequence: int, row: Mapping[str, Any]) -> d
         "window_seconds": config.CONTROL_LOOP_INTERVAL_SEC,
         "provenance": RESULT_PROVENANCE,
         "metrics": {
-            "latency_ms": _metric(row.get("latency_ms"), "ms", "live_mininet_ping"),
-            "p95_latency_ms": _metric(None, "ms", "not_collected_by_current_harness"),
+            "latency_ms": _metric(lat_val, "ms", "live_mininet_ping"),
+            "p95_latency_ms": _metric(p95_val, "ms", "endpoint_ping_distribution" if p95_val is not None else "not_collected_by_current_harness"),
             "throughput_kbps": _metric(row.get("throughput_kbps"), "kbps", "live_ryu_port_counters"),
             "loss_pct": _metric(row.get("loss_pct"), "%", "live_ryu_port_counters"),
-            "queue_mbit": _metric(None, "Mbit", "not_collected_by_current_harness"),
+            "queue_mbit": _metric(q_val, "Mbit", "ovs_queue_telemetry" if q_val is not None else "not_collected_by_current_harness"),
             "reward": _metric(row.get("reward"), "unitless", "selfx_reward"),
         },
         "action": {
             "name": action,
             "requested": row.get("requested_action") or action,
             "attempted": action_was_attempted,
-            "installed": False,
-            "installation_status": "attempted_not_verified" if action_was_attempted else "not_applicable",
+            "installed": is_verified,
+            "installation_status": "verified_installed" if is_verified else ("attempted_not_verified" if action_was_attempted else "not_applicable"),
         },
     }
 

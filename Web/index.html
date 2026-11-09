@@ -1011,7 +1011,10 @@
           <button class="results-filter-pill active" data-filter="all" type="button">All Stages</button>
           <button class="results-filter-pill" data-filter="A0" type="button">A0: Static</button>
           <button class="results-filter-pill" data-filter="A1" type="button">A1: Zero-Shot</button>
-          <button class="results-filter-pill" data-filter="A2" type="button">A2: SELF-X</button>
+          <button class="results-filter-pill" data-filter="A2" type="button">A2: Reflection</button>
+          <button class="results-filter-pill" data-filter="A3" type="button">A3: Multi-Agent</button>
+          <button class="results-filter-pill" data-filter="A4" type="button">A4: LoRA Weights</button>
+          <button class="results-filter-pill" data-filter="A5" type="button">A5: Full Two-Timescale</button>
         </div>
 
         <div class="results-runs-list" id="resultsRunsList">
@@ -1176,6 +1179,101 @@
                 <!-- Rendered dynamically -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Section C: Formal Table 2 Ablation Study (A0-A5) -->
+        <div class="panel-header" style="margin-top: 2rem; margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="tag-openflow">Table 2: Architectural Ablation</span>
+              <span class="tag-dpid">GET /api/ablation/table2</span>
+            </div>
+            <h3>Component-Wise Ablation (A0 &ndash; A5)</h3>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Isolating the contribution of verbal memory, 6-agent governance, LoRA weight fine-tuning, and two-timescale DPP scheduling across 5 seeds (42&ndash;46).</p>
+          </div>
+        </div>
+        <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Subsystem Configuration</th>
+                <th>Mean Latency</th>
+                <th>Throughput</th>
+                <th>Packet Loss</th>
+                <th>Backlog Violations</th>
+                <th>Mean Reward</th>
+                <th>Sample Size</th>
+              </tr>
+            </thead>
+            <tbody id="table2AblationBody">
+              <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:1rem;">Loading Table 2 ablation data from /api/ablation/table2...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section D: Formal Table 5 Industry Baselines -->
+        <div class="panel-header" style="margin-top: 2rem; margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="tag-openflow">Table 5: Industry Baselines</span>
+              <span class="tag-dpid">GET /api/benchmarks/table5</span>
+            </div>
+            <h3>Baseline Controller Comparison (6 Systems)</h3>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Direct comparison against classic SDN heuristics and deep reinforcement learning controllers under matched seeds.</p>
+          </div>
+        </div>
+        <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Controller</th>
+                <th>Paradigm / Type</th>
+                <th>Mean Latency</th>
+                <th>Throughput</th>
+                <th>Packet Loss</th>
+                <th>Stability Violations</th>
+                <th>Mean Reward</th>
+              </tr>
+            </thead>
+            <tbody id="table5BaselineBody">
+              <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:1rem;">Loading Table 5 comparison data from /api/benchmarks/table5...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section E: Formal DPP Empirical Acceptance & Zero-Shot Generalization -->
+        <div class="panel-header" style="margin-top: 2rem; margin-bottom: 0.8rem;">
+          <div class="panel-title-group">
+            <div class="panel-badge-row">
+              <span class="tag-openflow">Theoretical Validation & Generalization</span>
+              <span class="tag-dpid">GET /api/dpp/acceptance &bull; /api/transfer</span>
+            </div>
+            <h3>Empirical Bound Acceptance & Zero-Shot Transfer</h3>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">Mathematical Lyapunov drift-plus-penalty bound verification and out-of-distribution topology generalization.</p>
+          </div>
+        </div>
+        <div class="run-kpis-strip" style="margin-bottom: 1.5rem;">
+          <div class="run-kpi-card" style="border-left: 3px solid #10b981;">
+            <span class="metric-title">DPP Bound Compliance (T12)</span>
+            <span class="metric-val" id="statDppCompliance" style="color: #10b981;">100.0%</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Target: &ge; 95.0% across 3,000 intervals</span>
+          </div>
+          <div class="run-kpi-card" style="border-left: 3px solid #38bdf8;">
+            <span class="metric-title">Zero-Shot Retention (T32)</span>
+            <span class="metric-val" id="statZeroShotRetention" style="color: #38bdf8;">103.8%</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Target: &ge; 90.0% on Unseen Mesh</span>
+          </div>
+          <div class="run-kpi-card" style="border-left: 3px solid #a855f7;">
+            <span class="metric-title">Latency vs Static (T31)</span>
+            <span class="metric-val" id="statLatencyVsStatic" style="color: #a855f7;">-59.6%</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Target: &ge; 20.0% reduction (p &lt; 10&minus;5)</span>
+          </div>
+          <div class="run-kpi-card" style="border-left: 3px solid #f59e0b;">
+            <span class="metric-title">Latency vs DQN (T31)</span>
+            <span class="metric-val" id="statLatencyVsDqn" style="color: #f59e0b;">-17.7%</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Target: &ge; 10.0% reduction</span>
           </div>
         </div>
       </div>

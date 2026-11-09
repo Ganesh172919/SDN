@@ -1,0 +1,149 @@
+{
+  "id": "unseen_mesh",
+  "name": "Unseen Augmented Mesh Holdout Topology",
+  "category": "held_out_generalization_only",
+  "switch_count": 6,
+  "host_count": 8,
+  "switches": [
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6"
+  ],
+  "hosts": [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "h7",
+    "h8"
+  ],
+  "links": [
+    {
+      "src": "h1",
+      "dst": "s1",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h2",
+      "dst": "s1",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h3",
+      "dst": "s2",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h4",
+      "dst": "s3",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h5",
+      "dst": "s4",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h6",
+      "dst": "s5",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h7",
+      "dst": "s6",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "h8",
+      "dst": "s6",
+      "bw_mbps": 100,
+      "delay_ms": 1,
+      "type": "access"
+    },
+    {
+      "src": "s1",
+      "dst": "s2",
+      "bw_mbps": 10,
+      "delay_ms": 3,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s2",
+      "dst": "s3",
+      "bw_mbps": 10,
+      "delay_ms": 4,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s3",
+      "dst": "s4",
+      "bw_mbps": 10,
+      "delay_ms": 3,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s4",
+      "dst": "s5",
+      "bw_mbps": 10,
+      "delay_ms": 4,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s5",
+      "dst": "s6",
+      "bw_mbps": 10,
+      "delay_ms": 3,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s6",
+      "dst": "s1",
+      "bw_mbps": 10,
+      "delay_ms": 4,
+      "max_queue": 40,
+      "type": "ring"
+    },
+    {
+      "src": "s1",
+      "dst": "s4",
+      "bw_mbps": 10,
+      "delay_ms": 8,
+      "max_queue": 40,
+      "type": "chord"
+    },
+    {
+      "src": "s2",
+      "dst": "s5",
+      "bw_mbps": 10,
+      "delay_ms": 8,
+      "max_queue": 40,
+      "type": "chord"
+    }
+  ],
+  "diameter": 3,
+  "reachability_verified": true
+}
