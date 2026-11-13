@@ -1,0 +1,61 @@
+{
+  "schema": "selfx.pipeline.adapter.v1",
+  "generated_utc": "2026-11-09T09:59:33.103705+00:00",
+  "dataset": "C:\\Users\\RAVIPRAKASH\\SDN\\SDN\\selfx\\output\\pipeline_study\\replay_dataset.jsonl",
+  "episodes": 150,
+  "distinct_states": 24,
+  "train_states": 13,
+  "gate_states": 11,
+  "gate_seeds": [
+    1903,
+    1904
+  ],
+  "label_rule": "highest mean realised reward over the 3x3 state neighbourhood (exact state weighted double); states with no counterfactual kept only above the global mean reward",
+  "train_grid": {
+    "mice": 0.5,
+    "elephant": 1.0,
+    "queue": 0.5
+  },
+  "action_distribution": {
+    "no_op": 4,
+    "reroute": 6,
+    "rate_limit": 3
+  },
+  "hyperparameters": {
+    "rank": 8,
+    "alpha": 16,
+    "steps": 60,
+    "batch_size": 6,
+    "learning_rate": 0.003,
+    "seed": 77,
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ],
+    "objective": "cross-entropy over three frozen action tokens"
+  },
+  "trainable_parameters": 460800,
+  "prompt_sha256": "2a5ca77eca8cae3560fb91c9621b2005e9cdec3277abe161b980db7471d45080",
+  "frozen_parameter_sha256_before": "b5a97c3c0e782232ff0f0795e7b2d03ccd14671ec33725c6e469ab4366e93298",
+  "frozen_parameter_sha256_after": "b5a97c3c0e782232ff0f0795e7b2d03ccd14671ec33725c6e469ab4366e93298",
+  "adapter_parameter_sha256_before": "87cfdcb4975ac7cb2d3e79f933cd6a7782866e0c3faa66f7933881c7b0bd75ea",
+  "adapter_parameter_sha256_after": "6b6c1afc45e08a221411794227311a99e2b324ae3b2522daf239a66dc271c910",
+  "gate": {
+    "base_agreement": 0.27273,
+    "candidate_agreement": 0.45455,
+    "gain": 0.18182,
+    "required_margin": 0.02,
+    "decision": "promoted"
+  },
+  "final_loss": 0.63085,
+  "training_seconds": 753.39,
+  "versions": {
+    "torch": "2.8.0+cpu",
+    "transformers": "4.55.4",
+    "peft": "0.17.1",
+    "safetensors": "0.6.2"
+  },
+  "deployment": {
+    "adapter_fraction": 1.0
+  }
+}

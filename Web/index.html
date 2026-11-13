@@ -288,9 +288,23 @@
   <!-- Segmented Navigation Pills -->
   <nav class="tabs-nav-wrap" aria-label="Main Dashboard Tabs">
     <div class="tabs-container" role="tablist">
+      <button class="tab-btn" data-tab="tab-comparison" role="tab" aria-selected="false" id="tabBtnComparison"
+              title="Interactive 14-Controller Comparison Studio, Radar, CDF, and Trajectory Comparator">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-5h2v5zm4 0h-2V7h2v10zm4 0h-2v-7h2v7z"/></svg>
+        <span>Algorithm Comparison</span>
+        <span class="tab-badge" style="background:var(--cyan); color:#000;">14</span>
+      </button>
+
       <button class="tab-btn active" data-tab="tab-topo" role="tab" aria-selected="true" id="tabBtnTopo">
         <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
-        <span>Topology &amp; Live Flows</span>
+        <span>Topology &amp; Multi-Fabric</span>
+      </button>
+
+      <button class="tab-btn" data-tab="tab-analytics" role="tab" aria-selected="false" id="tabBtnAnalytics"
+              title="Lyapunov Drift-Plus-Penalty, Formal Backlog Bounds, and Paired Statistical Hypothesis Lab">
+        <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 2C8.12 2 7 3.12 7 4.5v1.64c-.32.18-.62.39-.89.63L4.7 5.36c-.98-.98-2.56-.98-3.54 0s-.98 2.56 0 3.54l1.41 1.41c-.24.27-.45.57-.63.89H.5C.22 11.2 0 11.42 0 11.7v2.6c0 .28.22.5.5.5h1.44c.18.32.39.62.63.89l-1.41 1.41c-.98.98-.98 2.56 0 3.54s2.56.98 3.54 0l1.41-1.41c.27.24.57.45.89.63v1.44c0 .28.22.5.5.5h2.6c.28 0 .5-.22.5-.5v-1.44c.32-.18.62-.39.89-.63l1.41 1.41c.98.98 2.56.98 3.54 0s.98-2.56 0-3.54l-1.41-1.41c.24-.27.45-.57.63-.89h1.44c.28 0 .5-.22.5-.5v-2.6c0-.28-.22-.5-.5-.5h-1.44c-.18-.32-.39-.62-.63-.89l1.41-1.41c.98-.98.98-2.56 0-3.54s-2.56-.98-3.54 0L13.89 6.77c-.27-.24-.57-.45-.89-.63V4.5C13 3.12 11.88 2 10.5 2h-1zm1 4.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5z"/></svg>
+        <span>Theory &amp; DPP Lab</span>
+        <span class="tab-badge" style="background:#10b981; color:#000;">PASS</span>
       </button>
 
       <button class="tab-btn" data-tab="tab-agent" role="tab" aria-selected="false" id="tabBtnAgent">
@@ -330,6 +344,399 @@
   <!-- Main View Screens -->
   <main class="app-main-content">
 
+    <!-- VIEW 0: 14-CONTROLLER ALGORITHM COMPARISON STUDIO -->
+    <div class="tab-pane" id="tab-comparison" role="tabpanel" aria-labelledby="tabBtnComparison">
+      <div class="comparison-studio-container">
+        <!-- Section Header -->
+        <div class="card comparison-header-card">
+          <div class="comparison-title-row">
+            <div>
+              <div class="panel-badge-row">
+                <span class="live-indicator-dot"></span>
+                <span class="tag-openflow">Audited Comparison Dataset</span>
+                <span class="tag-dpid">14 Controllers &bull; 13 XY Visualizations</span>
+                <span class="badge-tag accent-cyan">EC466 SDN_07</span>
+              </div>
+              <h2>14-Controller Performance &amp; Attribution Studio</h2>
+              <p>Rigorous, reproducible evaluation comparing SELF-X against 13 baseline and ablated controllers under matched steady and bursty workloads.</p>
+            </div>
+            <div class="comparison-actions">
+              <a href="comparison/index.html" target="_blank" class="btn-ctrl" style="text-decoration:none;" title="Open standalone HTML comparison gallery">
+                <span>Standalone Gallery ↗</span>
+              </a>
+              <a href="comparison/SELF_X_Algorithm_Comparison.pdf" target="_blank" class="btn-ctrl" style="text-decoration:none;" title="Open comprehensive 13-page PDF Atlas">
+                <span>PDF Atlas ↗</span>
+              </a>
+              <button class="btn-ctrl" id="btnExportEffectsCSV" type="button" title="Download Statistical Effects Matrix as CSV">
+                <span>Export Effects CSV ↓</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Chips -->
+          <div class="comparison-filter-chips">
+            <span class="filter-label">Controller Families:</span>
+            <button class="chip-btn active" data-family="all" type="button">All 14 Controllers</button>
+            <button class="chip-btn" data-family="agentic" type="button">Agentic Family (S1-S5)</button>
+            <button class="chip-btn" data-family="rl" type="button">RL Baselines (DQN, MARL, Tabular Q)</button>
+            <button class="chip-btn" data-family="heuristic" type="button">Heuristics (Threshold, Least Loaded, Static)</button>
+            <button class="chip-btn" data-family="ablation" type="button">Ablation Conditions (w/o LoRA, w/o Governor)</button>
+          </div>
+        </div>
+
+        <!-- Row 1: Dual Visualizers (Radar Spider Chart + Empirical CDF) -->
+        <div class="comparison-dual-grid">
+          <!-- Left: 7-Axis Multi-Metric Radar Chart -->
+          <div class="card comparison-card">
+            <div class="card-title-row">
+              <div class="card-icon-chip cyan">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <div>
+                <h3>Multi-Metric Efficiency Radar (7-Axis)</h3>
+                <span class="card-sub">Simultaneous trade-off profiling across latency, goodput, loss, stability &amp; churn</span>
+              </div>
+            </div>
+
+            <!-- Interactive Controller Toggle Chips -->
+            <div class="radar-toggles" id="radarControllerToggles">
+              <span class="radar-toggle-pill active" data-cfg="S5" style="border-color:#00f2fe; color:#00f2fe;">S5: SELF-X</span>
+              <span class="radar-toggle-pill active" data-cfg="S0" style="border-color:#ef4444; color:#ef4444;">S0: Static</span>
+              <span class="radar-toggle-pill active" data-cfg="dqn" style="border-color:#a855f7; color:#a855f7;">DQN</span>
+              <span class="radar-toggle-pill active" data-cfg="least_loaded" style="border-color:#10b981; color:#10b981;">Least Loaded</span>
+              <span class="radar-toggle-pill" data-cfg="marl" style="border-color:#f59e0b; color:#f59e0b;">MARL</span>
+              <span class="radar-toggle-pill" data-cfg="S3" style="border-color:#38bdf8; color:#38bdf8;">S3: LoRA</span>
+              <span class="radar-toggle-pill" data-cfg="no_governor" style="border-color:#f43f5e; color:#f43f5e;">w/o Governor</span>
+            </div>
+
+            <div class="canvas-box" style="position:relative; height:420px; display:flex; justify-content:center; align-items:center;">
+              <canvas id="comparisonRadarCanvas" width="500" height="420" aria-label="7-axis controller efficiency radar chart"></canvas>
+            </div>
+            <div style="font-size:11px; color:var(--text-secondary); text-align:center; margin-top:4px;">
+              Click chips above to overlay or remove controllers from the spider polygon view.
+            </div>
+          </div>
+
+          <!-- Right: Empirical Cumulative Distribution Function (CDF) -->
+          <div class="card comparison-card">
+            <div class="card-title-row" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="card-icon-chip emerald">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                </div>
+                <div>
+                  <h3>Empirical CDF Distributions</h3>
+                  <span class="card-sub">Distributional performance percentiles (P50, P90, P95, P99)</span>
+                </div>
+              </div>
+              <div class="cdf-metric-toggles">
+                <button class="btn-ctrl active" id="btnCdfDelayToggle" type="button" style="font-size:11px; padding:3px 8px;">Delay (ms)</button>
+                <button class="btn-ctrl" id="btnCdfQueueToggle" type="button" style="font-size:11px; padding:3px 8px;">Queue (Mbit)</button>
+              </div>
+            </div>
+
+            <!-- Percentile Slider & Readouts -->
+            <div class="cdf-controls-bar">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label for="cdfPercentileSlider" style="font-size:11px; color:var(--text-secondary); font-weight:600;">Percentile:</label>
+                <input type="range" id="cdfPercentileSlider" min="1" max="99" value="95" style="width:140px;">
+                <span class="badge-tag accent-cyan" id="cdfPercentileLabel">P95</span>
+              </div>
+              <div class="cdf-readouts" id="cdfPercentileReadouts" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+            </div>
+
+            <div class="canvas-box" style="position:relative; height:300px;">
+              <canvas id="comparisonCDFCanvas" width="540" height="300" aria-label="Empirical cumulative distribution function curves"></canvas>
+            </div>
+            <div style="font-size:11px; color:var(--text-secondary); text-align:center; margin-top:4px;">
+              Click anywhere on the chart or drag the slider to inspect crosshair values at that percentile.
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Synchronized Trajectory Comparator (180s Test Horizon) -->
+        <div class="card comparison-card" style="margin-top:1.2rem;">
+          <div class="card-title-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-icon-chip purple">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+              </div>
+              <div>
+                <h3>Head-to-Head Trajectory Comparator (180-Second Sequence)</h3>
+                <span class="card-sub">Synchronized time series with dynamic performance advantage ribbon</span>
+              </div>
+            </div>
+
+            <!-- Selectors and Metric Switches -->
+            <div class="comparator-controls" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label style="font-size:11px; color:var(--text-secondary);">Baseline (A):</label>
+                <select id="trajSelectA" class="form-select-custom" style="padding:4px 8px; font-size:11px; border-radius:4px; background:var(--surface-active); color:var(--text-primary); border:1px solid var(--border-color);"></select>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label style="font-size:11px; color:var(--text-secondary);">Target (B):</label>
+                <select id="trajSelectB" class="form-select-custom" style="padding:4px 8px; font-size:11px; border-radius:4px; background:var(--surface-active); color:var(--text-primary); border:1px solid var(--border-color);"></select>
+              </div>
+              <div class="metric-btn-group" id="trajMetricGroup" style="display:flex; gap:4px;">
+                <button class="btn-ctrl active" data-metric="latency_ms" type="button" style="font-size:11px; padding:3px 7px;">Latency</button>
+                <button class="btn-ctrl" data-metric="throughput_mbps" type="button" style="font-size:11px; padding:3px 7px;">Goodput</button>
+                <button class="btn-ctrl" data-metric="loss_pct" type="button" style="font-size:11px; padding:3px 7px;">Loss %</button>
+                <button class="btn-ctrl" data-metric="reward" type="button" style="font-size:11px; padding:3px 7px;">Reward</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="canvas-box" style="position:relative; height:240px; margin-top:12px;">
+            <canvas id="trajectoryComparatorCanvas" width="980" height="240" aria-label="Synchronized trajectory comparator canvas"></canvas>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-secondary); margin-top:6px;">
+            <div>
+              <span style="display:inline-block; width:12px; height:12px; background:rgba(16,185,129,0.35); border:1px solid #10b981; margin-right:4px; vertical-align:middle;"></span> Green ribbon indicates Target (B) outperforms Baseline (A).
+              <span style="display:inline-block; width:12px; height:12px; background:rgba(239,68,68,0.35); border:1px solid #ef4444; margin-left:12px; margin-right:4px; vertical-align:middle;"></span> Red ribbon indicates Target (B) degraded.
+            </div>
+            <div>Dashed line: Baseline (A) &bull; Solid line: Target (B)</div>
+          </div>
+        </div>
+
+        <!-- Row 3: Audited Statistical Effects Matrix -->
+        <div class="card comparison-card" style="margin-top:1.2rem;">
+          <div class="card-title-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-icon-chip emerald">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+              </div>
+              <div>
+                <h3>Audited Statistical Effects Matrix (SELF-X Advantage vs All Controllers)</h3>
+                <span class="card-sub">Exact delta measurements, 95% bootstrap confidence intervals, and hypothesis test p-values</span>
+              </div>
+            </div>
+            <div class="effects-table-filters" style="display:flex; gap:6px;">
+              <button class="chip-btn active" id="btnFilterEffectsAll" type="button" style="font-size:11px; padding:3px 8px;">All Comparisons</button>
+              <button class="chip-btn" id="btnFilterEffectsSig" type="button" style="font-size:11px; padding:3px 8px;">Significant (p &lt; 0.05)</button>
+              <button class="chip-btn" id="btnFilterEffectsRL" type="button" style="font-size:11px; padding:3px 8px;">RL Baselines</button>
+              <button class="chip-btn" id="btnFilterEffectsHeuristic" type="button" style="font-size:11px; padding:3px 8px;">Heuristics</button>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto; margin-top:10px;">
+            <table class="table-custom" id="comparisonEffectsTable"></table>
+          </div>
+        </div>
+
+        <!-- Row 4: 14-Controller Architectural Specifications Grid -->
+        <div class="card comparison-card" style="margin-top:1.2rem;">
+          <div class="card-title-row">
+            <div class="card-icon-chip cyan">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <div>
+              <h3>14-Controller Architectural &amp; Attribution Directory</h3>
+              <span class="card-sub">Mechanisms, state representations, actuation frequencies, and parameter counts</span>
+            </div>
+          </div>
+          <div class="catalog-grid" id="comparisonCatalogGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; margin-top:12px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: THEORY & LYAPUNOV DPP VERIFICATION LAB -->
+    <div class="tab-pane" id="tab-analytics" role="tabpanel" aria-labelledby="tabBtnAnalytics">
+      <div class="analytics-lab-container">
+        <!-- Section Header -->
+        <div class="card analytics-header-card">
+          <div class="comparison-title-row">
+            <div>
+              <div class="panel-badge-row">
+                <span class="live-indicator-dot"></span>
+                <span class="tag-openflow">Theoretical Bounds &amp; Formal Verification</span>
+                <span class="tag-dpid">Deliverables D1 &bull; D2 &bull; D3</span>
+                <span class="badge-tag accent-cyan">Lyapunov DPP</span>
+              </div>
+              <h2>Formal Verification &amp; Statistical Hypothesis Lab</h2>
+              <p>Deterministic queue stability proofs, Lyapunov Drift-Plus-Penalty parameter sweeps, Paired Student's t-tests, and LoRA adapter parameter efficiency.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 1: Lyapunov Drift-Plus-Penalty Visualizer -->
+        <div class="card comparison-card" style="margin-top:1rem;">
+          <div class="card-title-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-icon-chip cyan">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              </div>
+              <div>
+                <h3>Lyapunov Drift-Plus-Penalty (DPP) Phase Space &amp; V-Tradeoff</h3>
+                <span class="card-sub">Dynamic parameter trade-off: Backlog O(V) vs Objective Penalty O(1/V)</span>
+              </div>
+            </div>
+            <!-- Slider -->
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label for="dppVSlider" style="font-size:11px; color:var(--text-secondary); font-weight:600;">Control Parameter:</label>
+              <input type="range" id="dppVSlider" min="1" max="32" step="1" value="8" style="width:140px;">
+              <span class="badge-tag accent-cyan" id="dppVSliderValue">V = 8.0</span>
+            </div>
+          </div>
+
+          <!-- Theoretical Math Formula Banner -->
+          <div class="formula-banner" style="background:var(--surface-active); padding:10px 14px; border-radius:6px; margin-top:8px; font-family:var(--font-mono); font-size:12px; color:var(--cyan); border-left:3px solid var(--cyan);">
+            &Delta;L(Q) + V &bull; g(t) &le; B + V &bull; C - &epsilon; &sum; Q<sub>i</sub>(t) &nbsp;&bull;&nbsp; Bound: Q &le; (B + V&bull;C) / &epsilon;
+          </div>
+
+          <!-- KPI Strip -->
+          <div class="kpi-mini-strip" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:10px;">
+            <div class="kpi-box" style="background:var(--surface-active); padding:10px; border-radius:6px;">
+              <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Analytic Backlog Bound</div>
+              <div style="font-size:18px; font-weight:700; color:var(--cyan); font-family:var(--font-mono);" id="dppAnalyticBoundVal">30.08 Mbit</div>
+              <div style="font-size:10px; color:var(--text-secondary);">(B=8.0, C=1.85, &epsilon;=0.6)</div>
+            </div>
+            <div class="kpi-box" style="background:var(--surface-active); padding:10px; border-radius:6px;">
+              <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Empirical Compliance</div>
+              <div style="font-size:18px; font-weight:700; color:#10b981; font-family:var(--font-mono);" id="dppComplianceRateVal">100.0% (PASS)</div>
+              <div style="font-size:10px; color:var(--text-secondary);">950 / 950 evaluated slots</div>
+            </div>
+            <div class="kpi-box" style="background:var(--surface-active); padding:10px; border-radius:6px;">
+              <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Mean Slot Latency</div>
+              <div style="font-size:18px; font-weight:700; color:#a855f7; font-family:var(--font-mono);">0.003 ms</div>
+              <div style="font-size:10px; color:var(--text-secondary);">Ultra-fast Lyapunov evaluation</div>
+            </div>
+            <div class="kpi-box" style="background:var(--surface-active); padding:10px; border-radius:6px;">
+              <div style="font-size:10px; color:var(--text-secondary); text-transform:uppercase;">Acceptance Criterion</div>
+              <div style="font-size:18px; font-weight:700; color:#10b981; font-family:var(--font-mono);">&ge; 95% Bound Met</div>
+              <div style="font-size:10px; color:var(--text-secondary);">Tested on 3 volatile profiles</div>
+            </div>
+          </div>
+
+          <div class="canvas-box" style="position:relative; height:280px; margin-top:12px;">
+            <canvas id="dppPhaseSpaceCanvas" width="540" height="280" aria-label="Lyapunov parameter V backlog tradeoff chart"></canvas>
+          </div>
+          <div style="font-size:11px; color:var(--text-secondary); text-align:center; margin-top:4px;">
+            Solid Cyan: Measured Mean Backlog &bull; Amber: Measured Max Backlog &bull; Red Dashed: Formal Theoretical Bound
+          </div>
+        </div>
+
+        <!-- Row 2: Dual Cards (Paired t-test Forest Plot & LoRA Training Visualizer) -->
+        <div class="comparison-dual-grid" style="margin-top:1.2rem;">
+          <!-- Left: Forest Plot -->
+          <div class="card comparison-card">
+            <div class="card-title-row">
+              <div class="card-icon-chip emerald">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+              </div>
+              <div>
+                <h3>Paired Student's t-test Forest Plot (N=10)</h3>
+                <span class="card-sub">Stage A1 vs Stage A5 across 10 independent evaluation seeds</span>
+              </div>
+            </div>
+
+            <div class="kpi-mini-strip" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:6px;">
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">t-Statistic</div>
+                <div style="font-size:13px; font-weight:700; color:var(--cyan); font-family:var(--font-mono);" id="statTStatVal">t = 14.41</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">p-Value</div>
+                <div style="font-size:13px; font-weight:700; color:#10b981; font-family:var(--font-mono);" id="statPVal">p &lt; 0.0001</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">Cohen's d</div>
+                <div style="font-size:13px; font-weight:700; color:#a855f7; font-family:var(--font-mono);" id="statCohensDVal">d = 4.56</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">Mean Difference</div>
+                <div style="font-size:13px; font-weight:700; color:#10b981; font-family:var(--font-mono);" id="statMeanDiffVal">+137.8 pts</div>
+              </div>
+            </div>
+
+            <div class="canvas-box" style="position:relative; height:320px; margin-top:8px;">
+              <canvas id="forestPlotCanvas" width="540" height="320" aria-label="Paired Student's t-test forest plot canvas"></canvas>
+            </div>
+            <div style="font-size:10px; color:var(--text-secondary); text-align:center; margin-top:2px;">
+              H0 (No Difference) decisively rejected: Verdict = REJECT_H0_SIGNIFICANT_IMPROVEMENT
+            </div>
+          </div>
+
+          <!-- Right: LoRA Training Inspector -->
+          <div class="card comparison-card">
+            <div class="card-title-row">
+              <div class="card-icon-chip purple">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.55 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-1.38 0-2.64-.47-3.66-1.25l-.26-.2-1.9 1.9-.71-.71 1.9-1.9-.2-.26C6.47 14.64 6 13.38 6 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6z"/></svg>
+              </div>
+              <div>
+                <h3>SmolLM2-135M LoRA Adapter Training Inspector</h3>
+                <span class="card-sub">Parameter-efficient fine-tuning loss trajectory over 60 optimization steps</span>
+              </div>
+            </div>
+
+            <div class="kpi-mini-strip" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:6px;">
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">LoRA Config</div>
+                <div style="font-size:12px; font-weight:700; color:var(--cyan); font-family:var(--font-mono);" id="loraRankSpec">r=8, &alpha;=16</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">Trainable Params</div>
+                <div style="font-size:12px; font-weight:700; color:#a855f7; font-family:var(--font-mono);" id="loraParamsCount">460,800 (0.24%)</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">Final Loss</div>
+                <div style="font-size:12px; font-weight:700; color:#10b981; font-family:var(--font-mono);" id="loraFinalLossVal">0.6309</div>
+              </div>
+              <div class="kpi-box" style="background:var(--surface-active); padding:6px; border-radius:4px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary);">Gating Verdict</div>
+                <div style="font-size:12px; font-weight:700; color:#10b981; font-family:var(--font-mono);" id="loraGateGainVal">+18.2% (PROMOTED)</div>
+              </div>
+            </div>
+
+            <div class="canvas-box" style="position:relative; height:240px; margin-top:8px;">
+              <canvas id="loraTrainingCanvas" width="540" height="240" aria-label="LoRA training cross-entropy loss trajectory"></canvas>
+            </div>
+            <div style="font-size:10px; color:var(--text-secondary); text-align:center; margin-top:2px;">
+              Base Agreement: 27.3% &rarr; Candidate Agreement: 45.5% (Required Margin: 2.0% satisfied)
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Zero-Shot Generalization & Policy Transfer Card -->
+        <div class="card comparison-card" style="margin-top:1.2rem;">
+          <div class="card-title-row" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="card-icon-chip cyan">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
+              </div>
+              <div>
+                <h3>Objective 6: Zero-Shot Policy Transfer &amp; Generalization</h3>
+                <span class="card-sub">Evaluating policy gain retention when transferred from 4-switch linear to unseen 6-switch mesh topology</span>
+              </div>
+            </div>
+            <span class="badge-state ok">103.8% RETENTION (PASS)</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:12px;">
+            <div style="background:var(--surface-active); padding:12px; border-radius:6px;">
+              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:4px;">Training Environment</div>
+              <strong style="color:var(--text-primary); font-size:13px;">Linear 4-Switch Fabric</strong>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Steady + Bursty Workload &bull; Gain: 435.89</div>
+            </div>
+            <div style="background:var(--surface-active); padding:12px; border-radius:6px;">
+              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:4px;">Holdout Environment</div>
+              <strong style="color:var(--cyan); font-size:13px;">Unseen 6-Switch Mesh Fabric</strong>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Flash-Crowd Surge &bull; Gain: 452.32</div>
+            </div>
+            <div style="background:var(--surface-active); padding:12px; border-radius:6px;">
+              <div style="font-size:11px; color:var(--text-secondary); margin-bottom:4px;">Retention Target vs Measured</div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+                <span>Target: <strong>&ge; 90.0%</strong></span>
+                <span style="color:#10b981; font-weight:700;">Measured: 103.8%</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px; overflow:hidden;">
+                <div style="width:100%; height:100%; background:#10b981;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- VIEW 1: TOPOLOGY & FLOW INSPECTOR -->
     <div class="tab-pane active" id="tab-topo" role="tabpanel" aria-labelledby="tabBtnTopo">
       <div class="topo-layout">
@@ -352,6 +759,30 @@
               <div class="legend-item"><span class="legend-swatch swatch-primary"></span> <span>Primary Link</span></div>
               <div class="legend-item"><span class="legend-swatch swatch-secondary"></span> <span>Secondary (Reroute)</span></div>
               <div class="legend-item"><span class="legend-swatch swatch-congested"></span> <span>Congested (&gt;85%)</span></div>
+            </div>
+          </div>
+
+          <!-- Multi-Topology Fabric Switcher -->
+          <div class="topo-fabric-switcher-bar">
+            <span class="switcher-label">Topology Fabric:</span>
+            <div class="fabric-btn-group" id="topoFabricButtonGroup">
+              <button class="fabric-btn active" data-topo="linear" type="button">
+                <span>Linear 4-Switch (Default)</span>
+              </button>
+              <button class="fabric-btn" data-topo="leaf_spine" type="button">
+                <span>Leaf-Spine 2x4 Data Center</span>
+              </button>
+              <button class="fabric-btn" data-topo="unseen_mesh" type="button">
+                <span>Augmented 6-Switch Mesh</span>
+              </button>
+            </div>
+            <div class="traffic-replayer-controls">
+              <span class="switcher-label">Workload Schedule:</span>
+              <select id="selectWorkloadSchedule" class="form-select-custom">
+                <option value="steady_bursty" selected>Steady + Bursty Pareto</option>
+                <option value="flash_crowd">Flash Crowd (84 events, 600s)</option>
+                <option value="volatile_dpp">Volatile DPP Stress</option>
+              </select>
             </div>
           </div>
 
@@ -484,6 +915,123 @@
               </tr>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- Multi-Fabric Dynamics & Traffic Matrix Studio -->
+      <div class="topo-studio-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-top:16px;">
+        <!-- Card 1: Traffic Matrix Heatmap -->
+        <div class="card comparison-card">
+          <div class="card-title-row">
+            <div class="card-icon-chip emerald">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 11h5V5H4v6zm0 7h5v-5H4v5zm6 0h5v-9h-5v9zm6 0h5v-13h-5v13z"/></svg>
+            </div>
+            <div>
+              <h3>Host-to-Host Traffic Matrix (8x8 Heatmap)</h3>
+              <span class="card-sub">Real-time Mbps throughput between all host pairs (Click any cell to burst)</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:center; align-items:center; margin:10px 0;">
+            <canvas id="trafficMatrixHeatmapCanvas" width="280" height="280" aria-label="8x8 host traffic matrix heatmap"></canvas>
+          </div>
+          <div id="trafficEventLog" style="height:70px; overflow-y:auto; font-family:var(--font-mono); font-size:10px; background:var(--surface-active); padding:6px 10px; border-radius:4px; border:1px solid var(--border-color);">
+            <div style="color:var(--text-secondary);">[LOG] Traffic matrix initialized. Click any cell to inject elephant burst.</div>
+          </div>
+        </div>
+
+        <!-- Card 2: TCAM Hardware Flow Table Capacity -->
+        <div class="card comparison-card">
+          <div class="card-title-row">
+            <div class="card-icon-chip cyan">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+            <div>
+              <h3>Switch TCAM Flow Table Utilization</h3>
+              <span class="card-sub">Hardware OpenFlow 1.3 TCAM capacity &amp; rule allocation</span>
+            </div>
+          </div>
+          <div id="tcamBarsContainer" style="margin-top:12px;"></div>
+          <div style="font-size:11px; color:var(--text-secondary); line-height:1.5; margin-top:8px;">
+            Hardware bounds: 1024 flow entries per switch. Rules are prioritized: elephant reroutes (priority 100), steady forwarding (priority 10), default L2 trunk (priority 1).
+          </div>
+        </div>
+
+        <!-- Card 3: Custom Packet & Burst Flow Injector -->
+        <div class="card comparison-card">
+          <div class="card-title-row">
+            <div class="card-icon-chip purple">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <div>
+              <h3>Custom Flow Injector</h3>
+              <span class="card-sub">Inject synthetic traffic flows across the selected topology fabric</span>
+            </div>
+          </div>
+
+          <form id="formCustomFlowInject" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary);">Source Host:</label>
+                <select id="customFlowSrc" class="form-select-custom" style="width:100%; padding:5px; font-size:11px;">
+                  <option value="h1">h1 (10.0.0.1)</option>
+                  <option value="h2" selected>h2 (10.0.0.2)</option>
+                  <option value="h3">h3 (10.0.0.3)</option>
+                  <option value="h4">h4 (10.0.0.4)</option>
+                  <option value="h5">h5 (10.0.0.5)</option>
+                  <option value="h6">h6 (10.0.0.6)</option>
+                  <option value="h7">h7 (10.0.0.7)</option>
+                  <option value="h8">h8 (10.0.0.8)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary);">Destination Host:</label>
+                <select id="customFlowDst" class="form-select-custom" style="width:100%; padding:5px; font-size:11px;">
+                  <option value="h1">h1 (10.0.0.1)</option>
+                  <option value="h2">h2 (10.0.0.2)</option>
+                  <option value="h3">h3 (10.0.0.3)</option>
+                  <option value="h4">h4 (10.0.0.4)</option>
+                  <option value="h5">h5 (10.0.0.5)</option>
+                  <option value="h6">h6 (10.0.0.6)</option>
+                  <option value="h7">h7 (10.0.0.7)</option>
+                  <option value="h8" selected>h8 (10.0.0.8)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                <span style="color:var(--text-secondary);">Injection Rate (Mbps):</span>
+                <strong id="customFlowRateLabel" style="color:var(--cyan);">12.0 Mbps</strong>
+              </div>
+              <input type="range" id="customFlowRateSlider" min="1" max="20" step="0.5" value="12" style="width:100%;">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary);">Traffic Profile:</label>
+                <select id="customFlowProfile" class="form-select-custom" style="width:100%; padding:5px; font-size:11px;">
+                  <option value="elephant">Pareto Elephant (Heavy)</option>
+                  <option value="burst">Micro-burst (Surge)</option>
+                  <option value="steady">Steady UDP Stream</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px; color:var(--text-secondary);">Protocol:</label>
+                <select id="customFlowProtocol" class="form-select-custom" style="width:100%; padding:5px; font-size:11px;">
+                  <option value="udp">UDP (Port 5201)</option>
+                  <option value="tcp">TCP (Port 80/443)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" class="btn-ctrl btn-elephant" id="btnSubmitCustomFlow" style="margin-top:6px; justify-content:center;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <span>Inject Flow Burst into Fabric</span>
+            </button>
+          </form>
+
+          <!-- Selected Element Detailed Inspector Container -->
+          <div id="topologyInspectorPanel" style="display:none; margin-top:12px; background:var(--surface-active); padding:10px 12px; border-radius:6px; border-left:3px solid var(--cyan);"></div>
         </div>
       </div>
     </div>
@@ -883,7 +1431,11 @@
         </div>
       </div>
 
-      <!-- SECTION 1: PRIMARY OFFLINE BENCHMARK ATLAS (86,400 windows) -->
+      <p style="margin: 0 0 1rem;">
+        <a href="comparison/index.html">View the audited comparison of 14 controllers across 13 XY graphs</a>
+      </p>
+
+      <!-- EARLIER OFFLINE BENCHMARK ATLAS (86,400 windows) -->
       <div class="benchmark-atlas-panel">
         <div class="panel-header">
           <div class="panel-title-group">
@@ -892,7 +1444,7 @@
               <span class="tag-openflow">Offline Simulation Suite</span>
               <span class="tag-dpid">GET /api/benchmarks/summary &bull; 86,400 Windows</span>
             </div>
-            <h2>Primary Benchmark Atlas &amp; Controller Ablation</h2>
+            <h2>Earlier Benchmark Atlas</h2>
             <p>Empirical evaluation across 8 traffic scenarios, 10 held-out seeds, and 9 controller variants. Includes 95% paired bootstrap confidence intervals.</p>
           </div>
           <div style="display:flex; align-items:center; gap:0.6rem;">
@@ -1186,11 +1738,11 @@
         <div class="panel-header" style="margin-top: 2rem; margin-bottom: 0.8rem;">
           <div class="panel-title-group">
             <div class="panel-badge-row">
-              <span class="tag-openflow">Table 2: Architectural Ablation</span>
+              <span class="tag-openflow">Historical Table 2: Heuristic Proxies</span>
               <span class="tag-dpid">GET /api/ablation/table2</span>
             </div>
             <h3>Component-Wise Ablation (A0 &ndash; A5)</h3>
-            <p style="font-size: 0.75rem; color: var(--text-secondary);">Isolating the contribution of verbal memory, 6-agent governance, LoRA weight fine-tuning, and two-timescale DPP scheduling across 5 seeds (42&ndash;46).</p>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">The archived stages use scripted policies. Open the audited comparison for measured component execution.</p>
           </div>
         </div>
         <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
@@ -1217,11 +1769,11 @@
         <div class="panel-header" style="margin-top: 2rem; margin-bottom: 0.8rem;">
           <div class="panel-title-group">
             <div class="panel-badge-row">
-              <span class="tag-openflow">Table 5: Industry Baselines</span>
+              <span class="tag-openflow">Historical Table 5: Heuristic Proxies</span>
               <span class="tag-dpid">GET /api/benchmarks/table5</span>
             </div>
             <h3>Baseline Controller Comparison (6 Systems)</h3>
-            <p style="font-size: 0.75rem; color: var(--text-secondary);">Direct comparison against classic SDN heuristics and deep reinforcement learning controllers under matched seeds.</p>
+            <p style="font-size: 0.75rem; color: var(--text-secondary);">The archived DQN and MARL labels refer to randomized threshold policies. The audited comparison uses trained networks.</p>
           </div>
         </div>
         <div class="ablation-table-card" style="margin-bottom: 1.5rem;">
@@ -1467,6 +2019,9 @@
   <script src="js/agent.js"></script>
   <script src="js/simulator.js"></script>
   <script src="js/results.js"></script>
+  <script src="js/comparison_viz.js"></script>
+  <script src="js/topology_studio.js"></script>
+  <script src="js/advanced_analytics.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

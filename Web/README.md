@@ -176,6 +176,16 @@ def handle_result_resource(self, path):
 | Endpoint | Method | Response Codes | Description & Payload Schema |
 | :--- | :---: | :---: | :--- |
 | `/api/status` | `GET` | `200` | Real-time health check. Returns `{"status": "online", "ryu_controller": "connected", "connected_switches": ["0000000000000001", ...]}`. |
+| `/api/comparison/configs` | `GET` | `200` | Lists all 14 evaluated SDN controllers with family classifications, mechanisms, and descriptions. |
+| `/api/comparison/effects` | `GET` | `200`, `404` | Returns statistical comparison matrix: deltas, 95% bootstrap CIs, p-values across all 13 comparison pairs. |
+| `/api/comparison/runs` | `GET` | `200`, `404` | Serves summarized or full per-window time series across matched seeds (`?configs=S0,S5` or `?summary_only=true`). |
+| `/api/topologies` | `GET` | `200` | Returns available network fabrics (`linear`, `leaf_spine`, `unseen_mesh`) with switch, host, and link counts. |
+| `/api/topologies/<id>` | `GET` | `200`, `400`, `404` | Serves complete graph manifest for requested fabric with switch tiers, link capacities, and propagation delays. |
+| `/api/traffic/schedules` | `GET` | `200` | Lists pre-recorded benchmark traffic profiles (`flash_crowd`, `steady_bursty`, `volatile_dpp`). |
+| `/api/traffic/schedules/<profile>` | `GET` | `200`, `400`, `404` | Serves complete event sequence, flow IDs, protocols, and rates for requested traffic schedule. |
+| `/api/analytics/dpp` | `GET` | `200`, `404` | Theoretical Lyapunov Drift-Plus-Penalty backlog bounds $(B+VC)/\epsilon$ and empirical $V$-tradeoff sweep. |
+| `/api/analytics/statistics` | `GET` | `200`, `404` | Paired Student's t-test report ($t=14.41$, $p < 0.0001$), Cohen's $d=4.557$, and seed-by-seed pair differences. |
+| `/api/analytics/lora` | `GET` | `200`, `404` | SmolLM2-135M LoRA adapter hyperparameters ($r=8, \alpha=16$), trainable parameters (460,800), and step loss log. |
 | `/api/memory` | `GET` | `200`, `404` | Retrieves stored LangGraph experience records: `{"count": 30, "entries": [{"cycle": 4, "action": "reroute", "reward": 0.118, ...}]}`. |
 | `/api/ablation` | `GET` | `200` | Returns live CSV comparison rows across A0, A1, and A2 evaluation runs. |
 | `/api/results` | `GET` | `200` | Lists all validated saved benchmark runs with stage (`A0`, `A1`, `A2`, `A4`), status, and timestamp. |
@@ -235,3 +245,31 @@ python Web/server.py
 
 ---
 *Authored by Team SDN_07 — EC466: Software Defined Networks*
+
+## Paper Evidence page (`pipeline.html`)
+
+A read-only view of `selfx/output/pipeline_study/` — the same result files the
+IEEE paper is generated from, so the dashboard and the manuscript cannot show
+different numbers.
+
+Open `http://127.0.0.1:5000/pipeline.html`, or follow the **Paper Evidence** link
+in the main tab bar.
+
+It renders the headline metrics, the six-stage ablation, the measured
+control-plane cost per mechanism, the baseline comparison, the paired
+significance tests, and the generated figures.
+
+### API
+
+| Endpoint | Serves |
+|---|---|
+| `/api/pipeline/summary` | `pipeline_summary.json` — aggregates per configuration |
+| `/api/pipeline/runs` | `pipeline_runs.json` — every run, every window |
+| `/api/pipeline/significance` | paired tests and the cluster bootstrap |
+| `/api/pipeline/vsweep` | the Lyapunov $V$ trade-off sweep |
+| `/api/pipeline/transfer` | zero-shot transfer to the held-out profile |
+| `/api/pipeline/adapter` | the LoRA fit and its promotion gate |
+
+The handler matches `name` against a fixed allow-list rather than joining it onto
+a path, so no request can walk out of the results directory. Every endpoint is
+GET-only and returns 404 with a hint if the study has not been run yet.

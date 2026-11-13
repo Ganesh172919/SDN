@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SELF-X — Pipeline Study Evidence</title>
+<meta name="description" content="Historical incremental-pipeline study. The audited comparison is available separately.">
+<style>
+  :root{
+    --surface:#fcfcfb; --panel:#ffffff; --ink:#0b0b0b; --ink2:#52514e; --muted:#8c8a85;
+    --line:#e3e2de;
+    --blue:#2a78d6; --orange:#eb6834; --aqua:#1baf7a; --yellow:#eda100;
+    --violet:#6250d6; --red:#e34948;
+    --ramp0:#c3dbf5; --ramp1:#9cc3ee; --ramp2:#6ea6e4; --ramp3:#4189db;
+    --ramp4:#2a78d6; --ramp5:#14528f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --surface:#1a1a19; --panel:#232322; --ink:#f0efec; --ink2:#c3c2b7; --muted:#8c8a85;
+      --line:#34342f; --blue:#3987e5; --orange:#d95926; --aqua:#199e70; --yellow:#c98500;
+      --violet:#9085e9; --red:#e66767;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--surface); color:var(--ink);
+    font:15px/1.55 "Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 16px 72px}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
+  h1{font-size:28px;margin:0 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--ink2);margin:0;font-size:15px}
+  .meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-size:12px;padding:3px 10px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink2);
+  }
+  h2{font-size:18px;margin:34px 0 4px}
+  .note{color:var(--ink2);font-size:13.5px;margin:0 0 14px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0 6px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .card .v{font-size:25px;font-weight:650;margin-top:4px;letter-spacing:-.02em}
+  .card .u{font-size:12.5px;color:var(--ink2);margin-top:2px}
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:rgba(42,120,214,.09);color:var(--ink);font-weight:650;font-size:12.5px;
+           text-transform:uppercase;letter-spacing:.03em}
+  tbody tr:last-child td{border-bottom:none}
+  tr.best td{background:rgba(27,175,122,.11);font-weight:650}
+  .bar{height:9px;border-radius:5px;background:var(--ramp4);display:inline-block;vertical-align:middle}
+  .barcell{text-align:left;width:150px}
+  figure{margin:16px 0 0;background:var(--panel);border:1px solid var(--line);
+         border-radius:10px;padding:14px}
+  figure img{width:100%;height:auto;display:block;border-radius:6px;background:#fff}
+  figcaption{color:var(--ink2);font-size:13px;margin-top:10px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+  .err{background:rgba(227,73,72,.1);border:1px solid var(--red);color:var(--ink);
+       border-radius:10px;padding:14px 16px;font-size:14px}
+  code{background:rgba(130,130,130,.14);padding:1px 5px;border-radius:4px;font-size:13px}
+  footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);
+         color:var(--muted);font-size:12.5px}
+  .legendrow{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0 0;font-size:12.5px;color:var(--ink2)}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+  @media (max-width:640px){ .wrap{padding:20px 16px 56px} h1{font-size:23px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p><a href="comparison/index.html">Open the current audited comparison and all 13 graphs</a></p>
+  <h1>Earlier SELF-X pipeline study</h1>
+  <p class="sub">Archived results from the remote-provider experiment.</p>
+  <div class="meta" id="meta"></div>
+</header>
+
+<div id="error" hidden></div>
+
+<section>
+  <h2>Headline</h2>
+  <p class="note" id="headline-note">Full pipeline (S5) against static OpenFlow forwarding (S0).</p>
+  <div class="cards" id="headline"></div>
+</section>
+
+<section>
+  <h2>Staged ablation</h2>
+  <p class="note">Each stage adds exactly one mechanism to the one above it. Every stage
+     saw bit-identical offered demand on every seed.</p>
+  <div id="ablation"></div>
+</section>
+
+<section>
+  <h2>Control-plane cost</h2>
+  <p class="note">Measured, not assumed. This is what sets each loop's period.</p>
+  <div id="latency"></div>
+</section>
+
+<section>
+  <h2>Against non-LLM controllers</h2>
+  <p class="note">Same trace, same reward, same action set.</p>
+  <div id="baselines"></div>
+</section>
+
+<section>
+  <h2>Significance</h2>
+  <p class="note">Paired on matched (seed, window) pairs. The interval is a seed-level
+     cluster bootstrap, which respects the serial dependence of windows inside a seed.</p>
+  <div id="stats"></div>
+</section>
+
+<section>
+  <h2>Figures</h2>
+  <div class="grid2" id="figures"></div>
+</section>
+
+<footer id="footer"></footer>
+</div>
+
+<script>
+const FIGS = [
+  ["fig1_architecture","The three loops and the single policy channel between them."],
+  ["fig3_ablation","Staged ablation; error bars are the standard error over seeds."],
+  ["fig4_control_latency","Measured decision latency against the two control periods."],
+  ["fig8_loss_decomposition","Loss split into the irreducible floor and the controller-addressable part."],
+  ["fig6_v_tradeoff","Sweeping the Lyapunov parameter V."],
+  ["fig9_convergence","Cumulative reward over one run."],
+];
+const LABEL = {
+  S0:"S0 static forwarding", S1:"S1 static LLM agent", S2:"S2 + self-critique",
+  S3:"S3 + LoRA policy head", S4:"S4 + six-agent governance", S5:"S5 full pipeline",
+  threshold:"Capacity-aware threshold", least_loaded:"Greedy least-loaded",
+  tabular_q:"Tabular Q-learning"
+};
+const RAMP = ["--ramp0","--ramp1","--ramp2","--ramp3","--ramp4","--ramp5"];
+const n = (v, d=2) => (v===undefined||v===null||Number.isNaN(v)) ? "—" : Number(v).toFixed(d);
+const el = (t, cls, html) => { const e=document.createElement(t); if(cls)e.className=cls;
+  if(html!==undefined)e.innerHTML=html; return e; };
+
+async function get(name){
+  const r = await fetch(`/api/pipeline/${name}`, {headers:{"Accept":"application/json"}});
+  if(!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
+  return r.json();
+}
+
+function table(head, rows, bestIndex){
+  const t = el("table");
+  const thead = el("thead");
+  const hr = el("tr");
+  head.forEach(h => hr.appendChild(el("th", null, h)));
+  thead.appendChild(hr); t.appendChild(thead);
+  const tb = el("tbody");
+  rows.forEach((r,i) => {
+    const tr = el("tr"); if(i===bestIndex) tr.className = "best";
+    r.forEach(c => tr.appendChild(el("td", null, c)));
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); return t;
+}
+
+function bar(value, max, colorVar){
+  const w = Math.max(2, Math.round(140 * value / (max||1)));
+  return `<span class="bar" style="width:${w}px;background:var(${colorVar})"></span>`;
+}
+
+function render(summary, stats){
+  const by = {}; summary.stages.forEach(s => by[s.configuration] = s);
+  const s0 = by.S0, s5 = by.S5;
+  const pct = (a,b) => 100*(a-b)/a;
+
+  // --- meta chips
+  const meta = document.getElementById("meta");
+  const llm = summary.llm || {};
+  [
+    `${summary.seeds.length} seeds`,
+    `${summary.windows_per_run} windows × ${n(summary.window_sec,0)} s`,
+    `τ = ${n(summary.tau_sec*1000,0)} ms`,
+    `governance every ${n(summary.governance_epoch_windows*summary.window_sec,0)} s`,
+    `${llm.total_decisions ?? 0} model decisions`,
+    `${n((llm.served_fraction ?? 0)*100,1)}% served`,
+    `${llm.declared_fallbacks ?? 0} declared fallbacks`,
+    `conservation ${Number(summary.max_conservation_error_mbit).toExponential(1)} Mbit`,
+  ].forEach(x => meta.appendChild(el("span","chip",x)));
+
+  // --- headline cards
+  const cards = [
+    ["Mean delay", n(s5.mean_latency_ms,1)+" ms", `${n(pct(s0.mean_latency_ms,s5.mean_latency_ms),1)}% below static`],
+    ["Packet loss", n(s5.loss_pct,1)+" %", `${n(pct(s0.loss_pct,s5.loss_pct),1)}% below static`],
+    ["Mean backlog", n(s5.mean_queue_mbit,3)+" Mbit", `${n(pct(s0.mean_queue_mbit,s5.mean_queue_mbit),1)}% below static`],
+    ["Fast-loop decision", n(s5.mean_fast_decision_us,1)+" µs", `p99 ${n(s5.p99_fast_decision_us,1)} µs`],
+    ["Irreducible loss floor", n(s0.oracle_floor_loss_pct,1)+" %", "demand above total capacity"],
+  ];
+  const box = document.getElementById("headline");
+  cards.forEach(([k,v,u]) => {
+    const c = el("div","card");
+    c.appendChild(el("div","k",k)); c.appendChild(el("div","v",v)); c.appendChild(el("div","u",u));
+    box.appendChild(c);
+  });
+
+  // --- ablation table
+  const order = ["S0","S1","S2","S3","S4","S5"];
+  const present = order.filter(k => by[k]);
+  const maxLat = Math.max(...present.map(k => by[k].mean_latency_ms));
+  const rows = present.map((k,i) => [
+    LABEL[k] || k,
+    `<span class="barcell">${bar(by[k].mean_latency_ms, maxLat, RAMP[i])}</span> ${n(by[k].mean_latency_ms,1)}`,
+    n(by[k].p95_latency_ms,1), n(by[k].mean_throughput_mbps,2),
+    n(by[k].loss_pct,1), n(by[k].mean_queue_mbit,3), n(by[k].mean_reward,3),
+  ]);
+  document.getElementById("ablation").appendChild(
+    table(["Stage","Delay (ms)","P95 (ms)","Goodput (Mbps)","Loss (%)","Backlog (Mbit)","Reward"],
+          rows, present.indexOf("S5")));
+
+  // --- control latency
+  const lat = [
+    ["Lyapunov DPP fast loop", n(s5.mean_fast_decision_us/1000,3), `${n(summary.tau_sec*1000,0)} ms slot`],
+    ["LoRA policy head (CPU)", n(by.S3?.mean_control_latency_ms,0), `${n(summary.window_sec,0)} s window`],
+    ["Zero-shot remote model", n(by.S1?.mean_control_latency_ms,0),
+      `${n(summary.governance_epoch_windows*summary.window_sec,0)} s epoch`],
+    ["Remote model + self-critique", n(by.S2?.mean_control_latency_ms,0),
+      `${n(summary.governance_epoch_windows*summary.window_sec,0)} s epoch`],
+  ].map(r => [r[0], r[1], r[2]]);
+  document.getElementById("latency").appendChild(
+    table(["Mechanism","Measured decision cost (ms)","Period it can run at"], lat, 0));
+
+  // --- baselines
+  const bl = ["S0","threshold","least_loaded","tabular_q","S2","S5"].filter(k => by[k]);
+  document.getElementById("baselines").appendChild(table(
+    ["Controller","Delay (ms)","P95 (ms)","Loss (%)","Reward","Control cost (ms)"],
+    bl.map(k => [LABEL[k]||k, n(by[k].mean_latency_ms,1), n(by[k].p95_latency_ms,1),
+                 n(by[k].loss_pct,1), n(by[k].mean_reward,3), n(by[k].mean_control_latency_ms,1)]),
+    bl.indexOf("S5")));
+
+  // --- statistics
+  if(stats && stats.tests){
+    const nameOf = {S5vsS0:"S5 vs S0 static", S5vsS1:"S5 vs S1 static LLM",
+      S5vsS2:"S5 vs S2 self-critique", S5vsS3:"S5 vs S3 LoRA",
+      S5vsS4:"S5 vs S4 governance", S5vsQ:"S5 vs tabular Q"};
+    const rs = Object.keys(nameOf).filter(k => stats.tests[k]).map(k => {
+      const r = stats.tests[k];
+      return [nameOf[k], r.n, n(r.t_statistic,2), Number(r.p_value).toExponential(1),
+              n(r.cohens_d,2), `[${n(r.ci95[0],3)}, ${n(r.ci95[1],3)}]`];
+    });
+    document.getElementById("stats").appendChild(
+      table(["Comparison","n pairs","t","p","Cohen's d","Bootstrap 95% CI"], rs));
+    document.getElementById("stats").appendChild(
+      el("p","note",`Bonferroni threshold α = ${stats.bonferroni_alpha}. `
+        + `${stats.bootstrap_draws.toLocaleString()} bootstrap draws, resampling whole seeds.`));
+  }
+
+  // --- figures
+  const figs = document.getElementById("figures");
+  FIGS.forEach(([name, caption]) => {
+    const f = el("figure");
+    const img = el("img");
+    img.src = `../paper/figures/${name}.png`;
+    img.alt = caption;
+    img.loading = "lazy";
+    img.onerror = () => { f.hidden = true; };
+    f.appendChild(img);
+    f.appendChild(el("figcaption", null, caption));
+    figs.appendChild(f);
+  });
+
+  document.getElementById("footer").innerHTML =
+    `Generated ${summary.generated_utc} · mode <code>${summary.mode}</code> · `
+    + `wall clock ${n(summary.wall_clock_sec,0)} s · `
+    + `regenerate with <code>scripts/run_all.ps1</code>. `
+    + `Results come from a discrete-time fluid-queue model of a two-path OpenFlow datapath; `
+    + `bit conservation is asserted on every slot of every run.`;
+}
+
+(async () => {
+  try{
+    const summary = await get("summary");
+    let stats = null;
+    try { stats = await get("significance"); } catch(e){ /* optional */ }
+    render(summary, stats);
+  }catch(e){
+    const box = document.getElementById("error");
+    box.hidden = false;
+    box.className = "err";
+    box.innerHTML = `<strong>No study results available.</strong><br>${e.message}<br><br>`
+      + `Start the dashboard with <code>python Web/server.py</code> and generate the results with `
+      + `<code>scripts/run_all.ps1</code> (or <code>scripts/run_all.sh</code>).`;
+  }
+})();
+</script>
+</body>
+</html>

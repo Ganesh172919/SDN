@@ -1,0 +1,41 @@
+# SELF-X — exact dependency set for the reported results.
+# Verified on Windows 11 / CPython 3.12, CPU only. No GPU is required.
+#
+#   python -m venv .venv
+#   .venv\Scripts\python -m pip install -r requirements.txt     (Windows)
+#   .venv/bin/python     -m pip install -r requirements.txt     (Linux/macOS)
+#
+# PyTorch is CPU-only here; on Linux/macOS drop the --extra-index-url line and
+# plain `torch==2.8.0` resolves correctly.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# --- control plane and providers -------------------------------------------
+requests==2.34.2
+python-dotenv==1.2.4
+pydantic==2.14.1
+
+# --- LoRA policy head (pinned SmolLM2-135M-Instruct, CPU inference) ---------
+torch==2.8.0
+transformers==4.55.4
+peft==0.17.1
+safetensors==0.6.2
+accelerate==1.10.1
+
+# --- evaluation, statistics and figures ------------------------------------
+numpy==2.5.4
+scipy==1.16.2
+matplotlib==3.11.2
+
+# --- deliverable generation (slides, PDF inspection) -----------------------
+python-pptx==1.0.2
+pymupdf==2.1
+pypdf==6.21.1
+
+# --- test suite -------------------------------------------------------------
+pytest==8.3.4
+
+# --- NOT pip-installable; only needed for the optional live Mininet path ----
+# mininet  -> `sudo apt install mininet` (needs Open vSwitch and root)
+# ryu      -> see selfx/README.md; unmaintained upstream, version-sensitive
+# iperf3   -> `sudo apt install iperf3`
+# None of the three is required to reproduce any result in the paper.

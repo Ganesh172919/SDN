@@ -1,14 +1,6 @@
-"""
-Evaluation of Stated Latency Targets (>=20% vs Static, >=10% vs DQN)
-Traceability: Task T31 | Deliverables D5, D6 | EC466 Team SDN_07
+"""Historical latency calculation over Table V proxies.
 
-Formal Target Metrics:
-  1. Target 1 (vs Static Control):
-     Reduction = 100 * (Latency_{Static} - Latency_{Full}) / Latency_{Static} >= 20.0%
-  2. Target 2 (vs DQN DRL Baseline):
-     Reduction = 100 * (Latency_{DQN} - Latency_{Full}) / Latency_{DQN} >= 10.0%
-
-Evaluated over matched paired seeds with standard uncertainty & confidence bounds.
+Its percentages are not measurements against trained DQN or the full pipeline.
 """
 
 from __future__ import annotations
@@ -89,6 +81,7 @@ def evaluate_latency_targets(
     all_passed = pass_static and pass_dqn
 
     report = {
+        "evidence_status": "historical_heuristic_proxy",
         "evaluation": "Formal Latency Reduction Verification",
         "sample_size_N": n,
         "mean_latency_static_ms": round(mean_static, 2),
@@ -125,6 +118,10 @@ def evaluate_latency_targets(
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy-proxy", action="store_true", help="regenerate the historical proxy")
+    if not parser.parse_args().legacy_proxy:
+        parser.error("Historical heuristic proxy. Run python -m selfx.eval.run_audited_comparison for the audited study.")
     evaluate_latency_targets()
 
 

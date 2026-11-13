@@ -1,3 +1,5 @@
+> Historical draft. The earlier DQN and MARL values came from randomized heuristic proxies. Use the [audited results](../../paper/COMPARISON.md) for empirical claims.
+
 # SELF-X: Autonomous Flow-Management in Software-Defined Networks via Two-Timescale Lyapunov Drift-Plus-Penalty and Multi-Agent Governance
 
 **Harsh Raj** (23BDS076), **Team SDN_07**  

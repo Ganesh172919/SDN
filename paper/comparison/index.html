@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SELF-X algorithm comparison</title>
+<style>
+:root { color-scheme: light; font: 16px/1.55 Inter, system-ui, sans-serif;
+  color: #172434; background: #f4f7f8; }
+body { max-width: 1460px; margin: auto; padding: 2rem clamp(1rem, 4vw, 4rem); }
+h1 { font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.15; margin: .5rem 0; }
+h2 { font-size: 1.25rem; }
+p { max-width: 78ch; }
+a { color: #00614f; text-underline-offset: .2em; }
+nav { display: flex; flex-wrap: wrap; gap: .6rem 1.5rem; margin: 1rem 0 2rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 510px), 1fr)); gap: 1rem; }
+figure { margin: 0; padding: .65rem; background: white; border: 1px solid #d5e0e5; border-radius: .5rem; }
+figcaption { font-weight: 650; padding: .35rem .4rem 0; }
+img { width: 100%; height: auto; display: block; }
+details { border: 1px solid #d5e0e5; background: white; border-radius: .5rem; padding: .75rem 1rem; }
+summary { cursor: pointer; font-weight: 650; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; font-variant-numeric: tabular-nums; }
+th, td { padding: .4rem .65rem; text-align: right; white-space: nowrap; }
+th:first-child { text-align: left; }
+tbody tr:nth-child(odd) { background: #f1f5f7; }
+</style>
+</head>
+<body>
+<header>
+<h1>SELF-X algorithm comparison</h1>
+<p>All 13 XY graphs compare the same 14 configurations across
+12 paired traffic traces in the fluid simulator.
+Agentic averaged <strong>60.54 ms</strong> delay,
+<strong>24.88%</strong> traffic loss and <strong>6.62 Mbps</strong> goodput.</p>
+<p>Agentic lowered mean delay by <strong>25.15%</strong> against static forwarding
+and <strong>1.22%</strong> against DQN. Its mean delay was <strong>+0.12 ms</strong>
+relative to fast DPP alone.</p>
+<nav aria-label="Results files">
+<a href="SELF_X_Algorithm_Comparison.pdf">Open PDF atlas</a>
+<a href="effects.csv">Download effects CSV</a>
+<a href="runs.json">Download per-seed data</a>
+</nav>
+</header>
+<main>
+<details>
+<summary>Agentic performance against every comparator</summary>
+<p>Positive reductions and gains favour Agentic. The delay interval is the pointwise paired
+95% interval for Agentic minus comparator. Holm adjustment applies to the delay tests.</p>
+<div class="scroll"><table><thead><tr>
+<th scope="col">Comparator</th><th scope="col">Delay (ms)</th><th scope="col">Delay reduction</th>
+<th scope="col">Paired 95% CI (ms)</th><th scope="col">Holm p</th><th scope="col">Loss reduction (pp)</th>
+<th scope="col">Goodput gain</th>
+</tr></thead><tbody><tr><th scope='row'>Static</th><td>80.88</td><td>+25.15%</td><td>[-27.51, -13.18]</td><td>0.01015</td><td>+1.12</td><td>+1.72%</td></tr><tr><th scope='row'>Base LM</th><td>61.30</td><td>+1.23%</td><td>[-0.96, -0.55]</td><td>0.001428</td><td>-0.33</td><td>-0.40%</td></tr><tr><th scope='row'>Base LM + critique</th><td>61.34</td><td>+1.31%</td><td>[-1.00, -0.61]</td><td>0.00119</td><td>-0.33</td><td>-0.40%</td></tr><tr><th scope='row'>LoRA policy</th><td>79.40</td><td>+23.75%</td><td>[-26.01, -11.70]</td><td>0.01015</td><td>+1.06</td><td>+1.62%</td></tr><tr><th scope='row'>Agentic at 5 s</th><td>71.77</td><td>+15.65%</td><td>[-14.57, -7.90]</td><td>0.004801</td><td>+0.45</td><td>+0.71%</td></tr><tr><th scope='row'>Capacity threshold</th><td>69.04</td><td>+12.31%</td><td>[-10.70, -6.30]</td><td>0.001428</td><td>+0.34</td><td>+0.57%</td></tr><tr><th scope='row'>Least loaded</th><td>70.85</td><td>+14.55%</td><td>[-13.67, -6.95]</td><td>0.007037</td><td>+0.41</td><td>+0.67%</td></tr><tr><th scope='row'>Tabular Q</th><td>71.52</td><td>+15.36%</td><td>[-14.11, -7.86]</td><td>0.007037</td><td>+0.50</td><td>+0.82%</td></tr><tr><th scope='row'>DQN</th><td>61.29</td><td>+1.22%</td><td>[-0.96, -0.54]</td><td>0.001428</td><td>-0.33</td><td>-0.40%</td></tr><tr><th scope='row'>Two-agent IQL</th><td>61.29</td><td>+1.22%</td><td>[-0.96, -0.54]</td><td>0.001428</td><td>-0.33</td><td>-0.40%</td></tr><tr><th scope='row'>DPP only</th><td>60.42</td><td>-0.20%</td><td>[+0.01, +0.23]</td><td>0.07446</td><td>-0.31</td><td>-0.38%</td></tr><tr><th scope='row'>Agentic without LoRA</th><td>60.07</td><td>-0.79%</td><td>[+0.34, +0.61]</td><td>0.005371</td><td>-0.33</td><td>-0.39%</td></tr><tr><th scope='row'>Agentic without governor</th><td>60.41</td><td>-0.22%</td><td>[+0.00, +0.27]</td><td>0.07446</td><td>-0.30</td><td>-0.36%</td></tr></tbody></table></div>
+</details>
+<h2>Comparison graphs</h2>
+<p>Select any graph to open the full-size image. DQN and two-agent IQL have identical curves because their executed actions match on every test trace.</p>
+<div class="grid"><figure id="mean-delay"><figcaption>01 Mean delay over time</figcaption><a href="01-mean-delay.png"><img src="01-mean-delay.png" width="1800" height="999" alt="Mean delay over time comparing all 14 configurations" loading="eager"></a></figure><figure id="tail-delay"><figcaption>02 Tail delay over time</figcaption><a href="02-tail-delay.png"><img src="02-tail-delay.png" width="1800" height="999" alt="Tail delay over time comparing all 14 configurations" loading="lazy"></a></figure><figure id="goodput"><figcaption>03 Goodput over time</figcaption><a href="03-goodput.png"><img src="03-goodput.png" width="1800" height="999" alt="Goodput over time comparing all 14 configurations" loading="lazy"></a></figure><figure id="loss"><figcaption>04 Loss over time</figcaption><a href="04-loss.png"><img src="04-loss.png" width="1800" height="999" alt="Loss over time comparing all 14 configurations" loading="lazy"></a></figure><figure id="queue"><figcaption>05 Backlog over time</figcaption><a href="05-queue.png"><img src="05-queue.png" width="1800" height="999" alt="Backlog over time comparing all 14 configurations" loading="lazy"></a></figure><figure id="reward"><figcaption>06 Cumulative control reward</figcaption><a href="06-reward.png"><img src="06-reward.png" width="1800" height="999" alt="Cumulative control reward comparing all 14 configurations" loading="lazy"></a></figure><figure id="rule-churn"><figcaption>07 Cumulative rule changes</figcaption><a href="07-rule-churn.png"><img src="07-rule-churn.png" width="1800" height="999" alt="Cumulative rule changes comparing all 14 configurations" loading="lazy"></a></figure><figure id="delay-load"><figcaption>08 Delay by offered load</figcaption><a href="08-delay-load.png"><img src="08-delay-load.png" width="1800" height="999" alt="Delay by offered load comparing all 14 configurations" loading="lazy"></a></figure><figure id="goodput-load"><figcaption>09 Goodput by offered load</figcaption><a href="09-goodput-load.png"><img src="09-goodput-load.png" width="1800" height="999" alt="Goodput by offered load comparing all 14 configurations" loading="lazy"></a></figure><figure id="loss-load"><figcaption>10 Loss by offered load</figcaption><a href="10-loss-load.png"><img src="10-loss-load.png" width="1800" height="999" alt="Loss by offered load comparing all 14 configurations" loading="lazy"></a></figure><figure id="sla-load"><figcaption>11 High-delay slots by offered load</figcaption><a href="11-sla-load.png"><img src="11-sla-load.png" width="1800" height="999" alt="High-delay slots by offered load comparing all 14 configurations" loading="lazy"></a></figure><figure id="delay-cdf"><figcaption>12 Distribution of window delay</figcaption><a href="12-delay-cdf.png"><img src="12-delay-cdf.png" width="1800" height="999" alt="Distribution of window delay comparing all 14 configurations" loading="lazy"></a></figure><figure id="queue-cdf"><figcaption>13 Distribution of peak window backlog</figcaption><a href="13-queue-cdf.png"><img src="13-queue-cdf.png" width="1800" height="999" alt="Distribution of peak window backlog comparing all 14 configurations" loading="lazy"></a></figure></div>
+</main>
+</body>
+</html>

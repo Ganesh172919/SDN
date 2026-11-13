@@ -47,6 +47,15 @@ class DashboardApp {
       this.initBenchmarkAtlas();
       this.initLLMDiagnostics();
     }
+    if (typeof ComparisonRadarChart !== 'undefined') {
+      this.initComparisonStudio();
+    }
+    if (typeof MultiTopologyRenderer !== 'undefined' || typeof TrafficMatrixHeatmap !== 'undefined') {
+      this.initMultiTopologyStudio();
+    }
+    if (typeof LyapunovDPPVisualizer !== 'undefined') {
+      this.initAdvancedAnalyticsLab();
+    }
     this.initAppMode();
 
     // Initial UI render
@@ -269,6 +278,346 @@ class DashboardApp {
     }
   }
 
+  async initComparisonStudio() {
+    this.comparisonRadar = new ComparisonRadarChart('comparisonRadarCanvas');
+    this.comparisonCDF = new ComparisonCDFChart('comparisonCDFCanvas');
+    this.trajComparator = new TrajectoryComparatorChart('trajectoryComparatorCanvas');
+    this.effectsExplorer = new EffectsMatrixExplorer('comparisonEffectsTable');
+
+    // 1. Fetch Configs & Build Catalog
+    try {
+      const cfgResp = await fetch('/api/comparison/configs');
+      if (cfgResp.ok) {
+        const cfgData = await cfgResp.json();
+        const configs = cfgData.configs || [];
+        this.renderComparisonCatalog(configs);
+        this.populateTrajectoryDropdowns(configs);
+      }
+    } catch (e) {
+      console.warn('Failed to load comparison configs:', e);
+    }
+
+    // 2. Fetch Effects Matrix
+    try {
+      const effResp = await fetch('/api/comparison/effects');
+      if (effResp.ok) {
+        const effData = await effResp.json();
+        this.effectsExplorer.setData(effData);
+      }
+    } catch (e) {
+      console.warn('Failed to load comparison effects:', e);
+    }
+
+    // 3. Fetch Summary Runs for Radar Chart
+    try {
+      const runsResp = await fetch('/api/comparison/runs?summary_only=true');
+      if (runsResp.ok) {
+        const runsData = await runsResp.json();
+        this.comparisonRadar.setData(runsData.summary || []);
+      }
+    } catch (e) {
+      console.warn('Failed to load comparison runs summary:', e);
+    }
+
+    // 4. Fetch Core Runs for CDF and Trajectory Comparator
+    try {
+      const coreRunsResp = await fetch('/api/comparison/runs?configs=S0,S5,dqn,least_loaded,marl');
+      if (coreRunsResp.ok) {
+        const coreRunsData = await coreRunsResp.json();
+        const runs = coreRunsData.runs || [];
+        this.comparisonCDF.setRuns(runs);
+        this.trajComparator.setRuns(runs);
+      }
+    } catch (e) {
+      console.warn('Failed to load core comparison runs:', e);
+    }
+
+    // Wire up Radar Toggles
+    const toggles = document.querySelectorAll('.radar-toggle-pill');
+    toggles.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const cfg = pill.getAttribute('data-cfg');
+        pill.classList.toggle('active');
+        this.comparisonRadar.toggleConfig(cfg);
+      });
+    });
+
+    // Wire up CDF Metric Toggles
+    const btnDelay = document.getElementById('btnCdfDelayToggle');
+    const btnQueue = document.getElementById('btnCdfQueueToggle');
+    if (btnDelay && btnQueue) {
+      btnDelay.addEventListener('click', () => {
+        btnDelay.classList.add('active');
+        btnQueue.classList.remove('active');
+        this.comparisonCDF.setMetric('delay');
+      });
+      btnQueue.addEventListener('click', () => {
+        btnQueue.classList.add('active');
+        btnDelay.classList.remove('active');
+        this.comparisonCDF.setMetric('queue');
+      });
+    }
+
+    // Wire up CDF Percentile Slider
+    const cdfSlider = document.getElementById('cdfPercentileSlider');
+    if (cdfSlider) {
+      cdfSlider.addEventListener('input', e => {
+        const p = parseInt(e.target.value, 10);
+        const pLabel = document.getElementById('cdfPercentileLabel');
+        if (pLabel) pLabel.textContent = `P${p}`;
+        this.comparisonCDF.setPercentile(p);
+      });
+    }
+
+    // Wire up Trajectory Comparator Selectors
+    const selA = document.getElementById('trajSelectA');
+    const selB = document.getElementById('trajSelectB');
+    if (selA && selB) {
+      const updateTraj = () => {
+        this.trajComparator.setControllers(selA.value, selB.value);
+      };
+      selA.addEventListener('change', updateTraj);
+      selB.addEventListener('change', updateTraj);
+    }
+
+    // Wire up Trajectory Metric Buttons
+    const metricGroup = document.getElementById('trajMetricGroup');
+    if (metricGroup) {
+      metricGroup.querySelectorAll('.btn-ctrl').forEach(btn => {
+        btn.addEventListener('click', () => {
+          metricGroup.querySelectorAll('.btn-ctrl').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const m = btn.getAttribute('data-metric');
+          this.trajComparator.setMetric(m);
+        });
+      });
+    }
+
+    // Wire up Effects Filter Buttons
+    const btnAll = document.getElementById('btnFilterEffectsAll');
+    const btnSig = document.getElementById('btnFilterEffectsSig');
+    const btnRL = document.getElementById('btnFilterEffectsRL');
+    const btnHeur = document.getElementById('btnFilterEffectsHeuristic');
+    const filterBtns = [btnAll, btnSig, btnRL, btnHeur].filter(Boolean);
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn === btnAll) this.effectsExplorer.setFilter('all');
+        else if (btn === btnSig) this.effectsExplorer.setFilter('significant');
+        else if (btn === btnRL) this.effectsExplorer.setFilter('rl');
+        else if (btn === btnHeur) this.effectsExplorer.setFilter('heuristic');
+      });
+    });
+
+    // Wire up CSV Export Button
+    const btnExport = document.getElementById('btnExportEffectsCSV');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        this.effectsExplorer.exportCSV();
+        this.showToast('Export Success', 'Downloaded SELF_X_Statistical_Effects_Matrix.csv', 'success');
+      });
+    }
+
+    // Wire up Family Filter Chips
+    const familyChips = document.querySelectorAll('.comparison-filter-chips .chip-btn');
+    familyChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        familyChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const fam = chip.getAttribute('data-family');
+        this.filterCatalogByFamily(fam);
+      });
+    });
+  }
+
+  renderComparisonCatalog(configs) {
+    const grid = document.getElementById('comparisonCatalogGrid');
+    if (!grid || !Array.isArray(configs)) return;
+    let html = '';
+    configs.forEach(c => {
+      let badgeClass = 'accent-cyan';
+      if (c.family === 'rl') badgeClass = 'accent-purple';
+      else if (c.family === 'heuristic') badgeClass = 'emerald';
+      else if (c.family === 'baseline') badgeClass = 'coral';
+
+      html += `
+        <div class="catalog-card" data-family="${c.family}" style="background:var(--surface-active); border:1px solid var(--border-color); border-radius:6px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <strong style="color:var(--text-primary); font-size:13px;">${c.id}</strong>
+              <span class="badge-tag ${badgeClass}" style="font-size:10px;">${c.family.toUpperCase()}</span>
+            </div>
+            <div style="font-weight:600; font-size:12px; color:var(--cyan); margin-bottom:6px;">${c.label}</div>
+            <p style="font-size:11px; color:var(--text-secondary); line-height:1.45; margin:0 0 10px 0;">${c.description}</p>
+          </div>
+          <div style="display:flex; gap:6px; border-top:1px solid var(--border-color); padding-top:8px;">
+            <button class="btn-ctrl btn-radar-add" data-id="${c.id}" type="button" style="font-size:10px; padding:3px 6px; flex:1;" title="Add to Radar chart">
+              + Radar
+            </button>
+            <button class="btn-ctrl btn-traj-compare" data-id="${c.id}" type="button" style="font-size:10px; padding:3px 6px; flex:1;" title="Compare vs S5">
+              vs S5
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    grid.innerHTML = html;
+
+    // Attach button listeners
+    grid.querySelectorAll('.btn-radar-add').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (this.comparisonRadar) {
+          this.comparisonRadar.toggleConfig(id);
+          this.showToast('Radar Updated', `Toggled ${id} on radar view`, 'info');
+        }
+      });
+    });
+
+    grid.querySelectorAll('.btn-traj-compare').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const selA = document.getElementById('trajSelectA');
+        const selB = document.getElementById('trajSelectB');
+        if (selA && selB && this.trajComparator) {
+          selA.value = id;
+          selB.value = 'S5';
+          this.trajComparator.setControllers(id, 'S5');
+          this.showToast('Comparator Updated', `Comparing ${id} vs S5`, 'info');
+        }
+      });
+    });
+  }
+
+  filterCatalogByFamily(fam) {
+    const cards = document.querySelectorAll('.catalog-card');
+    cards.forEach(card => {
+      if (fam === 'all' || card.getAttribute('data-family') === fam) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  populateTrajectoryDropdowns(configs) {
+    const selA = document.getElementById('trajSelectA');
+    const selB = document.getElementById('trajSelectB');
+    if (!selA || !selB || !Array.isArray(configs)) return;
+
+    let optA = '';
+    let optB = '';
+    configs.forEach(c => {
+      const isSelA = c.id === 'S0' ? 'selected' : '';
+      const isSelB = c.id === 'S5' ? 'selected' : '';
+      optA += `<option value="${c.id}" ${isSelA}>${c.id}: ${c.label}</option>`;
+      optB += `<option value="${c.id}" ${isSelB}>${c.id}: ${c.label}</option>`;
+    });
+    selA.innerHTML = optA;
+    selB.innerHTML = optB;
+  }
+
+  initMultiTopologyStudio() {
+    this.trafficHeatmap = new TrafficMatrixHeatmap('trafficMatrixHeatmapCanvas');
+    this.tcamBars = new TCAMCapacityBar('tcamBarsContainer');
+
+    // Initial TCAM bars
+    const initialSwitches = [
+      { id: 's1', tcamUsed: 142, tcamMax: 1024 },
+      { id: 's2', tcamUsed: 388, tcamMax: 1024 },
+      { id: 's3', tcamUsed: 310, tcamMax: 1024 },
+      { id: 's4', tcamUsed: 119, tcamMax: 1024 }
+    ];
+    this.tcamBars.render(initialSwitches);
+
+    // Fabric switch buttons
+    const fabricBtns = document.querySelectorAll('#topoFabricButtonGroup .fabric-btn');
+    fabricBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        fabricBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const topoId = btn.getAttribute('data-topo');
+        if (this.topology && typeof this.topology.loadTopology === 'function') {
+          this.topology.loadTopology(topoId);
+        }
+        this.showToast('Fabric Switched', `Active topology updated to ${topoId.replace('_', ' ').toUpperCase()}`, 'info');
+      });
+    });
+
+    // Custom flow rate slider
+    const rateSlider = document.getElementById('customFlowRateSlider');
+    const rateLabel = document.getElementById('customFlowRateLabel');
+    if (rateSlider && rateLabel) {
+      rateSlider.addEventListener('input', e => {
+        rateLabel.textContent = `${parseFloat(e.target.value).toFixed(1)} Mbps`;
+      });
+    }
+
+    // Submit custom flow
+    const btnSubmitFlow = document.getElementById('btnSubmitCustomFlow');
+    if (btnSubmitFlow) {
+      btnSubmitFlow.addEventListener('click', () => {
+        const src = document.getElementById('customFlowSrc')?.value || 'h2';
+        const dst = document.getElementById('customFlowDst')?.value || 'h8';
+        const rate = parseFloat(document.getElementById('customFlowRateSlider')?.value || 12);
+        const profile = document.getElementById('customFlowProfile')?.value || 'elephant';
+
+        if (this.trafficHeatmap) {
+          this.trafficHeatmap.injectFlow(src, dst, rate);
+        }
+
+        const logEl = document.getElementById('trafficEventLog');
+        if (logEl) {
+          const time = new Date().toISOString().substring(11, 19);
+          logEl.innerHTML = `<div style="color:var(--cyan); font-size:11px;">[${time}] INJECTED: ${src} &rarr; ${dst} at ${rate} Mbps (${profile.toUpperCase()})</div>` + logEl.innerHTML;
+        }
+
+        this.showToast('Flow Injected', `${src} &rarr; ${dst} at ${rate} Mbps injected into active fabric`, 'warn');
+      });
+    }
+  }
+
+  async initAdvancedAnalyticsLab() {
+    this.dppChart = new LyapunovDPPVisualizer('dppPhaseSpaceCanvas');
+    this.forestPlot = new StatisticalHypothesisLab('forestPlotCanvas');
+    this.loraChart = new LoRATrainingVisualizer('loraTrainingCanvas');
+
+    // 1. Fetch DPP Analytics
+    try {
+      const dppResp = await fetch('/api/analytics/dpp');
+      if (dppResp.ok) {
+        const dppData = await dppResp.json();
+        this.dppChart.setData(dppData);
+      }
+    } catch (e) {
+      console.warn('Failed to load DPP analytics:', e);
+    }
+
+    // 2. Fetch Statistics Lab
+    try {
+      const statResp = await fetch('/api/analytics/statistics');
+      if (statResp.ok) {
+        const statData = await statResp.json();
+        this.forestPlot.setData(statData);
+      }
+    } catch (e) {
+      console.warn('Failed to load statistical reports:', e);
+    }
+
+    // 3. Fetch LoRA Training Inspector
+    try {
+      const loraResp = await fetch('/api/analytics/lora');
+      if (loraResp.ok) {
+        const loraData = await loraResp.json();
+        this.loraChart.setData(loraData);
+      }
+    } catch (e) {
+      console.warn('Failed to load LoRA training data:', e);
+    }
+  }
+
   showToast(title, message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
@@ -387,21 +736,69 @@ class DashboardApp {
     }
 
     // Refresh canvases immediately and after pane animation completes
-    if (targetId === 'tab-topo' && this.topology) {
-      this.topology.setupDPI();
-      setTimeout(() => this.topology.setupDPI(), 60);
+    if (targetId === 'tab-topo') {
+      if (this.topology) {
+        this.topology.setupDPI();
+        setTimeout(() => this.topology.setupDPI(), 60);
+      }
+      if (this.trafficHeatmap) {
+        this.trafficHeatmap.setupDPI();
+        this.trafficHeatmap.render();
+      }
     } else if (targetId === 'tab-charts' && this.charts) {
       this.charts.renderAll();
       setTimeout(() => this.charts.renderAll(), 60);
     } else if (targetId === 'tab-ablation' && this.results) {
       this.results.onTabActivated();
       setTimeout(() => this.results.onTabActivated(), 60);
+    } else if (targetId === 'tab-comparison') {
+      if (this.comparisonRadar) {
+        this.comparisonRadar.setupDPI();
+        this.comparisonRadar.render();
+      }
+      if (this.comparisonCDF) {
+        this.comparisonCDF.setupDPI();
+        this.comparisonCDF.render();
+      }
+      if (this.trajComparator) {
+        this.trajComparator.setupDPI();
+        this.trajComparator.render();
+      }
+      setTimeout(() => {
+        if (this.comparisonRadar) { this.comparisonRadar.setupDPI(); this.comparisonRadar.render(); }
+        if (this.comparisonCDF) { this.comparisonCDF.setupDPI(); this.comparisonCDF.render(); }
+        if (this.trajComparator) { this.trajComparator.setupDPI(); this.trajComparator.render(); }
+      }, 60);
+    } else if (targetId === 'tab-analytics') {
+      if (this.dppChart) {
+        this.dppChart.setupDPI();
+        this.dppChart.render();
+      }
+      if (this.forestPlot) {
+        this.forestPlot.setupDPI();
+        this.forestPlot.render();
+      }
+      if (this.loraChart) {
+        this.loraChart.setupDPI();
+        this.loraChart.render();
+      }
+      setTimeout(() => {
+        if (this.dppChart) { this.dppChart.setupDPI(); this.dppChart.render(); }
+        if (this.forestPlot) { this.forestPlot.setupDPI(); this.forestPlot.render(); }
+        if (this.loraChart) { this.loraChart.setupDPI(); this.loraChart.render(); }
+      }, 60);
     }
   }
 
   checkHashRoute() {
     const hash = (window.location.hash || '').replace('#', '').toLowerCase();
     const map = {
+      'comparison': 'tab-comparison',
+      'compare': 'tab-comparison',
+      'algorithms': 'tab-comparison',
+      'analytics': 'tab-analytics',
+      'theory': 'tab-analytics',
+      'dpp': 'tab-analytics',
       'topo': 'tab-topo',
       'topology': 'tab-topo',
       'agent': 'tab-agent',

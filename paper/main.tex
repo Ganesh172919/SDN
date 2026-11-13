@@ -1,0 +1,149 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{pdfpages}
+\usepackage[hidelinks]{hyperref}
+\input{comparison/results}
+
+\begin{document}
+
+\title{SELF-X: An Audited Comparison of Agentic Flow Control in Software-Defined Networks}
+
+\author{%
+\IEEEauthorblockN{Ganesh Reddy J\IEEEauthorrefmark{1},
+M Jagadeswar\IEEEauthorrefmark{1},
+Harsh Raj\IEEEauthorrefmark{1},\\
+C Sai Aravind\IEEEauthorrefmark{1},
+Koushik C\IEEEauthorrefmark{2},
+Dhruv R Katti\IEEEauthorrefmark{3}}
+\IEEEauthorblockA{%
+\IEEEauthorrefmark{1}Dept.\ of Data Science and Artificial Intelligence\\
+\IEEEauthorrefmark{2}Dept.\ of Computer Science and Engineering\\
+\IEEEauthorrefmark{3}Dept.\ of Electronics and Communication Engineering\\
+\textit{Indian Institute of Information Technology Dharwad}, Dharwad, Karnataka, India\\
+Team SDN\_07 --- EC466 Software Defined Networks\\
+\{23bds024, 23bds033, 23bds076, 23bds075, 23bcs073, 23bec015\}@iiitdwd.ac.in}
+}
+
+\maketitle
+
+\begin{abstract}
+We evaluate a three-timescale flow controller that combines drift-plus-penalty
+(DPP) optimisation, a LoRA action prior, and a local language-model governor.
+Fourteen configurations use the same finite-buffer fluid datapath on twelve
+held-out traffic traces. Against static forwarding, SELF-X reduces mean delay
+by \AuditStaticReduction\%. Against trained DQN, the reduction is
+\AuditNeuralReduction\%, with \AuditNeuralLossDelta{} percentage points more
+traffic loss. Against DPP alone, mean delay is \AuditDPPDelta~ms higher
+(Holm-adjusted \(p=\AuditDPPHolm\)). The ablations measure the effect of fast
+actuation and expose limits in the language-model components. The governor
+repeats one adjustment across all tested epochs and critique makes
+\AuditCritiqueRevisions{} revisions.
+\end{abstract}
+
+\begin{IEEEkeywords}
+software-defined networking, flow control, drift-plus-penalty, DQN, independent Q-learning, ablation
+\end{IEEEkeywords}
+
+\section{Experimental question}
+
+SELF-X combines analytic control with slower model calls. We measure the
+incremental effect of the model components using the same simulator, safety
+guard, action set and offered traffic. The audited study supersedes the earlier
+Table II and Table V proxy results. Those scripts used hard-coded policies
+for stages labelled LLM, LoRA, DQN and MARL. The present study executes
+the model paths and records their effect on the deployed controller.
+
+\section{Datapath and controllers}
+
+The simulator has two \(10\) Mbps paths with \(2\) Mbit buffers and propagation
+delays of \(2\) and \(12\) ms. Background traffic uses the primary path. The
+controller can leave the bulk aggregate on primary, route it to the alternate
+path, or meter it on primary. For path \(i\), with offered rate \(a_i\) after
+metering and capacity \(c_i\), the backlog advances over a slot of length
+\(\tau\) as
+\[
+q_i(t+\tau)=\min\{B,\max[0,q_i(t)+(a_i-c_i)\tau]\}.
+\]
+The simulator accounts for service, overflow and metered traffic and checks
+bit conservation. Every executed action passes a shared guard that checks
+reroute utilisation and meter limits. DPP searches feasible actions and
+minimises a one-slot queue drift term plus a weighted operating cost.
+
+The full controller (S5) runs DPP every \(100\) ms. A constrained action
+prediction from the shipped SmolLM2 LoRA adapter becomes a bounded preference
+in DPP's score every \(5\) s. Every \(30\) s, five specialist prompts are
+evaluated in parallel on a single shared model. An orchestrator prompt sees
+the resulting ballots and selects one of three bounded changes to \(V\) and
+the cost weights. Model outputs use constrained tokens and incur a fixed
+simulated delay of \(400\) ms per forward stage. This experiment uses an
+action guard and bounded objective updates.
+
+\subsection{Reference controllers and ablations}
+
+S0 is fixed primary forwarding. S1 is the bare local model. S2 adds a review
+prompt over the proposed action and the previous three realised windows.
+S3 uses the LoRA head directly on the same prompt and cadence as S1. S2's
+review path is a separate experimental arm. S4 uses the S5 stack with DPP
+running every \(5\) s. Two further arms disable the LoRA preference or the
+governor individually. DPP-only disables both at the \(100\) ms cadence.
+
+The remaining references are the capacity threshold, least-loaded routing,
+online tabular Q-learning, DQN, and two-agent independent Q-learning (IQL).
+The two IQL agents have separate neural value functions and replay buffers.
+Their path and primary-meter votes combine into the same three-action menu as
+DQN. Both see the same telemetry and receive the same realised reward.
+DQN and IQL train with replay, Bellman targets, target networks and Adam
+updates. On test traces, they use frozen greedy policies at the same cadence
+as fast DPP. IQL is a project-specific MARL baseline.
+
+\section{Paired evaluation}
+
+Each configuration runs for \(180\) s on each of twelve held-out seeds,
+with four seeds per workload profile. Profiles include steady bursts,
+flash crowds and volatile demand. Neural policies train on eighteen separate
+seeds. The LoRA weights are frozen throughout the experiment.
+Delay is the mean of the \(5\) s windows' service-weighted slot delays.
+Loss includes overflow and metered bits divided by offered bits per seed.
+Goodput is served traffic per second. The primary comparisons use paired
+delay differences per seed, equal weighting of profiles, and Holm correction
+across thirteen comparisons against S5. Effects for all controllers are in
+\path{comparison/effects.csv}.
+
+\section{Results and component attribution}
+
+The full controller averaged \AuditDelay~ms delay, \AuditLoss\% traffic
+loss and \AuditGoodput~Mbps goodput. Fast DPP in S5 reduced delay by
+\AuditCadenceReduction\% relative to the same stack run at \(5\) s. S5
+reduced delay by \AuditNeuralReduction\% against each trained neural
+baseline (adjusted \(p=\AuditNeuralHolm\)), with higher loss and
+\AuditNeuralGoodputDelta~Mbps change in goodput. The two learned baselines
+made different proposals, but the guard produced the same effective actions.
+Their plotted datapath metrics coincide.
+
+Removing LoRA reduced delay by \AuditNoLoRADelta~ms (adjusted
+\(p=\AuditNoLoRAHolm\)). S5's LoRA prior changed \AuditPriorChanges{} slot
+choices relative to the same DPP scores at those states. The governor issued
+\AuditGovernorCalls{} merged decisions from \AuditSpecialistBallots{}
+specialist ballots. Every specialist and the orchestrator selected the same
+adjustment on all tested states. S2 made \AuditCritiqueCalls{} critique calls
+with \AuditMemoryPrompts{} nonempty memory prompts and
+\AuditCritiqueRevisions{} action revisions. These observations document
+execution and constrain the performance attribution.
+
+\section{Limitations and reproducibility}
+
+Results apply to this fluid simulator, topology, traffic mix, trained weights
+and model timing assumptions. The fast cadence is supported by the controlled
+comparison. The study gives no evidence of a delay advantage from the
+combined agentic layers over fast DPP alone, and supplies no evidence for
+novelty or for hardware-level performance. The repository README gives the
+single experiment entry point. The following thirteen XY plots show every
+evaluated configuration on time, offered load or empirical distribution axes.
+
+\clearpage
+\onecolumn
+\includepdf[pages=3-15,fitpaper=true]{comparison/SELF_X_Algorithm_Comparison.pdf}
+\end{document}
+

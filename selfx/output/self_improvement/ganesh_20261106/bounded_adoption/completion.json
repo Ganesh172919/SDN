@@ -1,0 +1,125 @@
+{
+  "active": {
+    "activation_event_sha256": "8f70ae6ec817acea8efa94d08a5a6a63188ae84681a56851f222fe783097df7f",
+    "artifact": "artifacts/e38b484ce26842f219eedc0ec849471ec6ba3f6eeec4d9812b6bb3a14526481f",
+    "id": "e38b484ce26842f219eedc0ec849471ec6ba3f6eeec4d9812b6bb3a14526481f",
+    "previous": {
+      "artifact": null,
+      "id": "base:12fd25f77366fa6b3b4b768ec3050bf629380bac"
+    },
+    "version": 3
+  },
+  "automatic_rollback": "controlled load failure restored prior incumbent",
+  "candidate_sha256": "e38b484ce26842f219eedc0ec849471ec6ba3f6eeec4d9812b6bb3a14526481f",
+  "completed_at_utc": "2026-11-05T21:59:57.336252+00:00",
+  "deployment": {
+    "adapter_fraction": 0.25,
+    "mask": "sha256_observation_v1",
+    "other_observations": "pinned_bare_base",
+    "purpose": "bounded adoption; same mask in weight-attribution comparison",
+    "source_candidate_sha256": "cd280ae17841c9b41aa45da1b491b5a7f321286c429d38628591545741461a3e"
+  },
+  "fine_tune_iterations": 1,
+  "holdout_summary": {
+    "candidate": {
+      "actions": {
+        "no_op": 455,
+        "rate_limit": 90,
+        "reroute": 319
+      },
+      "cumulative_reward": 70.308932232,
+      "installed_safety_violations": 0,
+      "latency_ms": 18.061938114583334,
+      "loss_pct": 4.117936717592593,
+      "mean_reward": 0.08137607897222222,
+      "profile_mean_reward": {
+        "alternate": 0.01391350027083333,
+        "flash": 0.20180408865972224,
+        "mixed": 0.028410647986111114
+      },
+      "proposed_unsafe": 353,
+      "seed_cumulative_reward": {
+        "3200": 11.245287300000001,
+        "3201": 10.78755568,
+        "3202": 14.3041991,
+        "3203": 11.384497957999999,
+        "3204": 11.658009314000001,
+        "3205": 10.92938288
+      },
+      "throughput_kbps": 13553.564236111111,
+      "windows": 864
+    },
+    "incumbent": {
+      "actions": {
+        "no_op": 484,
+        "reroute": 380
+      },
+      "cumulative_reward": 64.18849018,
+      "installed_safety_violations": 0,
+      "latency_ms": 19.014259375,
+      "loss_pct": 4.0838114282407405,
+      "mean_reward": 0.07429223400462963,
+      "profile_mean_reward": {
+        "alternate": 0.0,
+        "flash": 0.20142562049305557,
+        "mixed": 0.021451081520833335
+      },
+      "proposed_unsafe": 484,
+      "seed_cumulative_reward": {
+        "3200": 10.616892264,
+        "3201": 10.141349096,
+        "3202": 13.018465344,
+        "3203": 10.442646006,
+        "3204": 10.373374036000001,
+        "3205": 9.595763434
+      },
+      "throughput_kbps": 13555.982638888889,
+      "windows": 864
+    }
+  },
+  "on_policy_sources": {
+    "train_replay.jsonl": "716ba57fb18ca6024ea9fb02aa7513297cea9a4fdb3a8338ca584a864e942628"
+  },
+  "owner": "Ganesh",
+  "promotion": {
+    "accepted": true,
+    "mean_reward_gain": 0.005166374208333338,
+    "reasons": [
+      "all_frozen_stress_criteria_passed"
+    ]
+  },
+  "rejected_checkpoint": "07225ef03a894cba1f1f33c99f1e37ed1365005e015b737e78ffac930b1eca09",
+  "rejection_pointer_unchanged": true,
+  "schema": "selfx.lora.completion.v1",
+  "scope": "CPU LoRA action policy and frozen-replay evidence; live SDN and full A1-A5 remain separate tasks",
+  "status": "completed",
+  "task_ids": [
+    "T20",
+    "T21",
+    "T22",
+    "T23",
+    "T24",
+    "T25"
+  ],
+  "weight_attribution": {
+    "ci95": [
+      0.675773539959934,
+      1.364373810706732
+    ],
+    "mean_cumulative_reward_gain": 1.020073675333333,
+    "only_learned_difference": "LoRA weights",
+    "p_value": 0.0006203288168282815,
+    "same_memory": "disabled",
+    "same_prompt": true,
+    "seeds": [
+      "3200",
+      "3201",
+      "3202",
+      "3203",
+      "3204",
+      "3205"
+    ],
+    "test": "two-sided paired t-test, adapter versus bare base; not A1-to-A5",
+    "unit_of_replication": "independent seed, cumulative reward over 3 profiles"
+  }
+}

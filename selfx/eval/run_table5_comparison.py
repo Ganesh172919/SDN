@@ -1,16 +1,7 @@
-"""
-Phase 5 & Deliverable D5 — Table 5 Benchmark Baselines Runner (All 6 Systems)
-Traceability: Tasks T27, T28, T29 | Deliverable D5 | EC466 Team SDN_07
+"""Historical Table V proxy generator.
 
-Systems Evaluated (Table 5):
-  1. Static Ryu / POX Controller (Non-adaptive floor, Baseline 1 / A0)
-  2. DQN trained on the same reward (Single-agent DRL floor)
-  3. Two-agent MARL (classification + decision DQN, Boussaoud et al. [14])
-  4. Single non-specialist reflexive LLM agent (Araujo et al. [12])
-  5. SELF-X without Lyapunov DPP (LLM decides actions directly)
-  6. Full SELF-X: multi-agent + self-improvement + Lyapunov DPP (Proposed system)
-
-Evaluates on identical offered workloads and paired seeds.
+Systems 2-4 are randomized threshold policies. System 5 is a heuristic.
+System 6 runs DPP alone. Use run_audited_comparison for learned comparisons.
 """
 
 from __future__ import annotations
@@ -79,9 +70,8 @@ def simulate_system(
             arr_p, arr_s = total_offered, 0.0
 
         elif system_idx == 2:
-            # 2. DQN (single agent DRL)
+            # 2. Historical randomized threshold proxy
             cpu = 11.2
-            # DQN policy chooses based on quantized state with slight exploration jitter
             if total_offered > 10.0:
                 action = "reroute" if rng.random() < 0.70 else "rate_limit"
             else:
@@ -89,9 +79,8 @@ def simulate_system(
             arr_p, arr_s = (mouse_mbps, elephant_mbps) if action == "reroute" else (min(total_offered, 9.0), 0.0)
 
         elif system_idx == 3:
-            # 3. Two-agent MARL (Classification agent + Decision agent DQN)
+            # 3. Historical randomized threshold proxy
             cpu = 15.0
-            # Classification detects elephant; Decision steers
             if total_offered > 10.0:
                 action = "reroute" if rng.random() < 0.82 else "rate_limit"
             else:
@@ -99,7 +88,7 @@ def simulate_system(
             arr_p, arr_s = (mouse_mbps, elephant_mbps) if action == "reroute" else (min(total_offered, 9.5), 0.0)
 
         elif system_idx == 4:
-            # 4. Single reflexive LLM (Araujo et al.)
+            # 4. Historical randomized policy proxy
             cpu = 19.5
             if total_offered > 10.0:
                 action = "reroute" if rng.random() < 0.65 else ("rate_limit" if rng.random() < 0.85 else "no_op")
@@ -108,7 +97,7 @@ def simulate_system(
             arr_p, arr_s = (mouse_mbps, elephant_mbps) if action == "reroute" else (total_offered, 0.0)
 
         elif system_idx == 5:
-            # 5. SELF-X without Lyapunov DPP (LLM decides flow actions directly)
+            # 5. Historical queue-threshold proxy
             cpu = 21.0
             if total_offered > 10.0:
                 action = "reroute" if q2 < 2.0 else "rate_limit"
@@ -117,7 +106,7 @@ def simulate_system(
             arr_p, arr_s = (mouse_mbps, elephant_mbps) if action == "reroute" else (min(total_offered, 9.5), 0.0)
 
         else:
-            # 6. Full SELF-X (multi-agent + LoRA + Lyapunov DPP)
+            # 6. DPP-only controller
             cpu = 8.5
             dec = dpp.decide(
                 q_primary_mbit=q1,
@@ -182,15 +171,15 @@ def run_table5_comparison(
 ) -> Dict[str, Any]:
     systems = [
         (1, "Static Ryu/POX Controller"),
-        (2, "DQN (same reward)"),
-        (3, "Two-agent MARL (Boussaoud et al.)"),
-        (4, "Single reflexive LLM (Araujo et al.)"),
-        (5, "SELF-X without DPP"),
-        (6, "Full SELF-X (Proposed)"),
+        (2, "Randomized threshold proxy 2"),
+        (3, "Randomized threshold proxy 3"),
+        (4, "Randomized threshold proxy 4"),
+        (5, "Queue-threshold proxy"),
+        (6, "DPP only"),
     ]
 
     print("==================================================================")
-    print("SELF-X Six-System Baseline Benchmark Comparison (Table 5 / T27)")
+    print("Historical six-system proxy comparison (Table V)")
     print(f"Seeds: {seeds} | Duration: {duration_sec}s")
     print("==================================================================")
 
@@ -225,6 +214,7 @@ def run_table5_comparison(
         print(f"[{s_idx}] {s_name:38}: Latency={avg_lat:5.2f} ms | Loss={avg_loss:4.2f}% | Throughput={avg_tp:5.3f} Mbps | Reward={avg_rew:6.2f}")
 
     out = {
+        "evidence_status": "historical_heuristic_proxy",
         "title": "Table 5 - Six-System Benchmark Comparison",
         "seeds": seeds,
         "summary": summary_rows,
@@ -246,6 +236,10 @@ def run_table5_comparison(
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy-proxy", action="store_true", help="regenerate the historical proxy")
+    if not parser.parse_args().legacy_proxy:
+        parser.error("Historical heuristic proxy. Run python -m selfx.eval.run_audited_comparison for the audited study.")
     run_table5_comparison()
 
 

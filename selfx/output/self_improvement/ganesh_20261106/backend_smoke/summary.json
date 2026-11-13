@@ -1,0 +1,152 @@
+{
+  "schema": "selfx.simulation.v1",
+  "created_at_utc": "2026-11-05T22:00:31.289750+00:00",
+  "provenance": "simulation",
+  "decision_backend": "local_lora",
+  "seeds": [
+    3300
+  ],
+  "cycles_per_condition_seed": 4,
+  "simulated_seconds_per_condition_seed": 20.0,
+  "wall_seconds": 10.34371149999788,
+  "trace_sha256": {
+    "3300": "71420c77b563a8ab4439f0343238d9ee8a4e2d64d946e529e3dd87bede3bb70d"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "topology": "diamond-4-switch-8-host-logical-paths",
+  "capacity_per_path_mbps": 10,
+  "buffer_per_path_mbit": 0.5,
+  "interval_seconds": 5.0,
+  "conditions": {
+    "A0": {
+      "label": "Static primary path",
+      "windows": 4,
+      "latency_ms": 17.631981500000002,
+      "throughput_kbps": 9613.425,
+      "loss_pct": 3.478239,
+      "reward": 0.0,
+      "control_elapsed_ms": 0.08275,
+      "pooled_loss_pct": 5.084098988645649,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "decision_origins": {
+        "static": 4
+      },
+      "api_decision_windows": 0,
+      "api_reflection_windows": 0,
+      "actions": {
+        "no_op": 4
+      }
+    },
+    "A1": {
+      "label": "Controller without memory",
+      "windows": 4,
+      "latency_ms": 17.631981500000002,
+      "throughput_kbps": 9613.425,
+      "loss_pct": 3.478239,
+      "reward": 0.0,
+      "control_elapsed_ms": 2092.60775,
+      "pooled_loss_pct": 5.084098988645649,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "decision_origins": {
+        "local_lora": 4
+      },
+      "api_decision_windows": 0,
+      "api_reflection_windows": 0,
+      "actions": {
+        "reroute": 3,
+        "no_op": 1
+      }
+    },
+    "A2": {
+      "label": "Original state embedding memory",
+      "windows": 4,
+      "latency_ms": 17.631981500000002,
+      "throughput_kbps": 9613.425,
+      "loss_pct": 3.478239,
+      "reward": 0.0,
+      "control_elapsed_ms": 485.414,
+      "pooled_loss_pct": 5.084098988645649,
+      "safety_vetoes": 0,
+      "fallback_windows": 0,
+      "decision_origins": {
+        "local_lora": 4
+      },
+      "api_decision_windows": 0,
+      "api_reflection_windows": 0,
+      "actions": {
+        "reroute": 3,
+        "no_op": 1
+      }
+    }
+  },
+  "seed_means": {
+    "A0": {
+      "3300": {
+        "latency_ms": 17.631981500000002,
+        "throughput_kbps": 9613.425,
+        "loss_pct": 3.478239,
+        "reward": 0.0
+      }
+    },
+    "A1": {
+      "3300": {
+        "latency_ms": 17.631981500000002,
+        "throughput_kbps": 9613.425,
+        "loss_pct": 3.478239,
+        "reward": 0.0
+      }
+    },
+    "A2": {
+      "3300": {
+        "latency_ms": 17.631981500000002,
+        "throughput_kbps": 9613.425,
+        "loss_pct": 3.478239,
+        "reward": 0.0
+      }
+    }
+  },
+  "paired_seed_comparisons": {
+    "A1_minus_A0": {
+      "latency_ms": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "throughput_kbps": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "loss_pct": {
+        "mean_difference": 0.0,
+        "ci95": null
+      }
+    },
+    "A2_minus_A0": {
+      "latency_ms": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "throughput_kbps": {
+        "mean_difference": 0.0,
+        "ci95": null
+      },
+      "loss_pct": {
+        "mean_difference": 0.0,
+        "ci95": null
+      }
+    }
+  },
+  "limitations": [
+    "Analytical fluid simulation; no packets or physical SDN measurements.",
+    "Offline controller results do not establish LLM effectiveness.",
+    "One workload family and topology; no external dataset calibration.",
+    "State embedding is hand-designed and normalized, not a trained neural representation.",
+    "Reward compares each action against a same-window no-op model counterfactual.",
+    "Mean window loss and pooled traffic-volume loss are different statistics.",
+    "No guarantee that reflection or memory improves results."
+  ]
+}

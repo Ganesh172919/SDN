@@ -1,3 +1,5 @@
+> Historical report. Its Table II and V proxies did not evaluate all of their named AI components. Use the [audited results](../../paper/COMPARISON.md) for empirical claims.
+
 # SELF-X: Comprehensive IEEE Technical & Architectural Report
 ## Autonomous Software-Defined Network Flow Management with Two-Timescale Lyapunov Drift-Plus-Penalty Control and Multi-Agent Governance
 

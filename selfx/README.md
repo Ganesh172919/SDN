@@ -1,3 +1,5 @@
+> For the current benchmark, use the [three-command reproduction guide](../README.md) and the [audited comparison](../paper/COMPARISON.md). This page documents older workflows and outputs.
+
 # SELF-X: Loss-Aware SDN Flow-Management Agent with Episodic Memory
 
 > **Autonomous Software-Defined Networking with LLM In-Context Adaptation, Bounded Control Deadlines, Capacity-Aware OpenFlow Interventions, and Verifiable Benchmark Evidence**  

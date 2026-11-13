@@ -1,19 +1,7 @@
-"""
-Phase 5 & Deliverable D5 — Table 2 Six-Stage Ablation Study Runner
-Traceability: Tasks T26, T28, T29 | Deliverable D5 | EC466 Team SDN_07
+"""Historical Table II proxy generator.
 
-Ablation Stages (Table 2):
-  - A0: Static Ryu/POX hand-crafted rules (Non-learning floor)
-  - A1: Single non-specialist LLM; no reflection (Raw LLM reasoning)
-  - A2: A1 + verbal reflection & episodic memory (Verbal reflection alone)
-  - A3: A2 + safety-gated LoRA fine-tuning (Experience internalised in weights)
-  - A4: A3 + 6-agent orchestrator & specialists (Multi-agent decomposition)
-  - A5: A4 + Lyapunov DPP fast timescale (Full two-timescale system)
-
-Evaluates on paired seeds with identical offered traffic schedules.
-Collects all required metrics:
-  Latency (mean, p95), Throughput, Packet Loss, Convergence time, CPU overhead,
-  Control bytes, Packet-in count, Q(t) backlog, Bound violations, V/w, LoRA iterations.
+A1-A4 are scripted heuristics. A5 runs DPP alone. These outputs cannot
+attribute effects to LLM inference, critique, LoRA or multi-agent governance.
 """
 
 from __future__ import annotations
@@ -287,6 +275,7 @@ def run_table2_ablation(
         print(f"Stage {st:2}: Latency={avg_lat:5.2f} ms | Loss={avg_loss:4.2f}% | Throughput={avg_tp:5.3f} Mbps | Reward={avg_cum_rew:6.2f} | CPU={avg_cpu:4.1f}%")
 
     out_data = {
+        "evidence_status": "historical_heuristic_proxy",
         "title": "Table 2 - SELF-X Staged Ablation Study",
         "description": "Each stage adds exactly one design element, mapped to its literature analogue.",
         "seeds": seeds,
@@ -310,6 +299,10 @@ def run_table2_ablation(
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy-proxy", action="store_true", help="regenerate the historical proxy")
+    if not parser.parse_args().legacy_proxy:
+        parser.error("Historical heuristic proxy. Run python -m selfx.eval.run_audited_comparison for the audited study.")
     run_table2_ablation()
 
 

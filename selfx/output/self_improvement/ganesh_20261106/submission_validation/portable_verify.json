@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "task_ids": [
+    "T20",
+    "T21",
+    "T22",
+    "T23",
+    "T24",
+    "T25"
+  ],
+  "split_counts": {
+    "holdout": 864,
+    "stress": 576,
+    "train": 1122
+  },
+  "trainable_parameters": 460800,
+  "total_parameters": 134975808,
+  "stress_reward_gain": 0.005166374208333338,
+  "rejection_reasons": [
+    "insufficient_reward_gain",
+    "loss_regression",
+    "latency_regression",
+    "profile_reward_regression:alternate",
+    "profile_reward_regression:flash",
+    "profile_reward_regression:mixed"
+  ],
+  "weight_checks": {
+    "adapter_artifact_hashes": "passed",
+    "training_log_hash": "passed",
+    "reloaded_base_parameter_hash": "passed",
+    "reloaded_adapter_parameter_hash": "passed"
+  },
+  "holdout_attribution": {
+    "seeds": [
+      "3200",
+      "3201",
+      "3202",
+      "3203",
+      "3204",
+      "3205"
+    ],
+    "unit_of_replication": "independent seed, cumulative reward over 3 profiles",
+    "test": "two-sided paired t-test, adapter versus bare base; not A1-to-A5",
+    "p_value": 0.0006203288168282815,
+    "mean_cumulative_reward_gain": 1.020073675333333,
+    "ci95": [
+      0.675773539959934,
+      1.364373810706732
+    ],
+    "same_prompt": true,
+    "same_memory": "disabled",
+    "only_learned_difference": "LoRA weights"
+  },
+  "audit_events": 6,
+  "on_policy_episodes": 24,
+  "installed_safety_violations": 0,
+  "source_verification": {
+    "status": "passed",
+    "source_files": 3,
+    "splits_rebuilt": 3,
+    "excluded_audit_rebuilt": true
+  },
+  "scope": "trained language-model adapter; bounded adoption; frozen-replay network evidence",
+  "denied_original_reads": 0
+}

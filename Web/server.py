@@ -67,13 +67,139 @@ TABLE2_SUMMARY_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "ablation_table
 TABLE5_SUMMARY_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "baseline_table5" / "table5_comparison_summary.json").resolve()
 DPP_ACCEPTANCE_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "dpp_validation" / "dpp_acceptance_summary.json").resolve()
 TRANSFER_PATH = (Path(PROJECT_ROOT) / "selfx" / "output" / "transfer_evaluation" / "zero_shot_transfer_report.json").resolve()
+
+# Historical incremental-pipeline study (S0-S5 and baselines).
+PIPELINE_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "pipeline_study").resolve()
+PIPELINE_FILES = {
+    "summary": PIPELINE_DIR / "pipeline_summary.json",
+    "runs": PIPELINE_DIR / "pipeline_runs.json",
+    "significance": PIPELINE_DIR / "significance.json",
+    "vsweep": PIPELINE_DIR / "v_tradeoff.json",
+    "transfer": PIPELINE_DIR / "transfer.json",
+    "adapter": PIPELINE_DIR / "adapter_report.json",
+}
 EXPERIMENTS_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "experiments").resolve()
+COMPARISON_DIR = (Path(PROJECT_ROOT) / "paper" / "comparison").resolve()
+COMPARISON_FILES = {
+    "index.html", "SELF_X_Algorithm_Comparison.pdf", "effects.csv", "runs.json", "effects.json"
+}
+COMPARISON_CHART_RE = re.compile(r"(?:0[1-9]|1[0-3])-[a-z0-9-]+\.png")
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+RESOURCE_NAME_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+# Paths for comparison, topologies, traffic and analytics
+EFFECTS_JSON_PATH = (COMPARISON_DIR / "effects.json").resolve()
+RUNS_JSON_PATH = (COMPARISON_DIR / "runs.json").resolve()
+TOPOLOGIES_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "topologies").resolve()
+TRAFFIC_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "traffic").resolve()
+STATISTICAL_TESTS_DIR = (Path(PROJECT_ROOT) / "selfx" / "output" / "statistical_tests").resolve()
+PAIRED_TTEST_PATH = (STATISTICAL_TESTS_DIR / "paired_t_test_report.json").resolve()
+LATENCY_TARGETS_PATH = (STATISTICAL_TESTS_DIR / "latency_targets_report.json").resolve()
+V_TRADEOFF_PATH = (PIPELINE_DIR / "v_tradeoff.json").resolve()
+LORA_TRAINING_JSON = (PIPELINE_DIR / "adapter" / "training.json").resolve()
+LORA_TRAINING_LOG = (PIPELINE_DIR / "adapter" / "training_log.jsonl").resolve()
+
+COMPARISON_CONFIGS = [
+    {
+        "id": "S0",
+        "label": "Static (L2 Switch)",
+        "family": "baseline",
+        "description": "Default Ryu L2 learning switch with static shortest path routing and zero dynamic flow adaptation."
+    },
+    {
+        "id": "S1",
+        "label": "Base LM (Zero-Shot)",
+        "family": "agentic",
+        "description": "Zero-shot SmolLM2-135M agent generating flow reroute actions without reflection or episodic memory."
+    },
+    {
+        "id": "S2",
+        "label": "Base LM + Critique",
+        "family": "agentic",
+        "description": "SmolLM2-135M agent enhanced with explicit self-critique and candidate action revision."
+    },
+    {
+        "id": "S3",
+        "label": "LoRA Policy",
+        "family": "agentic",
+        "description": "Parameter-efficient fine-tuned SmolLM2-135M (rank 8, alpha 16) trained on successful past trajectories."
+    },
+    {
+        "id": "S4",
+        "label": "Agentic at 5s",
+        "family": "agentic",
+        "description": "Full multi-agent reflection loop operating at 5.0-second control window intervals."
+    },
+    {
+        "id": "S5",
+        "label": "SELF-X Agentic",
+        "family": "agentic",
+        "description": "Flagship SELF-X autonomous agent combining LangGraph reflection, episodic memory bank, and Lyapunov DPP safety governor."
+    },
+    {
+        "id": "threshold",
+        "label": "Capacity Threshold",
+        "family": "heuristic",
+        "description": "Reactive threshold-based controller triggering reroutes when link load exceeds 80% watermark."
+    },
+    {
+        "id": "least_loaded",
+        "label": "Least Loaded Path",
+        "family": "heuristic",
+        "description": "Greedy routing heuristic that directs new and elephant flows to the path with lowest instantaneous queue occupancy."
+    },
+    {
+        "id": "tabular_q",
+        "label": "Tabular Q-Learning",
+        "family": "rl",
+        "description": "Classical reinforcement learning with discrete state-action lookup table over coarse network bins."
+    },
+    {
+        "id": "dqn",
+        "label": "Deep Q-Network (DQN)",
+        "family": "rl",
+        "description": "Deep Q-Network with experience replay buffer, target network synchronization, and epsilon-greedy exploration."
+    },
+    {
+        "id": "marl",
+        "label": "Two-Agent IQL (MARL)",
+        "family": "rl",
+        "description": "Multi-agent independent Q-learning with decentralized controllers coordinating across sub-domains."
+    },
+    {
+        "id": "dpp",
+        "label": "DPP Only",
+        "family": "control_theoretic",
+        "description": "Pure Lyapunov Drift-Plus-Penalty mathematical optimization without language model reasoning."
+    },
+    {
+        "id": "no_lora",
+        "label": "Agentic w/o LoRA",
+        "family": "ablation",
+        "description": "Ablation condition: Complete agentic pipeline operating without parameter-efficient policy adaptation."
+    },
+    {
+        "id": "no_governor",
+        "label": "Agentic w/o Governor",
+        "family": "ablation",
+        "description": "Ablation condition: Complete agentic pipeline without the Lyapunov DPP safety guardrail and veto envelope."
+    }
+]
+
+_CACHED_RUNS_DATA = None
 
 
 class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WEB_DIR, **kwargs)
+
+    def translate_path(self, path):
+        resource = urlsplit(path).path.removeprefix("/comparison/")
+        if resource in COMPARISON_FILES or COMPARISON_CHART_RE.fullmatch(resource):
+            target = (COMPARISON_DIR / resource).resolve()
+            if path.startswith("/comparison/") and target.parent == COMPARISON_DIR:
+                return str(target)
+        return super().translate_path(path)
 
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store')
@@ -125,8 +251,54 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_dpp_acceptance()
             return
 
+        # API: incremental pipeline study (the dataset behind the IEEE paper)
+        if path.startswith('/api/pipeline/'):
+            self.handle_pipeline(path.rsplit('/', 1)[-1])
+            return
+
         # API: Zero-shot transfer evaluation
         if path == '/api/transfer':
+            self.handle_transfer()
+            return
+
+        # API: Algorithm Comparison 14-controller dataset & effects
+        if path == '/api/comparison/configs':
+            self.handle_comparison_configs()
+            return
+        if path == '/api/comparison/effects':
+            self.handle_comparison_effects()
+            return
+        if path == '/api/comparison/runs':
+            self.handle_comparison_runs()
+            return
+
+        # API: Multi-Topology Manifests
+        if path == '/api/topologies':
+            self.handle_topologies_list()
+            return
+        if path.startswith('/api/topologies/'):
+            self.handle_topology_manifest(path.removeprefix('/api/topologies/'))
+            return
+
+        # API: Traffic Workload Schedules
+        if path == '/api/traffic/schedules':
+            self.handle_traffic_schedules_list()
+            return
+        if path.startswith('/api/traffic/schedules/'):
+            self.handle_traffic_schedule(path.removeprefix('/api/traffic/schedules/'))
+            return
+
+        # API: Advanced Analytics & Theory Lab
+        if path == '/api/analytics/dpp':
+            self.handle_analytics_dpp()
+            return
+        if path == '/api/analytics/statistics':
+            self.handle_analytics_statistics()
+            return
+        if path == '/api/analytics/lora':
+            self.handle_analytics_lora()
+            return
+        if path == '/api/analytics/transfer':
             self.handle_transfer()
             return
 
@@ -231,9 +403,46 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "table2_available": TABLE2_SUMMARY_PATH.is_file(),
             "table5_available": TABLE5_SUMMARY_PATH.is_file(),
             "dpp_acceptance_available": DPP_ACCEPTANCE_PATH.is_file(),
-            "transfer_available": TRANSFER_PATH.is_file()
+            "transfer_available": TRANSFER_PATH.is_file(),
+            "pipeline_available": PIPELINE_FILES["summary"].is_file(),
+            "pipeline_resources": sorted(k for k, v in PIPELINE_FILES.items() if v.is_file()),
+            "comparison_available": EFFECTS_JSON_PATH.is_file() and RUNS_JSON_PATH.is_file(),
+            "topologies_available": TOPOLOGIES_DIR.is_dir(),
+            "traffic_schedules_available": TRAFFIC_DIR.is_dir(),
+            "analytics_available": DPP_ACCEPTANCE_PATH.is_file() and PAIRED_TTEST_PATH.is_file()
         }
         self.send_json(200, data)
+
+    def handle_pipeline(self, name):
+        """Serve one result file of the incremental pipeline study, read-only.
+
+        `name` is matched against a fixed allow-list rather than joined onto a
+        path, so no request can walk out of the results directory.
+        """
+        target = PIPELINE_FILES.get(name)
+        if target is None:
+            self.send_json(404, {
+                "error": "unknown pipeline resource",
+                "available": sorted(PIPELINE_FILES),
+            })
+            return
+        if not target.is_file():
+            self.send_json(404, {
+                "error": f"pipeline {name} not generated yet",
+                "available": False,
+                "hint": "run scripts/run_all.ps1 (or run_all.sh) to produce it",
+            })
+            return
+        try:
+            with open(target, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+        except json.JSONDecodeError:
+            self.send_json(502, {"error": f"pipeline {name} is malformed JSON"})
+            return
+        except Exception as exc:
+            self.send_json(500, {"error": f"failed to read pipeline {name}: {exc}"})
+            return
+        self.send_json(200, data, headers={"Cache-Control": "public, max-age=60"})
 
     def handle_ablation_table2(self):
         if not TABLE2_SUMMARY_PATH.is_file():
@@ -314,6 +523,239 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "disclaimer": "Analytical fluid simulation with authenticated external LLM calls. No in-switch packet forwarding.",
             "runs": runs
         })
+
+    def handle_comparison_configs(self):
+        self.send_json(200, {
+            "success": True,
+            "count": len(COMPARISON_CONFIGS),
+            "configs": COMPARISON_CONFIGS
+        }, headers={"Cache-Control": "public, max-age=300"})
+
+    def handle_comparison_effects(self):
+        if not EFFECTS_JSON_PATH.is_file():
+            self.send_json(404, {"error": "audited comparison effects.json not found", "available": False})
+            return
+        try:
+            with open(EFFECTS_JSON_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load comparison effects: {str(e)}"})
+
+    def handle_comparison_runs(self):
+        global _CACHED_RUNS_DATA
+        if not RUNS_JSON_PATH.is_file():
+            self.send_json(404, {"error": "audited comparison runs.json not found", "available": False})
+            return
+        try:
+            if _CACHED_RUNS_DATA is None:
+                with open(RUNS_JSON_PATH, "r", encoding="utf-8") as f:
+                    _CACHED_RUNS_DATA = json.load(f)
+            data = _CACHED_RUNS_DATA
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load comparison runs: {str(e)}"})
+            return
+
+        query = parse_qs(urlsplit(self.path).query)
+        requested_configs = set()
+        if "config" in query:
+            for item in query["config"]:
+                requested_configs.update(c.strip() for c in item.split(",") if c.strip())
+        if "configs" in query:
+            for item in query["configs"]:
+                requested_configs.update(c.strip() for c in item.split(",") if c.strip())
+
+        all_requested = query.get("all", ["false"])[0].lower() in ("true", "1", "yes")
+        summary_only = query.get("summary_only", ["false"])[0].lower() in ("true", "1", "yes")
+
+        all_runs = data.get("runs", [])
+        if summary_only or (not requested_configs and not all_requested):
+            summary_runs = []
+            for r in all_runs:
+                cfg = r.get("configuration", "")
+                windows = r.get("windows", [])
+                avg_latency = sum(w.get("latency_ms", 0) for w in windows) / max(len(windows), 1)
+                avg_goodput = sum(w.get("throughput_mbps", 0) for w in windows) / max(len(windows), 1)
+                avg_loss = sum(w.get("loss_pct", 0) for w in windows) / max(len(windows), 1)
+                avg_reward = sum(w.get("reward", 0) for w in windows) / max(len(windows), 1)
+                installs = sum(w.get("installs", 0) for w in windows)
+                vetoes = sum(w.get("vetoes", 0) for w in windows)
+                summary_runs.append({
+                    "configuration": cfg,
+                    "seed": r.get("seed"),
+                    "profile": r.get("profile"),
+                    "window_count": len(windows),
+                    "mean_latency_ms": round(avg_latency, 3),
+                    "mean_goodput_mbps": round(avg_goodput, 3),
+                    "mean_loss_pct": round(avg_loss, 3),
+                    "mean_reward": round(avg_reward, 4),
+                    "total_installs": installs,
+                    "total_vetoes": vetoes
+                })
+            self.send_json(200, {
+                "schema": data.get("schema", "selfx.audited-comparison.v1"),
+                "total_runs": len(all_runs),
+                "configs": data.get("configs", {}),
+                "summary": summary_runs
+            }, headers={"Cache-Control": "public, max-age=120"})
+            return
+
+        filtered = [r for r in all_runs if r.get("configuration") in requested_configs] if requested_configs else all_runs
+        self.send_json(200, {
+            "schema": data.get("schema", "selfx.audited-comparison.v1"),
+            "configs": data.get("configs", {}),
+            "count": len(filtered),
+            "runs": filtered
+        }, headers={"Cache-Control": "public, max-age=120"})
+
+    def handle_topologies_list(self):
+        if not TOPOLOGIES_DIR.is_dir():
+            self.send_json(404, {"error": "topologies directory not found", "available": False})
+            return
+        topos = []
+        try:
+            for manifest_file in sorted(TOPOLOGIES_DIR.glob("*manifest.json")):
+                with open(manifest_file, "r", encoding="utf-8") as f:
+                    manifest = json.load(f)
+                topos.append({
+                    "id": manifest.get("id", manifest_file.stem.replace("_manifest", "")),
+                    "name": manifest.get("name", manifest_file.stem),
+                    "category": manifest.get("category", "topology"),
+                    "switch_count": manifest.get("switch_count", len(manifest.get("switches", []))),
+                    "host_count": manifest.get("host_count", len(manifest.get("hosts", []))),
+                    "link_count": len(manifest.get("links", []))
+                })
+            self.send_json(200, {"success": True, "topologies": topos}, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load topologies: {str(e)}"})
+
+    def handle_topology_manifest(self, topo_id):
+        topo_id = topo_id.strip()
+        if not RESOURCE_NAME_RE.fullmatch(topo_id):
+            self.send_json(400, {"error": "invalid topology id format"})
+            return
+        candidate1 = (TOPOLOGIES_DIR / f"{topo_id}_manifest.json").resolve()
+        candidate2 = (TOPOLOGIES_DIR / f"{topo_id}.json").resolve()
+        target = candidate1 if candidate1.is_file() else (candidate2 if candidate2.is_file() else None)
+        if target is None or target.parent != TOPOLOGIES_DIR:
+            self.send_json(404, {"error": f"topology '{topo_id}' not found"})
+            return
+        try:
+            with open(target, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+            self.send_json(200, manifest, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load topology '{topo_id}': {str(e)}"})
+
+    def handle_traffic_schedules_list(self):
+        if not TRAFFIC_DIR.is_dir():
+            self.send_json(404, {"error": "traffic schedules directory not found", "available": False})
+            return
+        schedules = []
+        try:
+            for sched_file in sorted(TRAFFIC_DIR.glob("schedule_*.json")):
+                with open(sched_file, "r", encoding="utf-8") as f:
+                    sched = json.load(f)
+                schedules.append({
+                    "filename": sched_file.name,
+                    "profile": sched.get("profile", sched_file.stem),
+                    "seed": sched.get("seed", 42),
+                    "duration_sec": sched.get("duration_sec", 600),
+                    "num_hosts": sched.get("num_hosts", 8),
+                    "total_events": sched.get("total_events", len(sched.get("events", [])))
+                })
+            self.send_json(200, {"success": True, "schedules": schedules}, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to list traffic schedules: {str(e)}"})
+
+    def handle_traffic_schedule(self, profile):
+        profile = profile.strip()
+        if not RESOURCE_NAME_RE.fullmatch(profile):
+            self.send_json(400, {"error": "invalid traffic profile format"})
+            return
+        target = None
+        for cand in TRAFFIC_DIR.glob(f"*{profile}*.json"):
+            target = cand.resolve()
+            break
+        if target is None or target.parent != TRAFFIC_DIR or not target.is_file():
+            self.send_json(404, {"error": f"traffic schedule for profile '{profile}' not found"})
+            return
+        try:
+            with open(target, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.send_json(200, data, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load traffic schedule '{profile}': {str(e)}"})
+
+    def handle_analytics_dpp(self):
+        acceptance = None
+        v_tradeoff = None
+        if DPP_ACCEPTANCE_PATH.is_file():
+            try:
+                with open(DPP_ACCEPTANCE_PATH, "r", encoding="utf-8") as f:
+                    acceptance = json.load(f)
+            except Exception:
+                pass
+        if V_TRADEOFF_PATH.is_file():
+            try:
+                with open(V_TRADEOFF_PATH, "r", encoding="utf-8") as f:
+                    v_tradeoff = json.load(f)
+            except Exception:
+                pass
+        if not acceptance and not v_tradeoff:
+            self.send_json(404, {"error": "DPP analytical reports not found", "available": False})
+            return
+        self.send_json(200, {
+            "success": True,
+            "acceptance": acceptance,
+            "v_tradeoff": v_tradeoff
+        }, headers={"Cache-Control": "public, max-age=120"})
+
+    def handle_analytics_statistics(self):
+        paired_ttest = None
+        latency_targets = None
+        if PAIRED_TTEST_PATH.is_file():
+            try:
+                with open(PAIRED_TTEST_PATH, "r", encoding="utf-8") as f:
+                    paired_ttest = json.load(f)
+            except Exception:
+                pass
+        if LATENCY_TARGETS_PATH.is_file():
+            try:
+                with open(LATENCY_TARGETS_PATH, "r", encoding="utf-8") as f:
+                    latency_targets = json.load(f)
+            except Exception:
+                pass
+        if not paired_ttest and not latency_targets:
+            self.send_json(404, {"error": "Statistical reports not found", "available": False})
+            return
+        self.send_json(200, {
+            "success": True,
+            "paired_ttest": paired_ttest,
+            "latency_targets": latency_targets
+        }, headers={"Cache-Control": "public, max-age=120"})
+
+    def handle_analytics_lora(self):
+        if not LORA_TRAINING_JSON.is_file():
+            self.send_json(404, {"error": "LoRA training summary not found", "available": False})
+            return
+        try:
+            with open(LORA_TRAINING_JSON, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+            steps = []
+            if LORA_TRAINING_LOG.is_file():
+                with open(LORA_TRAINING_LOG, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.strip():
+                            steps.append(json.loads(line))
+            self.send_json(200, {
+                "success": True,
+                "config": config_data,
+                "steps": steps,
+                "step_count": len(steps)
+            }, headers={"Cache-Control": "public, max-age=120"})
+        except Exception as e:
+            self.send_json(500, {"error": f"failed to load LoRA training data: {str(e)}"})
 
     def handle_memory(self):
         candidates = [

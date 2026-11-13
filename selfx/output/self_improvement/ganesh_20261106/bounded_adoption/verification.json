@@ -1,0 +1,58 @@
+{
+  "audit_events": 6,
+  "holdout_attribution": {
+    "ci95": [
+      0.675773539959934,
+      1.364373810706732
+    ],
+    "mean_cumulative_reward_gain": 1.020073675333333,
+    "only_learned_difference": "LoRA weights",
+    "p_value": 0.0006203288168282815,
+    "same_memory": "disabled",
+    "same_prompt": true,
+    "seeds": [
+      "3200",
+      "3201",
+      "3202",
+      "3203",
+      "3204",
+      "3205"
+    ],
+    "test": "two-sided paired t-test, adapter versus bare base; not A1-to-A5",
+    "unit_of_replication": "independent seed, cumulative reward over 3 profiles"
+  },
+  "installed_safety_violations": 0,
+  "on_policy_episodes": 24,
+  "rejection_reasons": [
+    "insufficient_reward_gain",
+    "loss_regression",
+    "latency_regression",
+    "profile_reward_regression:alternate",
+    "profile_reward_regression:flash",
+    "profile_reward_regression:mixed"
+  ],
+  "scope": "trained language-model adapter; bounded adoption; frozen-replay network evidence",
+  "split_counts": {
+    "holdout": 864,
+    "stress": 576,
+    "train": 1122
+  },
+  "status": "passed",
+  "stress_reward_gain": 0.005166374208333338,
+  "task_ids": [
+    "T20",
+    "T21",
+    "T22",
+    "T23",
+    "T24",
+    "T25"
+  ],
+  "total_parameters": 134975808,
+  "trainable_parameters": 460800,
+  "weight_checks": {
+    "adapter_artifact_hashes": "passed",
+    "reloaded_adapter_parameter_hash": "passed",
+    "reloaded_base_parameter_hash": "passed",
+    "training_log_hash": "passed"
+  }
+}

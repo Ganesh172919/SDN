@@ -1,0 +1,107 @@
+{
+  "attribution": {
+    "ci95": [
+      0.675773539959934,
+      1.364373810706732
+    ],
+    "mean_cumulative_reward_gain": 1.020073675333333,
+    "only_learned_difference": "LoRA weights",
+    "p_value": 0.0006203288168282815,
+    "same_memory": "disabled",
+    "same_prompt": true,
+    "seeds": [
+      "3200",
+      "3201",
+      "3202",
+      "3203",
+      "3204",
+      "3205"
+    ],
+    "test": "two-sided paired t-test, adapter versus bare base; not A1-to-A5",
+    "unit_of_replication": "independent seed, cumulative reward over 3 profiles"
+  },
+  "candidate_sha256": "e38b484ce26842f219eedc0ec849471ec6ba3f6eeec4d9812b6bb3a14526481f",
+  "created_at_utc": "2026-11-05T21:59:55.427083+00:00",
+  "dataset_manifest_sha256": "ac1a8555c6040be66d7f107d3e2669eea3e3fca25dee2e7cd103b6b6c524b64c",
+  "gate": {
+    "accepted": true,
+    "mean_reward_gain": 0.007083844967592595,
+    "reasons": [
+      "all_frozen_stress_criteria_passed"
+    ]
+  },
+  "incumbent_sha256": "base:12fd25f77366fa6b3b4b768ec3050bf629380bac",
+  "memory": "disabled for both policies",
+  "network": "fixed replay queues; independent same-window outcomes",
+  "not_a_promotion_gate": true,
+  "policy": {
+    "max_installed_safety_violations": 0,
+    "max_latency_regression_ms": 1.0,
+    "max_loss_regression_pct": 0.1,
+    "max_profile_reward_regression": 0.005,
+    "min_mean_reward_gain": 0.002
+  },
+  "prompt_sha256": "988501109468174eec84fdf67db8c2046a66b3d38f07ea3715a1ac9a9727a85b",
+  "provenance": "simulation_frozen_replay",
+  "schema": "selfx.lora.evaluation.v1",
+  "split": "holdout",
+  "split_sha256": "95b8568159d654e3f29e4f87cc395228915c8e2844e86076c52ce57964a5c3fe",
+  "summary": {
+    "candidate": {
+      "actions": {
+        "no_op": 455,
+        "rate_limit": 90,
+        "reroute": 319
+      },
+      "cumulative_reward": 70.308932232,
+      "installed_safety_violations": 0,
+      "latency_ms": 18.061938114583334,
+      "loss_pct": 4.117936717592593,
+      "mean_reward": 0.08137607897222222,
+      "profile_mean_reward": {
+        "alternate": 0.01391350027083333,
+        "flash": 0.20180408865972224,
+        "mixed": 0.028410647986111114
+      },
+      "proposed_unsafe": 353,
+      "seed_cumulative_reward": {
+        "3200": 11.245287300000001,
+        "3201": 10.78755568,
+        "3202": 14.3041991,
+        "3203": 11.384497957999999,
+        "3204": 11.658009314000001,
+        "3205": 10.92938288
+      },
+      "throughput_kbps": 13553.564236111111,
+      "windows": 864
+    },
+    "incumbent": {
+      "actions": {
+        "no_op": 484,
+        "reroute": 380
+      },
+      "cumulative_reward": 64.18849018,
+      "installed_safety_violations": 0,
+      "latency_ms": 19.014259375,
+      "loss_pct": 4.0838114282407405,
+      "mean_reward": 0.07429223400462963,
+      "profile_mean_reward": {
+        "alternate": 0.0,
+        "flash": 0.20142562049305557,
+        "mixed": 0.021451081520833335
+      },
+      "proposed_unsafe": 484,
+      "seed_cumulative_reward": {
+        "3200": 10.616892264,
+        "3201": 10.141349096,
+        "3202": 13.018465344,
+        "3203": 10.442646006,
+        "3204": 10.373374036000001,
+        "3205": 9.595763434
+      },
+      "throughput_kbps": 13555.982638888889,
+      "windows": 864
+    }
+  },
+  "trace_sha256": "3370262aa52f00754012c371489b6599709bfa97d6492af63f4aa020b9ef4bce"
+}
