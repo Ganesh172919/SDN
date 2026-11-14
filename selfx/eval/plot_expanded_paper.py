@@ -1,0 +1,133 @@
+"""Generate the architecture diagram and time series for the expanded manuscript."""
+import argparse
+import json
+from pathlib import Path
+from statistics import mean
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from plot_audited_comparison import group_runs, run_metrics
+
+
+ROOT = Path(__file__).resolve().parents[2]
+COMPARISON = ROOT / "paper/comparison"
+ARMS = {
+    "S0": ("S0 Static", "#62686d", ":"),
+    "S4": ("S4 at 5 s", "#976416", "--"),
+    "S5": ("S5 SELF-X", "#006d79", "-"),
+    "dpp": ("DPP only", "#84477c", "-."),
+    "dqn": ("DQN / IQL", "#254884", (0, (4, 1, 1, 1))),
+}
+METRICS = (
+    ("latency_ms", "Mean delay (ms)"),
+    ("mean_queue_mbit", "Mean backlog (Mbit)"),
+    ("loss_pct", "Lost traffic (%)"),
+    ("throughput_mbps", "Goodput (Mbps)"),
+    ("installs", "Rule changes per window"),
+)
+
+
+def save(fig, path):
+    fig.savefig(path, metadata={"CreationDate": None})
+    plt.close(fig)
+
+
+def architecture(output):
+    fig, ax = plt.subplots(figsize=(7.1, 2.3))
+    ax.set(xlim=(0, 1), ylim=(0, 1))
+    ax.axis("off")
+
+    def box(x, y, label, color):
+        ax.text(x, y, label, ha="center", va="center", linespacing=1.35,
+                bbox=dict(boxstyle="round,pad=.42", fc=color, ec="#455567", lw=.85),
+                fontsize=8.7, zorder=2)
+
+    def arrow(x0, y0, x1, y1, **kwargs):
+        ax.annotate("", (x1, y1), (x0, y0), arrowprops=dict(
+            arrowstyle="-|>", color="#455567", linewidth=.95, **kwargs), zorder=1)
+
+    box(.15, .79, "5 s action prompt\nFrozen LoRA adapter", "#e0f2ef")
+    box(.48, .79, "30 s governor\nDemand and backlogs\nFive specialists, then merge", "#efe8f5")
+    box(.15, .35, "Current slot telemetry\nDemand and backlogs", "#edf0f3")
+    box(.48, .35, "100 ms optimizer\nFeasible DPP scores", "#ddeaf5")
+    box(.70, .35, "Shared action\nguard", "#f6eddb")
+    box(.90, .35, "Two-path\nfluid datapath", "#edf0f3")
+    arrow(.15, .46, .15, .69)
+    arrow(.28, .35, .375, .35)
+    arrow(.245, .73, .413, .44)
+    ax.text(.32, .54, "Preference\n+0.4 s", ha="right", va="center", fontsize=8.4)
+    arrow(.48, .66, .48, .45)
+    ax.text(.5, .56, "Objective update\n+0.8 s", ha="left", va="center", fontsize=8.4)
+    arrow(.585, .35, .615, .35)
+    arrow(.781, .35, .83, .35)
+    ax.plot([.90, .90, .15], [.255, .10, .10], color="#455567", linewidth=.95)
+    arrow(.15, .10, .15, .255)
+    ax.text(.52, .06, "Queue state for the next slot", fontsize=8.4, ha="center", va="center")
+    fig.subplots_adjust(left=.015, right=.99, top=.97, bottom=.07)
+    save(fig, output / "paper_architecture.pdf")
+
+
+def traces(grouped, output):
+    fig, axes = plt.subplots(3, 2, figsize=(7.1, 5.65), sharex=True)
+    demand_ax, *panels = axes.flat
+    time = [w["end_sec"] for w in next(iter(grouped["S5"].values()))["windows"]]
+    for ax in axes.flat:
+        ax.grid(alpha=.25)
+        ax.set_xlim(0, time[-1])
+    offered = [mean(r["windows"][i]["offered_mbps"] for r in grouped["S5"].values())
+               for i in range(len(time))]
+    demand_ax.stairs(offered, [0, *time], color="#344d5e", linewidth=1.4, baseline=None)
+    demand_ax.axhline(10, color="#976416", linestyle="--", linewidth=1)
+    demand_ax.set_ylabel("Offered load (Mbps)")
+    for ax, (metric, label) in zip(panels, METRICS, strict=True):
+        for arm, (name, color, style) in ARMS.items():
+            values = [mean(r["windows"][i][metric] for r in grouped[arm].values())
+                      for i in range(len(time))]
+            ax.plot(time, values, label=name, color=color, linestyle=style,
+                    linewidth=1.5 if arm == "S5" else 1.05)
+        ax.set_ylabel(label)
+    for ax in axes[-1]:
+        ax.set_xlabel("Simulated time (s)")
+    handles, labels = panels[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False,
+               bbox_to_anchor=(.5, .012))
+    fig.subplots_adjust(left=.085, right=.98, top=.98, bottom=.15, wspace=.30, hspace=.25)
+    save(fig, output / "paper_window_traces.pdf")
+
+
+def profile_table(grouped, output):
+    lines = []
+    for profile, short in (("steady_bursty", "Steady bursts"), ("flash_crowd", "Flash crowd"),
+                           ("volatile_dpp", "Volatile")):
+        for arm, display in (("S0", "S0"), ("S4", "S4"), ("S5", "S5"),
+                             ("dpp", "DPP"), ("dqn", "DQN/IQL")):
+            values = [run_metrics(r) for r in grouped[arm].values() if r["profile"] == profile]
+            delay, loss, goodput = (mean(v[k] for v in values)
+                                    for k in ("latency_ms", "loss_pct", "goodput_mbps"))
+            lines.append(f"{short if arm == 'S0' else ''} & {display} & {delay:.2f} & "
+                         f"{loss:.2f} & {goodput:.3f} " + r"\\")
+        lines.append(r"\addlinespace")
+    lines.pop()
+    (output / "expanded_profiles.tex").write_text(
+        "% Generated by plot_expanded_paper.py\n\\newcommand{\\ExpandedProfileRows}{%\n"
+        + "\n".join(lines) + "\n}\n", encoding="utf-8"
+    )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--runs", type=Path, default=COMPARISON / "runs.json")
+    parser.add_argument("--output", type=Path, default=COMPARISON)
+    args = parser.parse_args()
+    manifest = json.loads(args.runs.read_text(encoding="utf-8"))
+    if manifest["smoke"]:
+        parser.error("The figures require the full benchmark.")
+    args.output.mkdir(parents=True, exist_ok=True)
+    plt.rcParams.update({"font.size": 9, "pdf.fonttype": 42, "axes.spines.top": False,
+                         "axes.spines.right": False, "axes.axisbelow": True})
+    architecture(args.output)
+    grouped = group_runs(manifest)
+    traces(grouped, args.output)
+    profile_table(grouped, args.output)
