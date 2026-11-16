@@ -49,6 +49,12 @@ class SDNSimulator {
     this.isPlaying = playing;
   }
 
+  setSpeed(multiplier = 1) {
+    this.speedMultiplier = multiplier;
+    this.intervalSeconds = 5.0 / multiplier;
+    this.startLoop();
+  }
+
   setMode(mode) {
     this.mode = mode;
     this.recomputeMetricsForMode();

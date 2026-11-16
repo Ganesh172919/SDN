@@ -356,7 +356,7 @@ $$\Delta \text{Loss} = \text{LossPct}_{\text{action}} - \text{LossPct}_{\text{no
 
 $$\text{Reward} = w_L \left(\frac{\Delta \text{Latency}}{50.0}\right) + w_T \left(\frac{\Delta \text{Throughput}}{5000.0}\right) + w_{\text{loss}} \left(\frac{\Delta \text{Loss}}{20.0}\right)$$
 
-Where canonical weights are defined in [`selfx/config.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/config.py#L76-L79):
+Where canonical weights are defined in [`selfx/config.py`](../config.py#L76-L79):
 $$w_L = -0.4, \quad w_T = +0.4, \quad w_{\text{loss}} = -0.2$$
 
 Signs ensure that lower latency, higher throughput, and lower packet loss yield positive contributions.
@@ -365,7 +365,7 @@ Signs ensure that lower latency, higher throughput, and lower packet loss yield 
 
 ## 💻 Core Implementation Code Walkthrough
 
-### 1. Fluid Queue Simulation Engine ([`eval/simulator.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/eval/simulator.py#L86-L121))
+### 1. Fluid Queue Simulation Engine ([`eval/simulator.py`](../eval/simulator.py#L86-L121))
 
 The exact Python implementation calculates queue evolution, buffer drops, and average depth analytically:
 
@@ -419,7 +419,7 @@ def evaluate(self, demand: dict, decision: DecisionOutput, commit: bool = False)
 
 ---
 
-### 2. Physical Conservation Identity Verification ([`scripts/verify_v4_submission.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/scripts/verify_v4_submission.py#L42-L45))
+### 2. Physical Conservation Identity Verification ([simulation model](../eval/simulator.py))
 
 Every row of the 86,400-window dataset is audited against strict physical balance:
 
@@ -437,7 +437,7 @@ close(inflow, outflow, 1e-6)
 
 ---
 
-### 3. Bootstrap Resampling Implementation ([`eval/run_v4_benchmarks.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/eval/run_v4_benchmarks.py))
+### 3. Bootstrap Resampling Implementation ([`eval/run_v4_benchmarks.py`](../eval/run_v4_benchmarks.py))
 
 ```python
 # Paired bootstrap resampling across 10 seed differences
@@ -552,9 +552,8 @@ test_engine_conservation()
 
 ## 🔗 Cross-Reference Navigation
 
-- **Evaluator Guide**: [`selfx/docs/PROJECT_GUIDE.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/PROJECT_GUIDE.md)
-- **Master Developer Portal**: [`README.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/README.md)
-- **Low-Level Architecture**: [`selfx/docs/ARCHITECTURE.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/ARCHITECTURE.md)
-- **Operational Flows**: [`PROJECT_FLOW.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/PROJECT_FLOW.md)
-- **Benchmark Specification**: [`selfx/docs/BENCHMARKS_V4.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/BENCHMARKS_V4.md)
-- **Presentation Companion**: [`PROJECT_PRESENTATION.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/PROJECT_PRESENTATION.md)
+- **Evaluator Guide**: [`selfx/docs/PROJECT_GUIDE.md`](../../REPRODUCE.md)
+- **Master Developer Portal**: [`README.md`](../../README.md)
+- **Low-Level Architecture**: [`selfx/docs/ARCHITECTURE.md`](ARCHITECTURE.md)
+- **Operational Flows**: [`PROJECT_FLOW.md`](../../PROJECT_FLOW.md)
+- **Benchmark Specification**: [`selfx/docs/BENCHMARKS_V4.md`](BENCHMARKS.md)

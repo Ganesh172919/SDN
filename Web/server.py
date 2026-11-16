@@ -59,6 +59,7 @@ except ImportError:
     validate_trace_record = _schema.validate_trace_record
     read_run = _writer.read_run
 
+HOST = os.environ.get("SDN_WEB_HOST", "127.0.0.1")
 PORT = int(os.environ.get("SDN_WEB_PORT", 5000))
 RYU_BASE_URL = os.environ.get("RYU_REST_BASE", "http://127.0.0.1:8080")
 RESULTS_ROOT = Path(os.environ.get("SELFX_RESULTS_ROOT", Path(PROJECT_ROOT) / "results")).resolve()
@@ -98,6 +99,58 @@ LATENCY_TARGETS_PATH = (STATISTICAL_TESTS_DIR / "latency_targets_report.json").r
 V_TRADEOFF_PATH = (PIPELINE_DIR / "v_tradeoff.json").resolve()
 LORA_TRAINING_JSON = (PIPELINE_DIR / "adapter" / "training.json").resolve()
 LORA_TRAINING_LOG = (PIPELINE_DIR / "adapter" / "training_log.jsonl").resolve()
+
+# Files published by the local submission portal.
+PAPER_DIR = Path(PROJECT_ROOT) / "paper"
+FIGURES_DIR = PAPER_DIR / "figures"
+SUBMISSION_DIR = Path(PROJECT_ROOT) / "output" / "submission"
+CURRENT_SUBMISSION_DIR = SUBMISSION_DIR / "current"
+SUBMISSION_LIMIT_BYTES = 100_000_000
+SUBMISSION_DEADLINE = "2026-11-19T17:00:00+05:30"
+SUBMISSION_FORM_URL = "https://forms.gle/5DbSbyJUqFwpXSYM9"
+PAPER_TITLE = "SELF-X: Evaluating Language Model Assistance for Flow Control in Software-Defined Networks"
+PAPER_FIGURE_RE = re.compile(r"fig(?:[1-9]|10)_[a-z_]+\.(?:pdf|png)")
+AUDITED_FIGURES = {
+    "paper_architecture.pdf", "paper_window_traces.pdf",
+    "paper_delay_effects.pdf", "paper_delay_loss.pdf",
+}
+SUBMISSION_ARTIFACTS = {
+    "SELF_X_Submission.zip": ("Course Submission ZIP", "Source, evidence, manuscript, review materials, and presentation.", "bundle"),
+    "SELF_X_IEEE_Paper.pdf": ("Audited IEEE-format Manuscript", "Course manuscript built from paper/main.tex.", "paper"),
+    "Overleaf_Source.zip": ("Overleaf LaTeX Source", "Upload to Overleaf and compile main.tex.", "bundle"),
+    "SELF_X_Revision_Report.pdf": ("Revision Report", "Documents the changes made in response to the two Deep Review rounds.", "report"),
+    "SELF_X_Revision_Response.md": ("Point-by-point Revision Response", "Editable review response and change log.", "response"),
+    "SELF_X_Deep_Review_Round_1.md": ("Deep Review Export (Round 1)", "Original review feedback on the initial draft.", "review"),
+    "SELF_X_Deep_Review_Round_2.md": ("Deep Review Export (Round 2)", "Original review feedback on Revision 1.", "review"),
+    "SELF_X_Initial_Draft.pdf": ("Initial Draft", "Archived manuscript reviewed in Round 1.", "paper"),
+    "SELF_X_Revision_1.pdf": ("Revision 1", "Manuscript after the first Deep Review round.", "paper"),
+    "SELF_X_Revision_2.pdf": ("Revision 2", "Manuscript after the second Deep Review round.", "paper"),
+    "SELF_X_Revision_2_Expanded.pdf": ("Expanded Revision 2", "Archived expanded revision.", "paper"),
+    "SELF_X_Presentation.pdf": ("Course Presentation (PDF)", "Slides summarizing the audited comparison and its limitations.", "report"),
+    "SELF_X_Presentation.pptx": ("Course Presentation (PowerPoint)", "Editable presentation slides.", "report"),
+    "REPRODUCE.md": ("Reproduction Guide", "Commands for installation, the audited benchmark, and paper compilation.", "report"),
+    "SHA256SUMS.txt": ("SHA-256 Checksums", "Hashes for the files in the current release.", "manifest"),
+}
+
+
+def public_file(directory, name):
+    target = directory / name
+    if target.is_file() and target.resolve() == directory.resolve() / name:
+        return target
+    return None
+
+
+def submission_file(name):
+    if name not in SUBMISSION_ARTIFACTS:
+        return None
+    target = public_file(CURRENT_SUBMISSION_DIR, name)
+    if target:
+        return target
+    # A source checkout has these files before a course bundle is assembled.
+    if name in {"SELF_X_IEEE_Paper.pdf", "REPRODUCE.md"}:
+        return public_file(Path(PROJECT_ROOT), name)
+    return None
+
 
 COMPARISON_CONFIGS = [
     {
@@ -194,17 +247,46 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=WEB_DIR, **kwargs)
 
     def translate_path(self, path):
-        resource = urlsplit(path).path.removeprefix("/comparison/")
-        if resource in COMPARISON_FILES or COMPARISON_CHART_RE.fullmatch(resource):
-            target = (COMPARISON_DIR / resource).resolve()
-            if path.startswith("/comparison/") and target.parent == COMPARISON_DIR:
-                return str(target)
+        clean_path = urlsplit(path).path
+
+        for prefix, directory in (
+            ("/comparison/", COMPARISON_DIR),
+            ("/paper/comparison/", COMPARISON_DIR),
+            ("/paper/figures/", FIGURES_DIR),
+            ("/paper/", PAPER_DIR),
+            ("/downloads/", None),
+            ("/output/submission/current/", CURRENT_SUBMISSION_DIR),
+            ("/output/submission/", SUBMISSION_DIR),
+            ("/output/pdf/", Path(PROJECT_ROOT) / "output" / "pdf"),
+        ):
+            if not clean_path.startswith(prefix):
+                continue
+            name = clean_path.removeprefix(prefix)
+            target = None
+            if directory == COMPARISON_DIR:
+                if name in COMPARISON_FILES | AUDITED_FIGURES or COMPARISON_CHART_RE.fullmatch(name):
+                    target = public_file(directory, name)
+            elif directory == FIGURES_DIR:
+                if PAPER_FIGURE_RE.fullmatch(name):
+                    target = public_file(directory, name)
+            elif directory == PAPER_DIR:
+                if name in {"main.tex", "refs.bib", "README_OVERLEAF.md", "COMPARISON.md",
+                            "AUDITED_COMPARISON_SPECIFICATION.md"}:
+                    target = public_file(directory, name)
+            elif directory is None:
+                target = submission_file(name)
+            elif name in SUBMISSION_ARTIFACTS:
+                target = public_file(directory, name)
+
+            # Reserved URLs only serve the files selected above.
+            return str(target if target else Path(WEB_DIR) / ".unavailable" / "file")
+
         return super().translate_path(path)
 
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('X-Frame-Options', 'DENY')
+        self.send_header('X-Frame-Options', 'SAMEORIGIN')
         self.send_header('Referrer-Policy', 'same-origin')
         super().end_headers()
 
@@ -214,6 +296,10 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
+        if path == '/favicon.ico':
+            self.send_response(204)
+            self.end_headers()
+            return
         if path == '/login':
             self.redirect_public_dashboard()
             return
@@ -224,6 +310,11 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         # API: Real-time System Status & Ryu Controller Health
         if path == '/api/status':
             self.handle_status()
+            return
+
+        # API: Research Paper & Final Submission Portal Manifest
+        if path == '/api/submission/info':
+            self.handle_submission_info()
             return
 
         # API: Live Episodic Memory Bank
@@ -251,9 +342,9 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_dpp_acceptance()
             return
 
-        # API: incremental pipeline study (the dataset behind the IEEE paper)
+        # API: archived incremental pipeline study
         if path.startswith('/api/pipeline/'):
-            self.handle_pipeline(path.rsplit('/', 1)[-1])
+            self.handle_pipeline(path.removeprefix('/api/pipeline/'))
             return
 
         # API: Zero-shot transfer evaluation
@@ -384,10 +475,11 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             req = urllib.request.Request(f"{RYU_BASE_URL}/stats/switches", headers={'User-Agent': 'SDN-Dashboard'})
             with urllib.request.urlopen(req, timeout=1.2) as resp:
                 if resp.status == 200:
-                    ryu_online = True
-                    content = resp.read().decode('utf-8')
-                    switches = json.loads(content)
-        except Exception:
+                    payload = json.load(resp)
+                    if isinstance(payload, list):
+                        ryu_online = True
+                        switches = payload
+        except (OSError, ValueError):
             pass
 
         data = {
@@ -409,9 +501,137 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
             "comparison_available": EFFECTS_JSON_PATH.is_file() and RUNS_JSON_PATH.is_file(),
             "topologies_available": TOPOLOGIES_DIR.is_dir(),
             "traffic_schedules_available": TRAFFIC_DIR.is_dir(),
-            "analytics_available": DPP_ACCEPTANCE_PATH.is_file() and PAIRED_TTEST_PATH.is_file()
+            "analytics_available": DPP_ACCEPTANCE_PATH.is_file() and PAIRED_TTEST_PATH.is_file(),
+            "submission_available": submission_file("SELF_X_Submission.zip") is not None,
+            "submission_deadline": SUBMISSION_DEADLINE,
+            "submission_form_url": SUBMISSION_FORM_URL
         }
         self.send_json(200, data)
+
+    def handle_submission_info(self):
+        sha_map = {}
+        checksum_file = public_file(CURRENT_SUBMISSION_DIR, "SHA256SUMS.txt")
+        if checksum_file:
+            try:
+                for line in checksum_file.read_text(encoding="utf-8").splitlines():
+                    digest, separator, filename = line.partition("  ")
+                    if separator and re.fullmatch(r"[0-9a-f]{64}", digest):
+                        sha_map[filename] = digest
+            except (OSError, UnicodeError):
+                pass
+
+        artifacts = []
+        for filename, (title, description, category) in SUBMISSION_ARTIFACTS.items():
+            target = submission_file(filename)
+            if target is None:
+                continue
+            size = target.stat().st_size
+            artifacts.append({
+                "name": filename,
+                "title": title,
+                "description": description,
+                "category": category,
+                "size_bytes": size,
+                "size_str": f"{size / 1_000_000:.2f} MB" if size >= 1_000_000 else f"{size / 1_000:.1f} kB",
+                "sha256": sha_map.get(filename) if target.parent == CURRENT_SUBMISSION_DIR else None,
+                "download_url": f"/downloads/{filename}",
+            })
+
+        bundle = next((item for item in artifacts if item["name"] == "SELF_X_Submission.zip"), None)
+        size = bundle["size_bytes"] if bundle else None
+        info = {
+            "success": True,
+            "project_title": PAPER_TITLE,
+            "short_title": "SELF-X",
+            "team_id": "SDN_07",
+            "course": "EC466 Software Defined Networks",
+            "institution": "IIIT Dharwad",
+            "submission_deadline_iso": SUBMISSION_DEADLINE,
+            "submission_deadline_human": "19 November 2026, 5:00 PM IST",
+            "google_form_url": SUBMISSION_FORM_URL,
+            "overleaf_template_url": "https://www.overleaf.com/latex/templates/ieee-conference-template/grfzhhncsfqn",
+            "deep_review_portal_url": "https://research.google/deepreview/",
+            "max_bundle_size": "100 MB",
+            "submission_zip_size_mb": round(size / 1_000_000, 2) if size is not None else None,
+            "submission_zip_status": (
+                "NOT_BUILT" if size is None else
+                "UNDER_100MB" if size < SUBMISSION_LIMIT_BYTES else "OVER_LIMIT"
+            ),
+            "artifacts": artifacts,
+            "deep_review_rounds": [
+                {
+                    "round": 1,
+                    "document_id": "cfc7fbd2-e25a-4205-9cea-2a09f614aa9b",
+                    "input_document": "SELF_X_Initial_Draft.pdf",
+                    "output_document": "SELF_X_Revision_1.pdf",
+                    "status": "RESPONSE DOCUMENTED",
+                    "points_addressed": 15,
+                    "criticisms_and_solutions": [
+                        {"point": "1. Standalone DPP and stage attribution", "solution": "Added the 100 ms DPP-only arm with V=8, initial weights, and shared guard. Compared matched 5s stack and removed LM layers separately."},
+                        {"point": "2. Loop interfaces and startup timing", "solution": "S3 applies adapter proposal after 4 slots; S4/S5 use it as bounded preference. Governor updates become available eight slots after an epoch starts."},
+                        {"point": "3. Drift units, clipping, and backlog theorem", "solution": "Replaced earlier theorem with actual rate-form score (units of Mbit^2/s). Multiplication by slot duration gives linear term in unclipped quadratic drift. Finite buffer caps occupancy."},
+                        {"point": "4. Buffer saturation example", "solution": "Quantified excess arrival: an empty 2 Mbit queue fills in exactly 200 ms at 20 Mbps arrivals and 10 Mbps service."},
+                        {"point": "5. Loss floor quantification", "solution": "Removed unsupported 7.97% bufferless claim. Documented that buffer absorption separates instantaneous bursts from true packet drops."},
+                        {"point": "6. Action-to-rate mapping & metering", "solution": "Formally defined admitted rates, meter drops, clipping, overflow, served volume, and all five score terms. Bounded V in [0.5, 32.0]."},
+                        {"point": "7. Delay estimand & virtual waiting time", "solution": "Replaced Little's Law wording with virtual waiting time proxy at service rate. Defined clipped slot integral and served-volume weighting."},
+                        {"point": "8. Telemetry resolution & adapter provenance", "solution": "DPP uses exact simulator state; action prompt rounds rates to 0.5 Mbps; governor prompt rounds to integers. Documented 24-state grid and offline checkpoint."},
+                        {"point": "9. Window history & memory replay", "solution": "Clarified that S2 appends last effective action and reward after each 5s window. Documented that no arm retrains adapter during test."},
+                        {"point": "10. Control latency & real inference", "solution": "Replaced provider experiment with real local inference and 400 ms per sequential stage. Specialist agents share one stage."},
+                        {"point": "11. Sample size & statistical testing", "solution": "Full benchmark: 14 configs × 12 paired traces × 1,800 slots = 302,400 test slots. 13 Holm-adjusted tests + 20,000 bootstrap draws."},
+                        {"point": "12. Online tabular baseline exploration", "solution": "Explicitly documented Tabular Q exploration schedule (epsilon-decay) and added offline-trained frozen DQN and IQL benchmarks."},
+                        {"point": "13. Position against prior art & LoRA results", "solution": "Positioned against NetLLM and agentic SDN. Reported negative LoRA direct arm and paired result of removing prior from S5."},
+                        {"point": "14. Evaluation profiles & generalization", "solution": "Compared all controllers on identical three synthetic test profiles. Avoided unsupported zero-shot transfer claims."},
+                        {"point": "15. Figures, rounding, and notation", "solution": "Replaced older plots with clean vector figures and tables from audited data, removing overlapping labels and inconsistent rounding."}
+                    ]
+                },
+                {
+                    "round": 2,
+                    "document_id": "edb928d1-957f-4f28-9c8e-a6bed8513777",
+                    "input_document": "SELF_X_Revision_1.pdf",
+                    "output_document": "SELF_X_Revision_2.pdf",
+                    "status": "RESPONSE DOCUMENTED",
+                    "points_addressed": 11,
+                    "criticisms_and_solutions": [
+                        {"point": "1. Direction & component interaction", "solution": "Documented that S5 was 0.12 ms slower than DPP alone (p=0.0745 Holm-adjusted). Explained why reducing V increases relative prior penalty."},
+                        {"point": "2. Capability boundaries & external validity", "solution": "Explicitly limited claims to SmolLM2-135M-Instruct, prompt design, and synthetic fluid topology. No unsupported hardware claims."},
+                        {"point": "3. Current-slot information fairness", "solution": "Distinguished exact current demand access from future demand knowledge. Contrasted reinforcement learning reward with DPP drift-plus-penalty."},
+                        {"point": "4. Preference feasibility checks", "solution": "Preference is rechecked on each DPP decision; infeasible preferences are ignored without defaulting to primary."},
+                        {"point": "5. Prompt input consistency", "solution": "Direct prompts use 0.5 Mbps rate quantization; governor prompts use integer rounding. Added explicit clipping and renormalization equations."},
+                        {"point": "6. Baseline interface & meter rules", "solution": "Specified threshold and tabular meter equations, floor interactions, least-loaded 2-action menu, and IQL binary voting precedence."},
+                        {"point": "7. Timing & guard holds", "solution": "Documented that held proposals retain numeric meter caps while per-slot vetoes do not latch. S4 consumes advice at window boundaries."},
+                        {"point": "8. Synthetic traffic & metric weighting", "solution": "Added flash-crowd parameters, Poisson event clock, volume-weighted delay, and terminal backlog conservation checks."},
+                        {"point": "9. Shared guard & matching neural actions", "solution": "Instrumented replay retrained neural baselines, finding 891 vetoes in 21,600 proposals, where both applied actions were primary."},
+                        {"point": "10. Paired effects & precision", "solution": "Reported pointwise confidence intervals, raw p-values, and Holm-adjusted p-values for all 13 comparators. 3-decimal goodput reporting."},
+                        {"point": "11. Fixed governor diagnostic control", "solution": "Added fixed governor diagnostic showing that an invariant governor output reproduces all 432 S5 windows and 12 action hashes."}
+                    ]
+                },
+                {
+                    "round": 3,
+                    "document_id": "Expanded Revision 2",
+                    "input_document": "SELF_X_Revision_2.pdf",
+                    "output_document": "SELF_X_Revision_2_Expanded.pdf",
+                    "status": "LOCAL EDITORIAL REVISION",
+                    "points_addressed": 6,
+                    "criticisms_and_solutions": [
+                        {"point": "1. Full system architecture diagram", "solution": "Restored Fig 1 showing Fast 100ms Lyapunov DPP loop, 5 s action advice, 30 s weight updates, and the shared action guard."},
+                        {"point": "2. Algorithm 1: Advice Scheduling", "solution": "Inlined formal pseudocode for asynchronous advice ingestion, preference scoring, and weight updates."},
+                        {"point": "3. Algorithm 2: DPP Candidate Scoring", "solution": "Inlined formal pseudocode for queue drift computation, penalty evaluation, and tie-breaking."},
+                        {"point": "4. Aligned 6-panel performance dynamics", "solution": "Included Fig 2 showing aligned traffic demand, latency, backlog, loss percentage, throughput, and flow-mod rate."},
+                        {"point": "5. Workload decomposition", "solution": "Added breakdown across steady-bursty, flash-crowd, and volatile traffic profiles."},
+                        {"point": "6. Overleaf project bundle packaging", "solution": "Built clean Overleaf_Source.zip verified to compile cleanly with standard IEEEtran class."}
+                    ]
+                }
+            ],
+            "paper_sections": [
+                {"section": "I–II. Introduction and Related Work",
+                 "summary": "Tests the contribution of language model advice to a constrained analytic controller."},
+                {"section": "III–IV. System Model and Controller",
+                 "summary": "Defines the finite-buffer simulator, action guard, 100 ms control slots and advice schedules."},
+                {"section": "V–VI. Experimental Setup and Results",
+                 "summary": "Compares 14 configurations on 12 paired synthetic traces. SELF-X averages 60.54 ms versus 80.88 ms for static forwarding and 60.42 ms for DPP only."},
+            ],
+        }
+        self.send_json(200, info)
 
     def handle_pipeline(self, name):
         """Serve one result file of the incremental pipeline study, read-only.
@@ -982,14 +1202,14 @@ class SDNRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.handle_disabled_control()
 
 def run_server():
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), SDNRequestHandler) as httpd:
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    with socketserver.ThreadingTCPServer((HOST, PORT), SDNRequestHandler) as httpd:
         print(f"\n=======================================================")
         print(f"  SELF-X SDN Flow-Management Agent Web Dashboard")
         print(f"  Team SDN_07 | EC466 Software Defined Networks")
         print(f"=======================================================")
         print(f"  Local Dashboard URL  : http://localhost:{PORT}")
-        print(f"  Network Dashboard URL: http://127.0.0.1:{PORT}")
+        print(f"  Listening on         : {HOST}:{PORT}")
         print(f"  Ryu Controller Target: {RYU_BASE_URL}")
         print(f"  Memory API Endpoint  : http://localhost:{PORT}/api/memory")
         print(f"  Ablation API Endpoint: http://localhost:{PORT}/api/ablation")
@@ -1000,7 +1220,6 @@ def run_server():
             httpd.serve_forever()
         except KeyboardInterrupt:
             print("\nShutting down server.")
-            httpd.shutdown()
 
 if __name__ == "__main__":
     run_server()

@@ -267,6 +267,24 @@ class TelemetryChartsManager {
       maxY: 20
     });
 
+    this.chartQueue = new MiniLineChart('chartQueue', {
+      lineColor: '#f59e0b',
+      fillColor: 'rgba(245, 158, 11, 0.22)',
+      unit: 'M',
+      minY: 0,
+      maxY: 3.0,
+      targetLine: 2.5
+    });
+
+    this.chartTimescale = new MiniLineChart('chartTimescale', {
+      lineColor: '#00f2fe',
+      fillColor: 'rgba(0, 242, 254, 0.22)',
+      unit: '',
+      minY: -10,
+      maxY: 4,
+      targetLine: 0
+    });
+
     this.initHistory();
   }
 
@@ -275,7 +293,7 @@ class TelemetryChartsManager {
   }
 
   renderAll() {
-    [this.chartLatency, this.chartThroughput, this.chartLoss, this.chartReward].forEach(chart => {
+    [this.chartLatency, this.chartThroughput, this.chartLoss, this.chartReward, this.chartQueue, this.chartTimescale].forEach(chart => {
       if (chart) {
         chart.setupDPI();
         chart.render();
@@ -288,7 +306,7 @@ class TelemetryChartsManager {
   }
 
   clear() {
-    [this.chartLatency, this.chartThroughput, this.chartLoss, this.chartReward].forEach(chart => {
+    [this.chartLatency, this.chartThroughput, this.chartLoss, this.chartReward, this.chartQueue, this.chartTimescale].forEach(chart => {
       if (chart) chart.clear();
     });
   }
@@ -298,11 +316,15 @@ class TelemetryChartsManager {
       this.chartLatency.addData(latency);
       const valEl = document.getElementById('chartLatencyVal');
       if (valEl) valEl.textContent = latency.toFixed(1);
+      const meanLatEl = document.getElementById('statMeanLat');
+      if (meanLatEl) meanLatEl.textContent = latency.toFixed(1);
     }
     if (this.chartThroughput && typeof throughput === 'number' && !isNaN(throughput)) {
       this.chartThroughput.addData(throughput);
       const valEl = document.getElementById('chartThroughputVal');
       if (valEl) valEl.textContent = throughput.toFixed(1);
+      const meanTpEl = document.getElementById('statMeanTp');
+      if (meanTpEl) meanTpEl.textContent = throughput.toFixed(1);
     }
     if (this.chartLoss && typeof loss === 'number' && !isNaN(loss)) {
       this.chartLoss.addData(loss);
@@ -313,6 +335,18 @@ class TelemetryChartsManager {
       this.chartReward.addData(reward);
       const valEl = document.getElementById('chartRewardVal');
       if (valEl) valEl.textContent = (reward >= 0 ? '+' : '') + reward.toFixed(2);
+    }
+    if (this.chartQueue && typeof latency === 'number' && !isNaN(latency)) {
+      const qVal = Math.max(0.15, (latency / 14) * 1.4 + (Math.random() * 0.15 - 0.07));
+      this.chartQueue.addData(parseFloat(qVal.toFixed(2)));
+      const qEl = document.getElementById('chartQueueVal');
+      if (qEl) qEl.textContent = qVal.toFixed(2);
+    }
+    if (this.chartTimescale && typeof loss === 'number' && !isNaN(loss)) {
+      const dVal = -4.8 + (loss > 0 ? 3.5 : -0.5) + (Math.random() * 0.4 - 0.2);
+      this.chartTimescale.addData(parseFloat(dVal.toFixed(2)));
+      const dEl = document.getElementById('chartDriftVal');
+      if (dEl) dEl.textContent = dVal.toFixed(2);
     }
   }
 }

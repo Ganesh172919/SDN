@@ -17,6 +17,7 @@ The project was developed for EC466 Software Defined Networks by team SDN_07.
 
 ## Contents
 
+- [Course submission](#course-submission)
 - [Quick start](#quick-start)
 - [Dashboard walkthrough](#dashboard-walkthrough)
 - [System architecture](#system-architecture)
@@ -32,6 +33,28 @@ The project was developed for EC466 Software Defined Networks by team SDN_07.
 - [Repository layout](#repository-layout)
 - [Troubleshooting](#troubleshooting)
 
+## Course submission
+
+The IEEE-format manuscript reports the audited CPU study of 14 controllers on
+12 paired synthetic traces. SELF-X reduced mean delay from 80.88 ms for static
+forwarding to 60.54 ms. DPP alone averaged 60.42 ms, and the difference versus
+the full stack did not survive Holm adjustment.
+
+- [Audited manuscript](SELF_X_IEEE_Paper.pdf)
+- [Reproduction guide](REPRODUCE.md)
+- [Audited comparison and evidence](paper/COMPARISON.md)
+- [Overleaf build instructions](paper/README_OVERLEAF.md)
+
+From a Git checkout, build the course and Overleaf archives with
+`python selfx/scripts/package_ieee_submission.py`. The tool writes them and
+their SHA-256 checksums to `output/submission/current/`. Complete builds include
+the prepared review materials and editable presentation when those files are
+present in that directory or supplied with `--materials DIR`.
+
+Run `python -m pip install -r requirements.txt` in a Python 3.12 virtual
+environment, then run `python -m pytest` from the project root to verify the
+implementation.
+
 ## Quick start
 
 Use Python 3.12 and a web browser. Run the dashboard command from the repository root, which contains both `Web/` and `selfx/`.
@@ -45,7 +68,7 @@ Open [the dashboard on port 5000](http://127.0.0.1:5000/).
 The mode banner identifies browser simulation or a connected testbed.
 A fresh setup can run the simulation with no credentials, Mininet installation, or connected switch.
 
-For an alternate port, set `SDN_WEB_PORT` before starting the server.
+The server binds to `127.0.0.1` by default. Set `SDN_WEB_HOST` to choose a different address, or set `SDN_WEB_PORT` to use a different port.
 
 ```powershell
 $env:SDN_WEB_PORT = '5050'
@@ -577,7 +600,8 @@ SELF-X's action-token policy and registry are tied to the pinned 135M revision. 
 | Path | Responsibility |
 | --- | --- |
 | [Web/](Web/) | Browser interface, simulator, static assets, and HTTP bridge |
-| [selfx/agent/](selfx/agent/) | Control graph, policies, provider interface, memory, and rule handling |
+| [selfx/agent/](selfx/agent/README.md) | Decoupled two-timescale scheduler, Lyapunov DPP, 6-agent governor, and LoRA adaptation |
+| [selfx/eval/](selfx/eval/README.md) | Shared fluid datapath, PyTorch DQN/MARL baselines, local LLM inference, and plotting |
 | [selfx/agent/self_improvement/](selfx/agent/self_improvement/) | Replay preparation, LoRA fitting, registry, and rollback |
 | [selfx/live/](selfx/live/) | Desktop simulator and step-by-step session engine |
 | [selfx/topo.py](selfx/topo.py) | Topology manifests and Mininet construction |
@@ -597,4 +621,4 @@ SELF-X's action-token policy and registry are tied to the pinned 135M revision. 
 | Tkinter fails to initialize | Check that Tkinter is installed and that the Python process has a graphical display. |
 | An intervention is vetoed | Read the safety verdict and check the target flow, alternate-path load, or proposed meter rate. |
 
-For implementation details, see the [control architecture](selfx/docs/ARCHITECTURE.md), [dashboard bridge guide](Web/README.md), and [DPP derivation](selfx/docs/DPP_FORMAL_DERIVATION.md).
+For implementation details, see the [control architecture](selfx/docs/ARCHITECTURE.md), [dashboard bridge guide](Web/README.md), [production REST API reference](Web/docs/API_REFERENCE.md), [production operations & hardening manual](Web/docs/PRODUCTION_OPERATIONS_GUIDE.md), [revision & verification guide](selfx/docs/REVISION_AND_VERIFICATION_GUIDE.md), and [DPP derivation](selfx/docs/DPP_FORMAL_DERIVATION.md).

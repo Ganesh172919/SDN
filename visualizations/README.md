@@ -185,7 +185,7 @@ Get-ChildItem Web/assets/visualizations/*.png | Select-Object Name, Length
 ## 🛠️ Developer Extension Guide: Building on `visualizations/`
 
 ### Adding a New Comparative Chart
-1. **Add Plot Function in [`visualizations/create_visualizations.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/visualizations/create_visualizations.py)**:
+1. **Add Plot Function in [evaluation plotter](../selfx/eval/plot_audited_comparison.py)**:
    ```python
    def plot_energy_efficiency(csv_path, output_path):
        df = pd.read_csv(csv_path)
@@ -198,7 +198,7 @@ Get-ChildItem Web/assets/visualizations/*.png | Select-Object Name, Length
 2. **Invoke in Master Generation Routine**:
    Call the function inside `main()` and append the filename to the asset sync list.
 3. **Display in Dashboard HTML**:
-   Add an `<img>` tag pointing to `assets/visualizations/energy-efficiency.png` in [`Web/index.html`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/Web/index.html).
+   Add an `<img>` tag pointing to `assets/visualizations/energy-efficiency.png` in [`Web/index.html`](../Web/index.html).
 
 ---
 *Authored by Team SDN_07 — EC466: Software Defined Networks*

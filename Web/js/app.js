@@ -33,6 +33,12 @@ class DashboardApp {
     this.initModal();
     this.initTheme();
     this.initLightbox();
+    this.initFigureInspector();
+    this.initFlowModSynthesizer();
+    this.initResearchPortal();
+    this.initPromptAssembler();
+    this.initSafetyArbiterSandbox();
+    this.initInsightsGalleryFilters();
 
     // Initialize sub-modules
     this.topology = new TopologyVisualizer('topologyCanvas');
@@ -686,10 +692,22 @@ class DashboardApp {
         this.openShortcutsModal();
       } else if (e.code === 'Escape') {
         this.closeAllModals();
-      } else if (e.key >= '1' && e.key <= '7') {
+        if (this.closeFigureModal) this.closeFigureModal();
+      } else if (e.key >= '0' && e.key <= '9') {
         const tabBtns = document.querySelectorAll('.tab-btn');
-        const idx = parseInt(e.key, 10) - 1;
+        let idx = parseInt(e.key, 10) - 1;
+        if (e.key === '0') idx = 9;
         if (tabBtns[idx]) tabBtns[idx].click();
+      } else if (e.key === 'ArrowLeft') {
+        const modal = document.getElementById('figureViewerModal');
+        if (modal && modal.classList.contains('open') && this.stepFigureModal) {
+          this.stepFigureModal(-1);
+        }
+      } else if (e.key === 'ArrowRight') {
+        const modal = document.getElementById('figureViewerModal');
+        if (modal && modal.classList.contains('open') && this.stepFigureModal) {
+          this.stepFigureModal(1);
+        }
       }
     });
 
@@ -702,9 +720,11 @@ class DashboardApp {
   }
 
   closeAllModals() {
-    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+    document.querySelectorAll('.modal-overlay.open, .figure-modal-overlay.open').forEach(m => {
       m.classList.remove('open');
     });
+    const body = document.getElementById('figureViewerBody');
+    if (body) body.className = 'figure-modal-body';
   }
 
   activateTab(targetId, updateHash = true) {
@@ -812,7 +832,12 @@ class DashboardApp {
       'ablation': 'tab-ablation',
       'benchmarks': 'tab-ablation',
       'safety': 'tab-safety',
-      'rules': 'tab-safety'
+      'rules': 'tab-safety',
+      'research': 'tab-research',
+      'paper': 'tab-research',
+      'submission': 'tab-research',
+      'deepreview': 'tab-research',
+      'audit': 'tab-research'
     };
     if (map[hash]) {
       this.activateTab(map[hash], false);
@@ -821,6 +846,28 @@ class DashboardApp {
 
   initTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabsContainer = document.getElementById('mainTabsContainer');
+    const btnScrollLeft = document.getElementById('btnTabsScrollLeft');
+    const btnScrollRight = document.getElementById('btnTabsScrollRight');
+
+    if (btnScrollLeft && tabsContainer) {
+      btnScrollLeft.addEventListener('click', () => {
+        tabsContainer.scrollBy({ left: -240, behavior: 'smooth' });
+      });
+    }
+    if (btnScrollRight && tabsContainer) {
+      btnScrollRight.addEventListener('click', () => {
+        tabsContainer.scrollBy({ left: 240, behavior: 'smooth' });
+      });
+    }
+    if (tabsContainer) {
+      tabsContainer.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          tabsContainer.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
 
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -841,6 +888,19 @@ class DashboardApp {
   }
 
   initControls() {
+    // Playback Speed Controls
+    document.querySelectorAll('.btn-speed').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const speed = parseFloat(btn.getAttribute('data-speed') || '1');
+        document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (this.simulator && this.simulator.setSpeed) {
+          this.simulator.setSpeed(speed);
+        }
+        this.showToast('Simulation Speed', `Playback set to ${speed}x speed`);
+      });
+    });
+
     // Inject Elephant Burst
     const btnBurst = document.getElementById('btnBurstElephant');
     if (btnBurst) {
@@ -1625,6 +1685,660 @@ class DashboardApp {
 
   checkLiveBackend() {
     // The selected mode remains simulation until the user explicitly opts in.
+  }
+
+  initResearchPortal() {
+    // 1. Deadline Countdown (19th Nov 2026 17:00:00 IST)
+    const deadline = new Date("2026-11-19T17:00:00+05:30").getTime();
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const diff = deadline - now;
+      let text = "DEADLINE REACHED";
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        text = `${days}d ${hours}h ${mins}m ${secs}s`;
+      }
+      const headerClock = document.getElementById('headerDeadlineClock');
+      if (headerClock) headerClock.textContent = text;
+      const portalClock = document.getElementById('portalDeadlineCountdown');
+      if (portalClock) portalClock.textContent = text;
+    };
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Header shortcut
+    const btnHeaderPortal = document.getElementById('btnHeaderResearchPortal');
+    if (btnHeaderPortal) {
+      btnHeaderPortal.addEventListener('click', () => {
+        this.playSound('click');
+        this.activateTab('tab-research', true);
+      });
+    }
+    const btnBannerPaper = document.getElementById('btnBannerViewPaper');
+    if (btnBannerPaper) {
+      btnBannerPaper.addEventListener('click', () => {
+        this.playSound('click');
+        this.activateTab('tab-research', true);
+      });
+    }
+
+    // 3. Sub-tab switcher inside tab-research
+    const subTabBtns = document.querySelectorAll('.research-subtab-btn');
+    const subTabPanes = document.querySelectorAll('.research-subtab-pane');
+    subTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.playSound('click');
+        const target = btn.getAttribute('data-subtab');
+        subTabBtns.forEach(b => b.classList.toggle('active', b === btn));
+        subTabPanes.forEach(pane => pane.classList.toggle('active', pane.id === target));
+        const reader = document.querySelector('#subtab-paper iframe[data-src]');
+        if (target === 'subtab-paper' && reader) {
+          reader.src = reader.dataset.src;
+          delete reader.dataset.src;
+        }
+      });
+    });
+
+    const bundleStatus = document.getElementById('submissionBundleStatus');
+    fetch('/api/submission/info')
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        this.renderSubmissionArtifacts(data.artifacts);
+        this.renderDeepReviewRounds(data.deep_review_rounds);
+        if (bundleStatus) {
+          if (data.submission_zip_status === 'NOT_BUILT') {
+            bundleStatus.textContent = 'The full course ZIP is available with the release. To rebuild it from a Git checkout, run python selfx/scripts/package_ieee_submission.py.';
+          } else if (data.submission_zip_status === 'OVER_LIMIT') {
+            bundleStatus.textContent = `The course archive is ${data.submission_zip_size_mb} MB and exceeds the upload limit.`;
+          } else {
+            bundleStatus.textContent = `Course archive: ${data.submission_zip_size_mb} MB. Upload limit: 100 MB.`;
+          }
+        }
+      })
+      .catch(() => {
+        if (bundleStatus) bundleStatus.textContent = 'Submission downloads are temporarily unavailable.';
+      });
+
+    this.initCitationCopier();
+    this.initDeepReviewSearch();
+  }
+
+  renderSubmissionArtifacts(artifacts) {
+    const container = document.getElementById('submissionArtifactsContainer');
+    if (!container) return;
+
+    container.replaceChildren(...artifacts.map(artifact => {
+      const card = document.createElement('article');
+      card.className = 'submission-artifact-card';
+      const title = document.createElement('h4');
+      title.className = 'art-title';
+      title.textContent = artifact.title;
+      const description = document.createElement('p');
+      description.className = 'art-desc';
+      description.textContent = `${artifact.description} ${artifact.size_str}`;
+      const link = document.createElement('a');
+      link.className = 'btn-art-download';
+      link.href = artifact.download_url;
+      link.download = artifact.name;
+      link.textContent = `Download ${artifact.name}`;
+      card.append(title, description, link);
+
+      if (artifact.sha256) {
+        const checksum = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = 'SHA-256';
+        const digest = document.createElement('code');
+        digest.style.overflowWrap = 'anywhere';
+        digest.textContent = artifact.sha256;
+        checksum.append(summary, digest);
+        card.append(checksum);
+      }
+      return card;
+    }));
+  }
+
+  renderDeepReviewRounds(rounds) {
+    const container = document.getElementById('deepReviewRoundsContainer');
+    if (!container || !rounds) return;
+    container.innerHTML = rounds.map(r => `
+      <div class="review-round-card">
+        <div class="round-card-header">
+          <div class="round-badge-group">
+            <span class="round-num-badge">${r.round < 3 ? `Round ${r.round}` : "Local revision"}</span>
+            <span class="round-status-badge">${r.status}</span>
+          </div>
+          <span class="round-doc-id">Doc ID: ${r.document_id}</span>
+        </div>
+        <div class="round-io-bar">
+          <div><span class="io-label">Input Draft:</span> <code>${r.input_document}</code></div>
+          <div><span class="io-label">Output Revision:</span> <code>${r.output_document}</code></div>
+          <div><span class="io-label">Items documented:</span> <strong>${r.points_addressed}</strong></div>
+        </div>
+        <div class="round-critiques-list">
+          ${(r.criticisms_and_solutions || []).map(cs => `
+            <details class="critique-item">
+              <summary class="critique-summary">
+                <span class="critique-icon">💬</span>
+                <strong>${cs.point}</strong>
+              </summary>
+              <div class="solution-content">
+                <span class="sol-badge">SOLUTION IMPLEMENTED</span>
+                <p>${cs.solution}</p>
+              </div>
+            </details>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  openFigureModal(imgSrc, caption) {
+    if (this.figuresList) {
+      const found = this.figuresList.findIndex(f => f.src.includes(imgSrc) || imgSrc.includes(f.src));
+      if (found !== -1) {
+        this.stepFigureModal(found - this.currentFigureIdx);
+        const modal = document.getElementById('figureViewerModal');
+        if (modal) modal.classList.add('open');
+        return;
+      }
+    }
+    const modal = document.getElementById('figureViewerModal');
+    const modalImg = document.getElementById('figureViewerImg');
+    const modalCap = document.getElementById('figureViewerCaption');
+    if (modal && modalImg) {
+      modalImg.src = imgSrc;
+      if (modalCap) modalCap.textContent = caption;
+      modal.classList.add('open');
+    }
+  }
+
+  initFigureInspector() {
+    this.currentFigureIdx = 0;
+    this.figuresList = [
+      { num: 'Figure 1', title: 'Control Plane Decoupled Architecture', src: '/paper/figures/fig1_architecture.png', desc: 'Two-timescale separation: Fast 100ms Lyapunov DPP governor enforcing datapath stability paired with Slow 5s LangGraph agent cognition loop.' },
+      { num: 'Figure 2', title: 'Workload Traffic Profiles & Elephant Dynamics', src: '/paper/figures/fig2_traffic.png', desc: 'Six-panel synchronized dynamic traces across traffic demand, latency, backlog, loss percentage, throughput, and rule modifications.' },
+      { num: 'Figure 3', title: 'Staged Ablation Progression (S0 to S5)', src: '/paper/figures/fig3_ablation.png', desc: 'Sequential decomposition showing incremental improvements across Static (S0), Base LM (S1), Reflection (S2), LoRA (S3), Agentic 5s (S4), and Full SELF-X (S5).' },
+      { num: 'Figure 4', title: 'Measured Decision Latency Overhead', src: '/paper/figures/fig4_control_latency.png', desc: 'Local and remote provider inference latency percentiles showing sub-millisecond DPP fast-path execution.' },
+      { num: 'Figure 5', title: 'Fluid Queue Backlog & Dynamics', src: '/paper/figures/fig5_queue.png', desc: 'Queue backlog evolution under dual bottleneck core links s2-s3 with Lyapunov queue bounds.' },
+      { num: 'Figure 6', title: 'Lyapunov Parameter V-Tradeoff', src: '/paper/figures/fig6_v_tradeoff.png', desc: 'Drift-Plus-Penalty parameter sweep: average queue backlog O(V) versus operational cost O(1/V).' },
+      { num: 'Figure 7', title: 'Benchmark Against 14 Controller Baselines', src: '/paper/figures/fig7_baselines.png', desc: 'Baseline plot from the earlier pipeline study.' },
+      { num: 'Figure 8', title: 'Packet Loss Floor Decomposition', src: '/paper/figures/fig8_loss_decomposition.png', desc: 'Loss decomposition from the earlier pipeline study.' },
+      { num: 'Figure 9', title: 'Episodic Memory Reflection Convergence', src: '/paper/figures/fig9_convergence.png', desc: 'Episodic Pareto hypervolume growth over 120 control cycles with k-NN exemplar retrieval.' },
+      { num: 'Figure 10', title: 'Multi-Provider LLM Latency & Cost', src: '/paper/figures/fig10_provider.png', desc: 'Token economy, prompt caching efficiency, and inference latency trade-offs.' },
+      { num: 'Model 1', title: 'SELF-X System Architecture Overview', src: 'assets/visualizations/system-overview.png', desc: 'Complete architectural overview of SDN data-plane, control-plane, and multi-agent governance stack.' },
+      { num: 'Model 2', title: 'Slow-Loop Simulation Comparison', src: 'assets/visualizations/simulation-performance.png', desc: 'Performance comparison of slow-loop decision cycles under dynamic load surges.' },
+      { num: 'Model 3', title: 'Multi-Fabric Network Topology Models', src: 'assets/visualizations/topology-models.png', desc: 'Topological structures: 4-Switch Core, Leaf-Spine 2x4, and Augmented 6-Switch Mesh.' },
+      { num: 'Model 4', title: 'Implementation & Verification Roadmap', src: 'assets/visualizations/implementation-status.png', desc: 'Verification status across all mathematical models, OpenFlow drivers, and baseline benchmarks.' },
+      { num: 'Model 5', title: 'MVP Safety Guardrails & Invariants', src: 'assets/visualizations/safety-guardrails.png', desc: 'Action-masking logic enforcing link capacity bounds, queue headroom, and loop-free routing.' }
+    ];
+
+    const modal = document.getElementById('figureViewerModal');
+    const modalImg = document.getElementById('figureViewerImg');
+    const modalTitle = document.getElementById('figureViewerTitle');
+    const modalCap = document.getElementById('figureViewerCaption');
+    const modalIdx = document.getElementById('figureViewerIndex');
+    const btnDownload = document.getElementById('btnFigDownload');
+    const modalBody = document.getElementById('figureViewerBody');
+
+    const updateModalContent = (idx) => {
+      this.currentFigureIdx = (idx + this.figuresList.length) % this.figuresList.length;
+      const fig = this.figuresList[this.currentFigureIdx];
+      if (modalImg) modalImg.src = fig.src;
+      if (modalTitle) modalTitle.textContent = `${fig.num}: ${fig.title}`;
+      if (modalCap) modalCap.textContent = fig.desc;
+      if (modalIdx) modalIdx.textContent = `Figure ${this.currentFigureIdx + 1} of ${this.figuresList.length}`;
+      if (btnDownload) {
+        btnDownload.href = fig.src;
+        btnDownload.setAttribute('download', fig.src.split('/').pop());
+      }
+      if (modalBody) modalBody.className = 'figure-modal-body';
+      document.querySelectorAll('#btnZoom100, #btnZoom150, #btnZoom200').forEach(b => b.classList.remove('active'));
+      const z100 = document.getElementById('btnZoom100');
+      if (z100) z100.classList.add('active');
+    };
+
+    this.stepFigureModal = (delta) => {
+      updateModalContent(this.currentFigureIdx + delta);
+    };
+
+    this.closeFigureModal = () => {
+      if (modal) modal.classList.remove('open');
+      if (modalBody) modalBody.className = 'figure-modal-body';
+    };
+
+    const btnClose = document.getElementById('closeFigureModal');
+    if (btnClose) btnClose.addEventListener('click', () => this.closeFigureModal());
+
+    const btnPrev = document.getElementById('btnFigPrev');
+    if (btnPrev) btnPrev.addEventListener('click', () => this.stepFigureModal(-1));
+
+    const btnNext = document.getElementById('btnFigNext');
+    if (btnNext) btnNext.addEventListener('click', () => this.stepFigureModal(1));
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) this.closeFigureModal();
+      });
+    }
+
+    const z100 = document.getElementById('btnZoom100');
+    const z150 = document.getElementById('btnZoom150');
+    const z200 = document.getElementById('btnZoom200');
+    if (z100 && modalBody) z100.addEventListener('click', () => {
+      modalBody.className = 'figure-modal-body';
+      document.querySelectorAll('#btnZoom100, #btnZoom150, #btnZoom200').forEach(b => b.classList.remove('active'));
+      z100.classList.add('active');
+    });
+    if (z150 && modalBody) z150.addEventListener('click', () => {
+      modalBody.className = 'figure-modal-body zoom-150';
+      document.querySelectorAll('#btnZoom100, #btnZoom150, #btnZoom200').forEach(b => b.classList.remove('active'));
+      z150.classList.add('active');
+    });
+    if (z200 && modalBody) z200.addEventListener('click', () => {
+      modalBody.className = 'figure-modal-body zoom-200';
+      document.querySelectorAll('#btnZoom100, #btnZoom150, #btnZoom200').forEach(b => b.classList.remove('active'));
+      z200.classList.add('active');
+    });
+
+    document.querySelectorAll('.gallery-fig-card, .project-viz-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const imgSrc = card.getAttribute('data-img') || card.querySelector('img')?.getAttribute('src');
+        const cap = card.getAttribute('data-title') || card.querySelector('.fig-caption-text, p')?.textContent || '';
+        if (imgSrc) {
+          const found = this.figuresList.findIndex(f => f.src.includes(imgSrc) || imgSrc.includes(f.src));
+          if (found !== -1) {
+            updateModalContent(found);
+            if (modal) modal.classList.add('open');
+          } else {
+            this.openFigureModal(imgSrc, cap);
+          }
+        }
+      });
+    });
+  }
+
+  initFlowModSynthesizer() {
+    const swSelect = document.getElementById('fmTargetSwitch');
+    const matchSelect = document.getElementById('fmMatchPreset');
+    const actSelect = document.getElementById('fmActionType');
+    const priInput = document.getElementById('fmPriority');
+    const idleInput = document.getElementById('fmIdleTimeout');
+    const hardInput = document.getElementById('fmHardTimeout');
+    const preview = document.getElementById('flowModJsonPreview');
+    const btnCopy = document.getElementById('btnCopyFlowModJSON');
+    const btnPush = document.getElementById('btnPushFlowModRule');
+
+    const updatePreview = () => {
+      if (!preview) return null;
+      const dpid = parseInt(swSelect?.value || '2', 10);
+      const pri = parseInt(priInput?.value || '1000', 10);
+      const idle = parseInt(idleInput?.value || '30', 10);
+      const hard = parseInt(hardInput?.value || '60', 10);
+      const matchType = matchSelect?.value || 'elephant_burst';
+      const actType = actSelect?.value || 'reroute_secondary';
+
+      let matchObj = {
+        in_port: 1,
+        eth_type: 2048,
+        ipv4_src: "10.0.0.2",
+        ipv4_dst: "10.0.0.8",
+        ip_proto: 6,
+        tcp_dst: 5201
+      };
+      if (matchType === 'steady_stream') {
+        matchObj = { in_port: 1, eth_type: 2048, ipv4_src: "10.0.0.1", ipv4_dst: "10.0.0.7", ip_proto: 17, udp_dst: 5001 };
+      } else if (matchType === 'http_bulk') {
+        matchObj = { in_port: 2, eth_type: 2048, ipv4_src: "10.0.0.3", ipv4_dst: "10.0.0.5", ip_proto: 6, tcp_dst: 80 };
+      }
+
+      let actionsList = [{ type: "OUTPUT", port: 2 }];
+      if (actType === 'reroute_primary') {
+        actionsList = [{ type: "OUTPUT", port: 1 }];
+      } else if (actType === 'meter_limit') {
+        actionsList = [{ type: "METER", meter_id: 1 }, { type: "OUTPUT", port: 1 }];
+      } else if (actType === 'dscp_mark') {
+        actionsList = [{ type: "SET_FIELD", field: "ip_dscp", value: 46 }, { type: "OUTPUT", port: 2 }];
+      }
+
+      const payload = {
+        dpid: dpid,
+        cookie: 1,
+        cookie_mask: 1,
+        table_id: 0,
+        idle_timeout: idle,
+        hard_timeout: hard,
+        priority: pri,
+        flags: 1,
+        match: matchObj,
+        actions: actionsList
+      };
+
+      preview.textContent = JSON.stringify(payload, null, 2);
+      return payload;
+    };
+
+    [swSelect, matchSelect, actSelect, priInput, idleInput, hardInput].forEach(el => {
+      if (el) el.addEventListener('change', updatePreview);
+      if (el && el.tagName === 'INPUT') el.addEventListener('input', updatePreview);
+    });
+
+    if (btnCopy) {
+      btnCopy.addEventListener('click', () => {
+        const payload = updatePreview();
+        if (payload) {
+          navigator.clipboard.writeText(JSON.stringify(payload, null, 2)).then(() => {
+            this.showToast('OpenFlow 1.3 JSON Copied', 'Ryu flow-mod JSON copied to clipboard.');
+          });
+        }
+      });
+    }
+
+    if (btnPush) {
+      btnPush.addEventListener('click', () => {
+        const payload = updatePreview();
+        const dpid = payload?.dpid || 2;
+        const pri = payload?.priority || 1000;
+        this.showToast('Flow-Mod Preview', `Previewed a rule for switch s${dpid} (priority ${pri}).`, 'success');
+        if (preview) {
+          preview.style.borderColor = '#10b981';
+          preview.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.4)';
+          setTimeout(() => {
+            preview.style.borderColor = 'rgba(0, 242, 254, 0.25)';
+            preview.style.boxShadow = 'none';
+          }, 1500);
+        }
+      });
+    }
+
+    updatePreview();
+  }
+
+  initCitationCopier() {
+    const button = document.getElementById('btnCopyCitation');
+    const citation = document.getElementById('citationCodeBlock');
+    if (!button || !citation) return;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(citation.textContent);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Select citation text to copy';
+      }
+    });
+  }
+
+  initDeepReviewSearch() {
+    const filterPills = document.querySelectorAll('.review-filter-pill');
+    filterPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        this.playSound('click');
+        const topic = pill.getAttribute('data-topic');
+        filterPills.forEach(p => p.classList.toggle('active', p === pill));
+
+        const critiques = document.querySelectorAll('#deepReviewRoundsContainer .critique-item');
+        critiques.forEach(item => {
+          if (topic === 'all') {
+            item.style.display = '';
+          } else {
+            const text = item.textContent.toLowerCase();
+            const matches = text.includes(topic.toLowerCase());
+            item.style.display = matches ? '' : 'none';
+          }
+        });
+      });
+    });
+  }
+
+  initPromptAssembler() {
+    const scenarioSelect = document.getElementById('promptScenarioSelect');
+    const kSelect = document.getElementById('promptKSelect');
+    const agentSelect = document.getElementById('promptAgentSelect');
+    const codeEl = document.getElementById('assembledPromptCode');
+    const tokenEl = document.getElementById('promptTokenCount');
+    const assembleBtn = document.getElementById('btnAssemblePrompt');
+    const copyBtn = document.getElementById('btnCopyAssembledPrompt');
+
+    const exemplars = [
+      {
+        state: "Core link s2->s3 util=94.2%, delay=18.4ms, loss=2.8%, queue=1.92Mbit",
+        action: "reroute(flow_id='f_elephant', path=['s2', 's4', 's3'])",
+        outcome: "util drops to 58.1%, delay drops to 5.4ms, loss drops to 0.0%",
+        reflection: "Rerouting the elephant burst onto the secondary core link relieved the bottleneck without creating an ingress loop."
+      },
+      {
+        state: "Host h2 burst util=88.5%, ingress port 2 queue=1.45Mbit, loss=1.1%",
+        action: "rate_limit(meter_id=1, rate_kbps=8000, burst_kb=1024)",
+        outcome: "throughput capped at 8 Mbps, loss stabilized at 0.0%, delay=6.1ms",
+        reflection: "Rate-limiting the non-critical UDP elephant flow preserved bandwidth for latency-sensitive traffic while satisfying starvation floor (>=512k)."
+      },
+      {
+        state: "All links balanced, max util=38.4%, delay=4.8ms, loss=0.0%",
+        action: "no_op()",
+        outcome: "state maintains steady equilibrium, 0 control overhead incurred",
+        reflection: "Network within safe fluid envelope; intervening would cause unnecessary OpenFlow table churn."
+      },
+      {
+        state: "Post-burst transient spike s1->s2 util=82.0%, queue=1.10Mbit",
+        action: "reroute(flow_id='f_transient', path=['s1', 's3', 's4'])",
+        outcome: "load distributed evenly across leaf tier, delay=5.0ms",
+        reflection: "Multi-path diversion absorbed transient surge before queue overflowed."
+      },
+      {
+        state: "High jitter on core link, queue oscillating between 0.8M and 2.1Mbit",
+        action: "rate_limit(meter_id=2, rate_kbps=9500, burst_kb=2048)",
+        outcome: "queue damped to 0.95Mbit, jitter reduced by 72%",
+        reflection: "Token bucket smoothing eliminated cyclic packet burstiness."
+      },
+      {
+        state: "Core secondary link s2->s4 near capacity (89.1%), primary link at 42.0%",
+        action: "reroute(flow_id='f_elephant', path=['s2', 's3'])",
+        outcome: "rebalanced both core links to 65% and 62% respectively",
+        reflection: "Restored primary path after burst completion, returning to default shortest path."
+      },
+      {
+        state: "Packet drop spike detected at egress s4, loss=3.4%, queue full",
+        action: "rate_limit(meter_id=1, rate_kbps=6000, burst_kb=1024)",
+        outcome: "loss dropped to 0.0% within 1.2s, backlog cleared",
+        reflection: "Fast rate throttling stopped buffer exhaustion while alternative path computed."
+      },
+      {
+        state: "Periodic health audit: telemetry intact, 0 packet loss across all ports",
+        action: "no_op()",
+        outcome: "energy and control latency minimized",
+        reflection: "No action necessary; Lyapunov drift Delta(Q) is strongly negative (-4.8)."
+      }
+    ];
+
+    const generatePrompt = () => {
+      const scenario = scenarioSelect ? scenarioSelect.value : 'burst_s2_s3';
+      const k = kSelect ? parseInt(kSelect.value, 10) : 5;
+      const agent = agentSelect ? agentSelect.value : 'claude';
+
+      let currentDesc = "";
+      if (scenario === 'burst_s2_s3') {
+        currentDesc = '{\n  "current_state": {\n    "dpid": "0000000000000002",\n    "core_util": 92.4,\n    "delay_ms": 17.8,\n    "loss_pct": 2.6,\n    "queue_mbit": 1.88,\n    "active_flows": ["f_steady_3M", "f_burst_12M"]\n  }\n}';
+      } else if (scenario === 'asym_leaf') {
+        currentDesc = '{\n  "current_state": {\n    "dpid": "0000000000000001",\n    "core_util": 78.1,\n    "delay_ms": 11.2,\n    "loss_pct": 0.8,\n    "queue_mbit": 1.34,\n    "active_flows": ["f_ingress_asym"]\n  }\n}';
+      } else if (scenario === 'high_loss') {
+        currentDesc = '{\n  "current_state": {\n    "dpid": "0000000000000004",\n    "core_util": 89.9,\n    "delay_ms": 22.4,\n    "loss_pct": 3.8,\n    "queue_mbit": 2.15,\n    "active_flows": ["f_burst_drop"]\n  }\n}';
+      } else {
+        currentDesc = '{\n  "current_state": {\n    "dpid": "0000000000000002",\n    "core_util": 34.2,\n    "delay_ms": 4.6,\n    "loss_pct": 0.0,\n    "queue_mbit": 0.42,\n    "active_flows": ["f_steady_3M"]\n  }\n}';
+      }
+
+      const selectedExemplars = exemplars.slice(0, k);
+      let promptText = `# SYSTEM INSTRUCTION: Autonomous SDN Flow-Management Agent (SELF-X)\n`;
+      promptText += `You are an autonomous SDN flow controller operating over OpenFlow 1.3 (Ryu ofctl_rest API).\n`;
+      promptText += `Observe current network telemetry, review historical reflections, and select the optimal flow action.\n`;
+      promptText += `Execution Target: ${agent === 'claude' ? 'Anthropic Claude 3.5 Sonnet (LangGraph State Machine)' : 'SmolLM2-135M Instruct (Local CPU / Zero-GPU)'}\n\n`;
+      promptText += `## OUTPUT SCHEMA (Strict JSON Enforced):\n`;
+      promptText += `{\n  "action": "reroute" | "rate_limit" | "no_op",\n  "flow_id": string,\n  "target_path": [string],\n  "meter_rate_kbps": int,\n  "rationale": string\n}\n\n`;
+      promptText += `## TOP-${k} IN-CONTEXT DEMONSTRATIONS (Retrieved via k-NN from M=30 Memory Bank):\n`;
+      selectedExemplars.forEach((ex, idx) => {
+        promptText += `### Demonstration [${idx + 1}/${k}]:\n`;
+        promptText += `State: ${ex.state}\n`;
+        promptText += `Action Taken: ${ex.action}\n`;
+        promptText += `Observed Outcome: ${ex.outcome}\n`;
+        promptText += `Reflection: "${ex.reflection}"\n\n`;
+      });
+      promptText += `## CURRENT TELEMETRY INPUT:\n${currentDesc}\n\n`;
+      promptText += `## DECISION: Return ONLY the JSON action object.`;
+
+      if (codeEl) {
+        codeEl.textContent = promptText;
+      }
+      if (tokenEl) {
+        tokenEl.textContent = `Estimated Tokens: ~${Math.round(promptText.length / 3.8)}`;
+      }
+    };
+
+    if (scenarioSelect) scenarioSelect.addEventListener('change', generatePrompt);
+    if (kSelect) kSelect.addEventListener('change', generatePrompt);
+    if (agentSelect) agentSelect.addEventListener('change', generatePrompt);
+    if (assembleBtn) assembleBtn.addEventListener('click', () => {
+      this.playSound('click');
+      generatePrompt();
+    });
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        if (codeEl) {
+          navigator.clipboard.writeText(codeEl.textContent).then(() => {
+            const original = copyBtn.textContent;
+            copyBtn.textContent = '✓ Copied!';
+            setTimeout(() => { copyBtn.textContent = original; }, 2000);
+          });
+        }
+      });
+    }
+
+    // Initial prompt generation
+    generatePrompt();
+  }
+
+  initSafetyArbiterSandbox() {
+    const presetSelect = document.getElementById('safetyActionPreset');
+    const flowSelect = document.getElementById('safetyTargetFlow');
+    const evalBtn = document.getElementById('btnTestSafetyArbiter');
+
+    const valInv1 = document.getElementById('valInv1');
+    const valInv2 = document.getElementById('valInv2');
+    const valInv3 = document.getElementById('valInv3');
+    const valInv4 = document.getElementById('valInv4');
+
+    const boxInv1 = document.getElementById('boxInv1');
+    const boxInv2 = document.getElementById('boxInv2');
+    const boxInv3 = document.getElementById('boxInv3');
+    const boxInv4 = document.getElementById('boxInv4');
+
+    const titleEl = document.getElementById('arbiterDecisionTitle');
+    const reasonEl = document.getElementById('arbiterDecisionReason');
+    const pillEl = document.getElementById('arbiterDecisionPill');
+    const bannerEl = document.getElementById('arbiterResultBanner');
+
+    const updateArbiter = () => {
+      const preset = presetSelect ? presetSelect.value : 'safe_reroute';
+
+      let r1 = { pass: true, text: 'PASSED (0.0%)' };
+      let r2 = { pass: true, text: 'PASSED (64.2%)' };
+      let r3 = { pass: true, text: 'PASSED (12.0M)' };
+      let r4 = { pass: true, text: 'PASSED (-3.40)' };
+      let verdict = { pass: true, title: 'SIMULATED VERDICT: REROUTE PERMITTED', reason: 'This example passes the checks for projected utilization, rate and drift.' };
+
+      if (preset === 'safe_reroute') {
+        r1 = { pass: true, text: 'PASSED (0.0%)' };
+        r2 = { pass: true, text: 'PASSED (64.2%)' };
+        r3 = { pass: true, text: 'PASSED (12.0M)' };
+        r4 = { pass: true, text: 'PASSED (-3.40)' };
+        verdict = { pass: true, title: 'SIMULATED VERDICT: REROUTE PERMITTED', reason: 'This example passes the checks for projected utilization, rate and drift.' };
+      } else if (preset === 'safe_meter') {
+        r1 = { pass: true, text: 'PASSED (16.7%)' };
+        r2 = { pass: true, text: 'PASSED (52.0%)' };
+        r3 = { pass: true, text: 'PASSED (8.0M)' };
+        r4 = { pass: true, text: 'PASSED (-2.10)' };
+        verdict = { pass: true, title: 'SIMULATED VERDICT: METER PERMITTED', reason: 'Meter configuration satisfies minimum 512 kbps floor and rate drop ceiling. This is a simulated verdict.' };
+      } else if (preset === 'violate_drop') {
+        r1 = { pass: false, text: 'FAILED (75.0% > 20%)' };
+        r2 = { pass: true, text: 'PASSED (38.0%)' };
+        r3 = { pass: true, text: 'PASSED (3.0M)' };
+        r4 = { pass: true, text: 'PASSED (-1.20)' };
+        verdict = { pass: false, title: 'SAFETY VETO: EXCESSIVE FLOW RATE DROP', reason: 'Invariant 1 Violated: Candidate drops 75.0% of flow traffic (limit 20.0%). Fail-closed fallback to no_op.' };
+      } else if (preset === 'violate_util') {
+        r1 = { pass: true, text: 'PASSED (0.0%)' };
+        r2 = { pass: false, text: 'FAILED (96.4% > 90%)' };
+        r3 = { pass: true, text: 'PASSED (12.0M)' };
+        r4 = { pass: false, text: 'FAILED (+4.80 > 0.0)' };
+        verdict = { pass: false, title: 'SAFETY VETO: LINK OVERFLOW & DRIFT VIOLATION', reason: 'Invariants 2 & 4 Violated: Projected utilization 96.4% exceeds 90% threshold, causing positive Lyapunov drift. Fallback to no_op.' };
+      } else if (preset === 'violate_floor') {
+        r1 = { pass: false, text: 'FAILED (88.0% > 20%)' };
+        r2 = { pass: true, text: 'PASSED (32.0%)' };
+        r3 = { pass: false, text: 'FAILED (256k < 512k)' };
+        r4 = { pass: true, text: 'PASSED (-1.80)' };
+        verdict = { pass: false, title: 'SAFETY VETO: STARVATION FLOOR BREACH', reason: 'Invariant 3 Violated: Meter rate 256 kbps is below the mandatory 512 kbps starvation threshold. Action vetoed.' };
+      }
+
+      const applyBox = (box, valEl, rule) => {
+        if (!box || !valEl) return;
+        valEl.textContent = rule.text;
+        valEl.style.color = rule.pass ? '#10b981' : '#ef4444';
+        box.style.borderColor = rule.pass ? 'var(--border-card)' : 'rgba(239,68,68,0.5)';
+        box.style.background = rule.pass ? 'var(--bg-deepest)' : 'rgba(239,68,68,0.08)';
+      };
+
+      applyBox(boxInv1, valInv1, r1);
+      applyBox(boxInv2, valInv2, r2);
+      applyBox(boxInv3, valInv3, r3);
+      applyBox(boxInv4, valInv4, r4);
+
+      if (titleEl) {
+        titleEl.textContent = verdict.title;
+        titleEl.style.color = verdict.pass ? '#34d399' : '#f87171';
+      }
+      if (reasonEl) reasonEl.textContent = verdict.reason;
+      if (pillEl) {
+        pillEl.textContent = verdict.pass ? 'PERMITTED' : 'SAFETY VETO';
+        pillEl.className = verdict.pass ? 'compliance-pill pass' : 'compliance-pill fail';
+      }
+      if (bannerEl) {
+        bannerEl.style.background = verdict.pass ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)';
+        bannerEl.style.borderColor = verdict.pass ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)';
+      }
+    };
+
+    if (presetSelect) presetSelect.addEventListener('change', updateArbiter);
+    if (flowSelect) flowSelect.addEventListener('change', updateArbiter);
+    if (evalBtn) evalBtn.addEventListener('click', () => {
+      this.playSound('click');
+      updateArbiter();
+    });
+
+    updateArbiter();
+  }
+
+  initInsightsGalleryFilters() {
+    const filterPills = document.querySelectorAll('.viz-filter-pill');
+    filterPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        this.playSound('click');
+        const cat = pill.getAttribute('data-viz-cat');
+        filterPills.forEach(p => p.classList.toggle('active', p === pill));
+
+        const cards = document.querySelectorAll('.project-viz-grid .project-viz-card');
+        cards.forEach(card => {
+          if (cat === 'all') {
+            card.style.display = '';
+          } else {
+            const cardCat = card.getAttribute('data-viz-cat');
+            card.style.display = cardCat === cat ? '' : 'none';
+          }
+        });
+      });
+    });
   }
 }
 

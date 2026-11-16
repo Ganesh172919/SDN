@@ -186,7 +186,7 @@ Incoming Packet Flow: [ IPv4 Src: 10.0.0.1, Dst: 10.0.0.8, Protocol: UDP ]
 
 ## 💻 Core Implementation Code Walkthrough
 
-### 1. Transparent Embedding Engine ([`agent/embedding.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/embedding.py))
+### 1. Transparent Embedding Engine ([`agent/embedding.py`](../agent/embedding.py))
 
 ```python
 # File: selfx/agent/embedding.py
@@ -218,7 +218,7 @@ def cosine(a: list[float], b: list[float]) -> float:
 
 ---
 
-### 2. Balanced Episodic Memory Selection ([`agent/memory.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/memory.py))
+### 2. Balanced Episodic Memory Selection ([`agent/memory.py`](../agent/memory.py))
 
 ```python
 # File: selfx/agent/memory.py
@@ -282,8 +282,8 @@ The table below summarizes the 57,600 simulation windows evaluated across seeds 
 
 ## 🔗 Cross-Reference Navigation
 
-- **Master Portal**: [`README.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/README.md)
-- **Revision 3 Guide**: [`selfx/docs/BENCHMARKS_V3.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/BENCHMARKS_V3.md)
-- **Revision 4 Specification**: [`selfx/docs/BENCHMARKS_V4.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/BENCHMARKS_V4.md)
-- **Experimental Formulations**: [`selfx/docs/EXPERIMENTS.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/EXPERIMENTS.md)
-- **Evaluator Handbook**: [`selfx/docs/PROJECT_GUIDE.md`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/docs/PROJECT_GUIDE.md)
+- **Master Portal**: [`README.md`](../../README.md)
+- **Revision 3 Guide**: [`selfx/docs/BENCHMARKS_V3.md`](BENCHMARKS.md)
+- **Revision 4 Specification**: [`selfx/docs/BENCHMARKS_V4.md`](BENCHMARKS.md)
+- **Experimental Formulations**: [`selfx/docs/EXPERIMENTS.md`](EXPERIMENTS.md)
+- **Evaluator Handbook**: [`selfx/docs/PROJECT_GUIDE.md`](../../REPRODUCE.md)

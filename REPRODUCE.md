@@ -6,15 +6,15 @@ Use the archive root (the directory containing this file). The paper reports onl
 
 ## 1. Install the CPU environment
 
-Use 64-bit Python 3.12. Windows PowerShell:
+Use 64-bit Python 3.12. On Windows, make sure `python --version` reports 3.12 before running these commands.
 
 ~~~powershell
-py -3.12 -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements-comparison.txt
 ~~~
 
-Linux/macOS:
+On Linux or macOS, run the following commands.
 
 ~~~sh
 python3.12 -m venv .venv
@@ -22,6 +22,8 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements-comparison.txt
 ~~~
+
+For the complete implementation test suite, install `requirements.txt` in the same environment and run `python -m pytest` from the repository root.
 
 The commands below assume the virtual environment is active or that `python` is replaced with `.\.venv\Scripts\python.exe` on Windows. The rerun was verified on Windows x86-64, Python 3.12.15, and PyTorch 2.8.0+cpu with two threads and deterministic algorithms. No credentials, GPU, Mininet, or cloud inference are required.
 
@@ -61,13 +63,15 @@ python selfx/eval/verify_neural_guard.py --runs reproduced/full/runs.json --outp
 
 The smoke run uses short traces and is not paper evidence. A few optional integration tests may skip when legacy provider replay files are absent. The full run retrains DQN/IQL, evaluates 168 controller/seed runs (302,400 test slots), and writes runs.json, effects.csv, effects.json, results.tex, thirteen PNGs, and the atlas. The paper plotting commands generate its four vector figures and the main and workload tables. The revision checks regenerate trace-level intervals and Holm sensitivity, test fixed governance on S5, and retrain/replay the neural arms to audit proposal disagreements. The verifier compares recorded model/adapter identities, network fingerprints, applied-action hashes and all run data. Platform or library differences can affect numerical reproducibility.
 
-To rebuild the plots without inference or training:
+To rebuild the plots without inference or training, copy
+`paper/comparison/runs.json` to `reproduced/plots/runs.json` first. Run these
+commands from the repository root.
 
 ~~~console
-python selfx/eval/plot_audited_comparison.py --output paper/comparison
-python selfx/eval/plot_manuscript.py
-python selfx/eval/plot_expanded_paper.py
-python selfx/eval/revision_analysis.py
+python selfx/eval/plot_audited_comparison.py --output reproduced/plots
+python selfx/eval/plot_manuscript.py --effects reproduced/plots/effects.json --output reproduced/plots
+python selfx/eval/plot_expanded_paper.py --runs reproduced/plots/runs.json --output reproduced/plots
+python selfx/eval/revision_analysis.py --runs reproduced/plots/runs.json --output reproduced/plots
 ~~~
 
 To compile from the shipped evidence, see paper/README_OVERLEAF.md. To build with a rerun, copy results.tex, manuscript_table.tex, revision_analysis.tex, paper_delay_effects.pdf, paper_delay_loss.pdf, paper_architecture.pdf, paper_window_traces.pdf, and expanded_profiles.tex from reproduced/full to paper/comparison first. With TeX Live and latexmk:

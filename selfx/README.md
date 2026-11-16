@@ -318,7 +318,7 @@ The primary benchmark suite evaluates **86,400 controller windows** across **8 d
 ## 🛠️ Step-by-Step Developer Guide: Building on `selfx/`
 
 ### 1. Adding a New Unit Test
-All unit tests reside in [`selfx/tests/`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/tests/). To add a new test verifying a custom invariant:
+All unit tests reside in [`selfx/tests/`](tests). To add a new test verifying a custom invariant:
 ```python
 # selfx/tests/test_custom_invariant.py
 import pytest
@@ -336,7 +336,7 @@ Push-Location selfx; New-Item -ItemType Directory -Force -Path tmp; ..\selfx\.ve
 ```
 
 ### 2. Tuning Safety Guardrail Parameters
-Modify [`selfx/config.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/config.py):
+Modify [`selfx/config.py`](config.py):
 ```python
 SAFETY_MAX_FLOW_DROP_PCT = 15      # Tighten throttling cap to 15%
 SAFETY_MAX_LINK_UTIL_PCT = 85      # Tighten projected link ceiling to 85%

@@ -2,7 +2,7 @@
 
 Status correction, 07 November: T20-T24 are complete in CPU/replay scope. T25 has
 verified final weight attribution, with target-quality, reward-convergence and
-iterations-to-target evidence pending. See [the current check](GANESH_PENDING_WORK_CHECK.md).
+iterations-to-target evidence pending. See [the current check](REVISION_AND_VERIFICATION_GUIDE.md).
 
 This adds an executable CPU training and deployment path under
 `agent/self_improvement/`. It uses a real pretrained causal language model,

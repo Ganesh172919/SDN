@@ -70,9 +70,30 @@
 <body>
 <div class="wrap">
 <header>
-  <p><a href="comparison/index.html">Open the current audited comparison and all 13 graphs</a></p>
+  <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; font-size:13.5px; padding:10px 14px; background:rgba(42,120,214,0.08); border:1px solid var(--line); border-radius:8px; align-items:center;">
+    <a href="/" style="font-weight:600; text-decoration:none; color:var(--blue);">← Mission Control Dashboard</a>
+    <span style="color:var(--muted);">&bull;</span>
+    <a href="/#research" style="font-weight:600; text-decoration:none; color:var(--violet);">📄 Research Paper &amp; Submission Portal</a>
+    <span style="color:var(--muted);">&bull;</span>
+    <a href="/comparison/index.html" style="font-weight:600; text-decoration:none; color:var(--aqua);">📊 14-Controller Comparison Studio</a>
+    <span style="color:var(--muted);">&bull;</span>
+    <a href="/downloads/SELF_X_IEEE_Paper.pdf" style="font-weight:600; text-decoration:none; color:var(--orange);" target="_blank" rel="noopener">📥 IEEE Paper (PDF)</a>
+
+
+    <span style="color:var(--muted);">&bull;</span>
+    <a href="https://forms.gle/5DbSbyJUqFwpXSYM9" target="_blank" rel="noopener" style="font-weight:700; text-decoration:none; color:#10b981; background:rgba(16,185,129,0.12); padding:2px 8px; border-radius:4px;">Google Form Link ↗</a>
+  </div>
+
+  <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.4); padding:10px 14px; border-radius:8px; margin-bottom:20px; font-size:13px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+    <div>
+      <span style="background:#ef4444; color:#fff; font-weight:800; font-size:11px; padding:2px 6px; border-radius:4px; margin-right:6px;">COURSE DEADLINE</span>
+      <strong>Final Research Project Submission: 19th November 5:00 PM IST</strong>
+      <span style="color:var(--muted); margin-left:8px;">EC466 &bull; Team SDN_07</span>
+    </div>
+    <a href="/#research" style="color:var(--amber); font-weight:700; text-decoration:none;">View Full Portal &rarr;</a>
+  </div>
   <h1>Earlier SELF-X pipeline study</h1>
-  <p class="sub">Archived results from the remote-provider experiment.</p>
+  <p class="sub">Archived experimental results and figures from the multi-stage pipeline study.</p>
   <div class="meta" id="meta"></div>
 </header>
 
@@ -189,7 +210,7 @@ function render(summary, stats){
     ["Packet loss", n(s5.loss_pct,1)+" %", `${n(pct(s0.loss_pct,s5.loss_pct),1)}% below static`],
     ["Mean backlog", n(s5.mean_queue_mbit,3)+" Mbit", `${n(pct(s0.mean_queue_mbit,s5.mean_queue_mbit),1)}% below static`],
     ["Fast-loop decision", n(s5.mean_fast_decision_us,1)+" µs", `p99 ${n(s5.p99_fast_decision_us,1)} µs`],
-    ["Irreducible loss floor", n(s0.oracle_floor_loss_pct,1)+" %", "demand above total capacity"],
+    ["Instantaneous capacity excess", n(s0.oracle_floor_loss_pct,1)+" %", "earlier study estimate before buffering"],
   ];
   const box = document.getElementById("headline");
   cards.forEach(([k,v,u]) => {
@@ -254,7 +275,7 @@ function render(summary, stats){
   FIGS.forEach(([name, caption]) => {
     const f = el("figure");
     const img = el("img");
-    img.src = `../paper/figures/${name}.png`;
+    img.src = `/paper/figures/${name}.png`;
     img.alt = caption;
     img.loading = "lazy";
     img.onerror = () => { f.hidden = true; };

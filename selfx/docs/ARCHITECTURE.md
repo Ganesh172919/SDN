@@ -337,7 +337,7 @@ class SafetyResult:
 ## 🛠️ Step-by-Step Developer Guide: Extending the Architecture
 
 ### Adding a New State Embedding Dimension
-1. Open [`selfx/agent/embedding.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/embedding.py).
+1. Open [`selfx/agent/embedding.py`](../agent/embedding.py).
 2. Append the normalized feature (e.g., flow rate entropy $H_{\text{flow}} \in [0, 1]$):
    ```python
    def context(summary):
@@ -347,7 +347,7 @@ class SafetyResult:
        features.append(summary.get('flow_entropy', 0.5))
        return features
    ```
-3. Update `LossAwareMemory.meter_estimates` in [`selfx/agent/loss_aware_memory.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/selfx/agent/loss_aware_memory.py) to include the new dimension in the Euclidean distance weighting array.
+3. Update `LossAwareMemory.meter_estimates` in [`selfx/agent/loss_aware_memory.py`](../agent/loss_aware_memory.py) to include the new dimension in the Euclidean distance weighting array.
 
 ---
 *Authored by Team SDN_07 — EC466: Software Defined Networks*

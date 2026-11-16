@@ -257,15 +257,15 @@ python -m unittest discover -s slow-loop/tests -v
 
 ### Adding a New Specialist Agent
 To add a new specialist (e.g., `carbon_aware_specialist`):
-1. Define the role in [`slow-loop/agentic/config.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/slow-loop/agentic/config.py):
+1. Define the role in [`slow-loop/agentic/config.py`](agentic/config.py):
    ```python
    ROLES = ("flow_sizing", "routing", "anomaly", "security", "slicing", "carbon_aware")
    ```
-2. Add the system prompt in [`slow-loop/agentic/prompts.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/slow-loop/agentic/prompts.py):
+2. Add the system prompt in [`slow-loop/agentic/prompts.py`](agentic/prompts.py):
    ```python
    CARBON_AWARE_PROMPT = "Assess grid carbon intensity and favor low-energy paths when intensity > 400 gCO2/kWh."
    ```
-3. Update opinion synthesis in [`slow-loop/agentic/agents.py`](file:///c:/Users/RAVIPRAKASH/SDN/SDN/slow-loop/agentic/agents.py) to parse and merge the specialist's structured recommendations into candidate policy $\Delta\Pi$.
+3. Update opinion synthesis in [`slow-loop/agentic/agents.py`](agentic/agents.py) to parse and merge the specialist's structured recommendations into candidate policy $\Delta\Pi$.
 
 ---
 *Authored by Team SDN_07 — EC466: Software Defined Networks*
