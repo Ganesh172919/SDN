@@ -8,7 +8,10 @@ from types import SimpleNamespace
 from typing import Any
 
 import requests
-import config
+try:
+    import config
+except ImportError:
+    from selfx import config
 
 
 class ProviderError(RuntimeError):

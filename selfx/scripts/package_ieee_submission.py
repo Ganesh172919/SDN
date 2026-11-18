@@ -18,10 +18,11 @@ OVERLEAF = (
     "comparison/paper_delay_loss.pdf", "comparison/paper_window_traces.pdf",
 )
 MATERIALS = (
+    "Overleaf_SELF_X_Bundle.zip",
     "SELF_X_Revision_Report.pdf", "SELF_X_Revision_Response.md",
     "SELF_X_Deep_Review_Round_1.md", "SELF_X_Deep_Review_Round_2.md",
     "SELF_X_Initial_Draft.pdf", "SELF_X_Revision_1.pdf", "SELF_X_Revision_2.pdf",
-    "SELF_X_Revision_2_Expanded.pdf",
+    "SELF_X_Revision_2_Expanded.pdf", "SELF_X_Revision_2_Decision_Model.pdf",
     "SELF_X_Presentation.pdf", "SELF_X_Presentation.pptx",
 )
 ROOT_FILES = {
@@ -51,6 +52,8 @@ TEXT = {".py", ".ps1", ".sh", ".md", ".json", ".jsonl", ".csv", ".js", ".svg",
 def include(name):
     if name in ROOT_FILES:
         return True
+    if name.startswith("Web/data/"):
+        return False
     if name.startswith("selfx/output/"):
         return (
             name.startswith(DASHBOARD_EVIDENCE)
@@ -104,20 +107,22 @@ def check_archive(path):
             raise ValueError(f"Invalid archive: {path.name}")
 
 
-def build(destination, materials):
+def build(destination, materials, compiled_paper):
     source = source_files()
     supplied = [name for name in MATERIALS if (materials / name).is_file()]
     destination.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(dir=destination) as staging:
         staged = Path(staging)
         paper = staged / "SELF_X_IEEE_Paper.pdf"
-        paper.write_bytes((ROOT / paper.name).read_bytes())
+        paper.write_bytes(compiled_paper.read_bytes())
         overleaf = staged / "Overleaf_Source.zip"
         full = staged / "SELF_X_Submission.zip"
         with ZipFile(overleaf, "w", ZIP_DEFLATED, compresslevel=9) as archive:
             write_sources(archive, ((ROOT / "paper" / name, name) for name in OVERLEAF))
         with ZipFile(full, "w", ZIP_DEFLATED, compresslevel=9) as archive:
-            write_sources(archive, ((ROOT / name, name) for name in source))
+            write_sources(archive, (
+                (paper if name == paper.name else ROOT / name, name) for name in source
+            ))
             release = "output/submission/current"
             write_sources(archive, ((materials / name, f"{release}/{name}") for name in supplied))
             archive.write(overleaf, f"{release}/{overleaf.name}")
@@ -143,8 +148,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--destination", "--output", type=Path, default=DEFAULT_DEST)
     parser.add_argument("--materials", type=Path, help="Directory with prepared review and presentation files.")
+    parser.add_argument("--paper", type=Path, default=ROOT / "SELF_X_IEEE_Paper.pdf",
+                        help="Compiled manuscript to ship with the source.")
     args = parser.parse_args()
-    build(args.destination, args.materials or args.destination)
+    build(args.destination, args.materials or args.destination, args.paper)
 
 
 if __name__ == "__main__":

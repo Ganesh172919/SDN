@@ -437,7 +437,7 @@ class AgentManager {
       empty.className = 'empty-state';
       empty.textContent = this.liveMode
         ? 'No live memory records were returned by GET /api/memory.'
-        : 'No simulation memory records are available.';
+        : 'No closed-loop memory records are available.';
       this.memoryGrid.appendChild(empty);
       return;
     }

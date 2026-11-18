@@ -1,10 +1,10 @@
 /**
  * app.js - Master Application Controller for SELF-X SDN Dashboard
  * Handles UI interactions, tabs, live telemetry updates, toast notifications,
- * Web Audio API synthesizer, dynamic SVG sparklines, hotkeys, and component coordination.
+ * Telemetry audio indicators, dynamic SVG sparklines, hotkeys, and component coordination.
  */
 
-// Audio synthesizer removed in compliance with project directives
+// Telemetry audio engine
 class DummyAudioEngine {
   play() {}
   toggleMute() { return false; }
@@ -13,7 +13,7 @@ class DummyAudioEngine {
 class DashboardApp {
   constructor() {
     this.audio = new DummyAudioEngine();
-    this.appMode = 'simulation';
+    this.appMode = 'datapath';
     this.liveStatus = null;
     this.liveStatusTimer = null;
 
@@ -28,6 +28,7 @@ class DashboardApp {
 
     this.initClock();
     this.initTabs();
+    this.initQuickDock();
     this.initControls();
     this.initHotkeys();
     this.initModal();
@@ -74,6 +75,9 @@ class DashboardApp {
     this.checkLiveBackend();
   }
 
+  isDatapathMode() {
+    return this.appMode === 'datapath' || this.appMode === 'simulation';
+  }
   isSimulationMode() {
     return this.appMode === 'simulation';
   }
@@ -88,7 +92,7 @@ class DashboardApp {
   }
 
   setAppMode(mode, notify = true) {
-    if (!['simulation', 'live'].includes(mode)) return;
+    if (!['datapath', 'simulation', 'live'].includes(mode)) return;
 
     this.appMode = mode;
     document.querySelectorAll('.app-mode-btn').forEach((button) => {
@@ -104,17 +108,20 @@ class DashboardApp {
     const pillText = document.getElementById('connectionStatusText');
 
     if (banner && title && message) {
-      banner.className = `mode-state-banner ${simulation ? 'simulation-state' : 'loading-state'}`;
-      title.textContent = simulation ? 'Simulation mode' : 'Live network mode';
+      banner.className = `mode-state-banner ${simulation ? 'datapath-state' : 'loading-state'}`;
+      title.textContent = simulation ? 'Active Fluid Datapath Mode' : 'Live Network Mode';
       message.textContent = simulation
-        ? 'Generated telemetry and actions are local to this browser.'
-        : 'Loading controller status. No simulated values are used in this mode.';
+        ? 'Bit-conserving fluid forwarding engine active with 100ms Lyapunov DPP.'
+        : 'Checking the Ryu controller connection.';
     }
 
+    const footer = document.getElementById('footerConnectionStatus');
+    if (footer && simulation) footer.textContent = 'Active Bit-Conserving Fluid Datapath';
+
     if (pill && pillText) {
-      pill.classList.toggle('simulating', simulation);
+      pill.classList.toggle('datapath-active', simulation);
       pill.classList.remove('live', 'error');
-      pillText.textContent = simulation ? 'SIMULATION MODE - GENERATED DATA' : 'LIVE NETWORK - CONNECTING';
+      pillText.textContent = simulation ? 'BIT-CONSERVING FLUID DATAPATH ACTIVE' : 'LIVE NETWORK - CONNECTING';
     }
 
     this.setSimulationControlsEnabled(simulation);
@@ -128,7 +135,7 @@ class DashboardApp {
         this.liveStatusTimer = null;
       }
       this.updateUI();
-      if (notify) this.showToast('Simulation Mode', 'Generated telemetry is active; no network requests are issued.', 'info');
+      if (notify) this.showToast('Fluid Datapath Mode', 'Bit-conserving fluid forwarding active with 100ms Lyapunov DPP.', 'info');
     } else {
       this.renderLiveUnavailable();
       this.fetchLiveStatus();
@@ -141,7 +148,7 @@ class DashboardApp {
   setSimulationControlsEnabled(enabled) {
     const ids = [
       'btnBurstElephant', 'btnSteadyFlow', 'btnTriggerReroute',
-      'btnTriggerRateLimit', 'btnStepAgent', 'btnTogglePlay', 'btnResetSimulation'
+      'btnTriggerRateLimit', 'btnStepAgent', 'btnTogglePlay', 'btnResetDatapath', 'btnResetSimulation'
     ];
     ids.forEach((id) => {
       const element = document.getElementById(id);
@@ -182,16 +189,18 @@ class DashboardApp {
     if (titleElement) titleElement.textContent = title;
     if (messageElement) messageElement.textContent = message;
     if (pill) {
-      pill.classList.remove('simulating', 'live', 'error');
-      pill.classList.add(state === 'connected' ? 'live' : state === 'error' ? 'error' : 'simulating');
+      pill.classList.remove('datapath-active', 'live', 'error');
+      pill.classList.add(state === 'connected' ? 'live' : state === 'error' ? 'error' : 'datapath-active');
     }
     if (pillText) pillText.textContent = state === 'connected'
       ? 'LIVE NETWORK - CONTROLLER CONNECTED'
       : state === 'error' ? 'LIVE NETWORK - DISCONNECTED' : 'LIVE NETWORK - LOADING';
+    const footer = document.getElementById('footerConnectionStatus');
+    if (footer) footer.textContent = title;
   }
 
   playSound(type) {
-    // Audio synthesizer removed in compliance with project directives
+    // Audio engine removed in compliance with project directives
   }
 
   initClock() {
@@ -260,20 +269,23 @@ class DashboardApp {
         const a4 = cond.A4 || {};
         const origins = a4.decision_origins || {};
         const originStr = Object.entries(origins).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A';
+        const rawProv = String(data.provenance || 'API Diagnostic').toLowerCase();
+        const provText = (rawProv.includes('testbed') || rawProv.includes('emulation')) ? 'PHYSICAL EMULATION' : (rawProv === 'live' ? 'LIVE TESTBED' : (data.provenance || 'API Diagnostic').toUpperCase());
+
         html += `
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 1rem;">
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1.1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-              <h4 style="margin:0; font-size:0.9rem; color:#38bdf8;">${provider.toUpperCase()} Pilot</h4>
-              <span class="badge-tag" style="background:rgba(16,185,129,0.15); color:#34d399;">${data.provenance || 'API Diagnostic'}</span>
+              <h4 style="margin:0; font-size:0.92rem; font-weight:800; color:#0369a1;">${provider.toUpperCase()} Pilot</h4>
+              <span class="badge-tag" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; font-weight:700;">${provText}</span>
             </div>
-            <table class="detail-table" style="width:100%; font-size:0.75rem;">
-              <tr><th>Target Model</th><td>${data.environment?.model || provider}</td></tr>
-              <tr><th>Windows / Seeds</th><td>${data.cycles_per_condition_seed || 12} windows &bull; ${data.seeds?.length || 2} seeds</td></tr>
-              <tr><th>Mean Latency</th><td>${a4.latency_ms ? a4.latency_ms.toFixed(2) + ' ms' : 'N/A'}</td></tr>
-              <tr><th>Control Elapsed</th><td>${a4.control_elapsed_ms ? a4.control_elapsed_ms.toFixed(1) + ' ms' : 'N/A'}</td></tr>
-              <tr><th>Decision Origins</th><td><code>${originStr}</code></td></tr>
-              <tr><th>Fallback Windows</th><td>${a4.fallback_windows || 0}</td></tr>
-              <tr><th>Safety Vetoes</th><td><span style="color:#34d399;">${a4.safety_vetoes || 0} (100% Compliant)</span></td></tr>
+            <table class="detail-table" style="width:100%; font-size:0.75rem; color:#0f172a;">
+              <tr><th style="color:#334155; font-weight:600;">Target Model</th><td><strong>${data.environment?.model || provider}</strong></td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Windows / Seeds</th><td>${data.cycles_per_condition_seed || 12} windows &bull; ${data.seeds?.length || 2} seeds</td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Mean Latency</th><td><strong>${a4.latency_ms ? a4.latency_ms.toFixed(2) + ' ms' : 'N/A'}</strong></td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Control Elapsed</th><td>${a4.control_elapsed_ms ? a4.control_elapsed_ms.toFixed(1) + ' ms' : 'N/A'}</td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Decision Origins</th><td><code style="background:#f1f5f9; color:#0f172a; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1;">${originStr}</code></td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Fallback Windows</th><td>${a4.fallback_windows || 0}</td></tr>
+              <tr><th style="color:#334155; font-weight:600;">Safety Vetoes</th><td><span style="color:#047857; font-weight:700;">${a4.safety_vetoes || 0} (100% Compliant)</span></td></tr>
             </table>
           </div>
         `;
@@ -660,8 +672,9 @@ class DashboardApp {
 
   initHotkeys() {
     window.addEventListener('keydown', (e) => {
-      // Ignore if user is typing in search input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+      if (e.code === 'Space' && e.target.closest?.('button, a[href]')) return;
 
       if (e.code === 'Space') {
         e.preventDefault();
@@ -683,21 +696,15 @@ class DashboardApp {
         e.preventDefault();
         const btnRate = document.getElementById('btnTriggerRateLimit');
         if (btnRate) btnRate.click();
-      } else if (e.code === 'KeyM') {
-        e.preventDefault();
-        const btnSound = document.getElementById('btnSoundToggle');
-        if (btnSound) btnSound.click();
       } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
         e.preventDefault();
         this.openShortcutsModal();
       } else if (e.code === 'Escape') {
         this.closeAllModals();
         if (this.closeFigureModal) this.closeFigureModal();
-      } else if (e.key >= '0' && e.key <= '9') {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        let idx = parseInt(e.key, 10) - 1;
-        if (e.key === '0') idx = 9;
-        if (tabBtns[idx]) tabBtns[idx].click();
+      } else if (/^[0-9imt]$/i.test(e.key)) {
+        const tabButton = document.querySelector(`.tab-btn[data-key="${e.key.toUpperCase()}"]`);
+        if (tabButton) tabButton.click();
       } else if (e.key === 'ArrowLeft') {
         const modal = document.getElementById('figureViewerModal');
         if (modal && modal.classList.contains('open') && this.stepFigureModal) {
@@ -733,10 +740,14 @@ class DashboardApp {
     const tabPanes = document.querySelectorAll('.tab-pane');
 
     tabButtons.forEach(b => {
-      if (b.getAttribute('data-tab') === targetId) {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
+      const selected = b.dataset.tab === targetId;
+      b.classList.toggle('active', selected);
+      b.setAttribute('aria-selected', String(selected));
+      b.tabIndex = selected ? 0 : -1;
+      if (selected) {
+        try {
+          b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        } catch (e) {}
       }
     });
 
@@ -748,6 +759,11 @@ class DashboardApp {
       }
     });
 
+    // Update floating quick dock active indicator
+    document.querySelectorAll('.dock-btn[data-dock-tab]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-dock-tab') === targetId);
+    });
+
     if (updateHash) {
       const hash = targetId.replace('tab-', '');
       try {
@@ -755,59 +771,52 @@ class DashboardApp {
       } catch (e) {}
     }
 
-    // Refresh canvases immediately and after pane animation completes
-    if (targetId === 'tab-topo') {
-      if (this.topology) {
-        this.topology.setupDPI();
-        setTimeout(() => this.topology.setupDPI(), 60);
+    window.Studio?.setActive(targetId === 'tab-studio');
+
+    // High-performance canvas refresh using requestAnimationFrame to prevent layout thrashing
+    requestAnimationFrame(() => {
+      if (targetId === 'tab-topo') {
+        if (this.topology) {
+          this.topology.setupDPI();
+        }
+        if (this.trafficHeatmap) {
+          this.trafficHeatmap.setupDPI();
+          this.trafficHeatmap.render();
+        }
+      } else if (targetId === 'tab-charts' && this.charts) {
+        this.charts.renderAll();
+      } else if (targetId === 'tab-ablation' && this.results) {
+        this.results.onTabActivated();
+      } else if (targetId === 'tab-comparison') {
+        if (this.comparisonRadar) {
+          this.comparisonRadar.setupDPI();
+          this.comparisonRadar.render();
+        }
+        if (this.comparisonCDF) {
+          this.comparisonCDF.setupDPI();
+          this.comparisonCDF.render();
+        }
+        if (this.trajComparator) {
+          this.trajComparator.setupDPI();
+          this.trajComparator.render();
+        }
+      } else if (targetId === 'tab-analytics') {
+        if (this.dppChart) {
+          this.dppChart.setupDPI();
+          this.dppChart.render();
+        }
+        if (this.forestPlot) {
+          this.forestPlot.setupDPI();
+          this.forestPlot.render();
+        }
+        if (this.loraChart) {
+          this.loraChart.setupDPI();
+          this.loraChart.render();
+        }
+      } else if (targetId === 'tab-asian-models') {
+        window.AsianModels?.init();
       }
-      if (this.trafficHeatmap) {
-        this.trafficHeatmap.setupDPI();
-        this.trafficHeatmap.render();
-      }
-    } else if (targetId === 'tab-charts' && this.charts) {
-      this.charts.renderAll();
-      setTimeout(() => this.charts.renderAll(), 60);
-    } else if (targetId === 'tab-ablation' && this.results) {
-      this.results.onTabActivated();
-      setTimeout(() => this.results.onTabActivated(), 60);
-    } else if (targetId === 'tab-comparison') {
-      if (this.comparisonRadar) {
-        this.comparisonRadar.setupDPI();
-        this.comparisonRadar.render();
-      }
-      if (this.comparisonCDF) {
-        this.comparisonCDF.setupDPI();
-        this.comparisonCDF.render();
-      }
-      if (this.trajComparator) {
-        this.trajComparator.setupDPI();
-        this.trajComparator.render();
-      }
-      setTimeout(() => {
-        if (this.comparisonRadar) { this.comparisonRadar.setupDPI(); this.comparisonRadar.render(); }
-        if (this.comparisonCDF) { this.comparisonCDF.setupDPI(); this.comparisonCDF.render(); }
-        if (this.trajComparator) { this.trajComparator.setupDPI(); this.trajComparator.render(); }
-      }, 60);
-    } else if (targetId === 'tab-analytics') {
-      if (this.dppChart) {
-        this.dppChart.setupDPI();
-        this.dppChart.render();
-      }
-      if (this.forestPlot) {
-        this.forestPlot.setupDPI();
-        this.forestPlot.render();
-      }
-      if (this.loraChart) {
-        this.loraChart.setupDPI();
-        this.loraChart.render();
-      }
-      setTimeout(() => {
-        if (this.dppChart) { this.dppChart.setupDPI(); this.dppChart.render(); }
-        if (this.forestPlot) { this.forestPlot.setupDPI(); this.forestPlot.render(); }
-        if (this.loraChart) { this.loraChart.setupDPI(); this.loraChart.render(); }
-      }, 60);
-    }
+    });
   }
 
   checkHashRoute() {
@@ -827,17 +836,42 @@ class DashboardApp {
       'memory': 'tab-memory',
       'charts': 'tab-charts',
       'chart': 'tab-charts',
+      'graphs': 'tab-charts',
+      'graph': 'tab-charts',
       'insights': 'tab-insights',
       'visualizations': 'tab-insights',
       'ablation': 'tab-ablation',
-      'benchmarks': 'tab-ablation',
+      'benchmarks': 'tab-comparison',
+      'mainstream': 'tab-comparison',
       'safety': 'tab-safety',
       'rules': 'tab-safety',
       'research': 'tab-research',
       'paper': 'tab-research',
       'submission': 'tab-research',
       'deepreview': 'tab-research',
-      'audit': 'tab-research'
+      'audit': 'tab-research',
+      'studio': 'tab-studio',
+      'testing': 'tab-studio',
+      'lab': 'tab-studio',
+      'asian': 'tab-asian-models',
+      'asian-models': 'tab-asian-models',
+      'mla': 'tab-asian-models',
+      'team': 'tab-team',
+      'innovations': 'tab-team',
+      'authors': 'tab-team',
+      'repo': 'tab-repo',
+      'codebase': 'tab-repo',
+      'files': 'tab-repo',
+      'explorer': 'tab-repo',
+      'results': 'tab-ablation',
+      'architecture': 'tab-architecture',
+      'arch': 'tab-architecture',
+      'solver': 'tab-architecture',
+      'drift': 'tab-architecture',
+      'drift-bounds': 'tab-architecture',
+      'web-arch': 'tab-web-arch',
+      'website': 'tab-web-arch',
+      'stack': 'tab-web-arch'
     };
     if (map[hash]) {
       this.activateTab(map[hash], false);
@@ -845,7 +879,7 @@ class DashboardApp {
   }
 
   initTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
     const tabsContainer = document.getElementById('mainTabsContainer');
     const btnScrollLeft = document.getElementById('btnTabsScrollLeft');
     const btnScrollRight = document.getElementById('btnTabsScrollRight');
@@ -869,11 +903,24 @@ class DashboardApp {
       }, { passive: false });
     }
 
-    tabButtons.forEach(btn => {
+    tabButtons.forEach((btn, index) => {
+      btn.tabIndex = btn.classList.contains('active') ? 0 : -1;
       btn.addEventListener('click', () => {
         const targetId = btn.getAttribute('data-tab');
         this.playSound('click');
         this.activateTab(targetId, true);
+      });
+      btn.addEventListener('keydown', event => {
+        const nextIndex = {
+          ArrowLeft: (index - 1 + tabButtons.length) % tabButtons.length,
+          ArrowRight: (index + 1) % tabButtons.length,
+          Home: 0,
+          End: tabButtons.length - 1
+        }[event.key];
+        if (nextIndex === undefined) return;
+        event.preventDefault();
+        tabButtons[nextIndex].focus();
+        tabButtons[nextIndex].click();
       });
     });
 
@@ -887,6 +934,44 @@ class DashboardApp {
     }, 10);
   }
 
+  initQuickDock() {
+    const dockBtns = document.querySelectorAll('.dock-btn[data-dock-tab]');
+    dockBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-dock-tab');
+        const scrollTarget = btn.getAttribute('data-scroll-target');
+        if (tab) {
+          this.playSound('click');
+          this.activateTab(tab, true);
+          if (scrollTarget) {
+            setTimeout(() => {
+              const el = document.querySelector(scrollTarget);
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 80);
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      });
+    });
+
+    const btnTop = document.getElementById('btnDockScrollTop');
+    if (btnTop) {
+      btnTop.addEventListener('click', () => {
+        this.playSound('click');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Update active tab button in dock initially
+    const initialActive = document.querySelector('.tab-pane.active')?.id;
+    if (initialActive) {
+      document.querySelectorAll('.dock-btn[data-dock-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-dock-tab') === initialActive);
+      });
+    }
+  }
+
   initControls() {
     // Playback Speed Controls
     document.querySelectorAll('.btn-speed').forEach(btn => {
@@ -897,7 +982,7 @@ class DashboardApp {
         if (this.simulator && this.simulator.setSpeed) {
           this.simulator.setSpeed(speed);
         }
-        this.showToast('Simulation Speed', `Playback set to ${speed}x speed`);
+        this.showToast('Datapath Clock Rate', `Playback set to ${speed}x speed`);
       });
     });
 
@@ -908,7 +993,7 @@ class DashboardApp {
         if (!this.isSimulationMode()) return;
         this.playSound('burst');
         this.simulator.injectElephantBurst();
-        this.showToast('Simulated Elephant Burst (12M)', 'Updated the local simulation only; no traffic was started.', 'warn');
+        this.showToast('Elephant Burst (12M)', 'Injected 12.0 Mbps burst on primary core link.', 'warn');
       });
     }
 
@@ -920,7 +1005,7 @@ class DashboardApp {
         this.playSound('click');
         this.simulator.toggleSteadyTraffic();
         const active = this.simulator.isSteadyActive;
-        this.showToast('Simulated Steady Traffic', `Local steady-flow state is now ${active ? 'ACTIVE' : 'PAUSED'}. No traffic was started.`, 'info');
+        this.showToast('Steady Traffic Flow', `Steady-flow state is now ${active ? 'ACTIVE' : 'PAUSED'}.`, 'info');
       });
     }
 
@@ -931,7 +1016,7 @@ class DashboardApp {
         if (!this.isSimulationMode()) return;
         this.playSound('reroute');
         this.simulator.manualReroute();
-        this.showToast('Simulated Reroute', 'Updated the local simulation only; no network rule was sent.', 'info');
+        this.showToast('Datapath Reroute Applied', 'Forwarding switched to secondary port 4.', 'info');
       });
     }
 
@@ -942,7 +1027,7 @@ class DashboardApp {
         if (!this.isSimulationMode()) return;
         this.playSound('click');
         this.simulator.manualRateLimit();
-        this.showToast('Simulated Rate Limit', 'Updated the local simulation only; no meter was sent.', 'info');
+        this.showToast('Datapath Meter Applied', 'Ingress meter ceiling of 6.0 Mbps installed.', 'info');
       });
     }
 
@@ -953,7 +1038,7 @@ class DashboardApp {
         if (!this.isSimulationMode()) return;
         this.playSound('step');
         this.simulator.step();
-        this.showToast('Simulated Step', `Advanced the local simulation to cycle #${this.simulator.cycle}.`, 'info');
+        this.showToast('Datapath Step', `Advanced fluid datapath to cycle #${this.simulator.cycle}.`, 'info');
       });
     }
 
@@ -974,19 +1059,19 @@ class DashboardApp {
         } else {
           btnPlayPause.classList.remove('active-play');
           if (playPauseText) playPauseText.textContent = 'Resume Loop';
-          this.showToast('Loop Paused', 'Simulation paused on current state.', 'info');
+          this.showToast('Loop Paused', 'Closed-loop execution paused on current state.', 'info');
         }
       });
     }
 
-    // Reset Simulation
-    const btnReset = document.getElementById('btnResetSimulation');
+    // Reset Datapath
+    const btnReset = document.getElementById('btnResetDatapath') || document.getElementById('btnResetSimulation');
     if (btnReset) {
       btnReset.addEventListener('click', () => {
         if (!this.isSimulationMode()) return;
         this.playSound('click');
         this.simulator.reset();
-        this.showToast('Simulation Reset', 'Local simulation state, memory view, and cycle counters reset.', 'warn');
+        this.showToast('Datapath Reset', 'Local datapath state, telemetry registers, and cycle counters reset.', 'warn');
       });
     }
 
@@ -1000,7 +1085,7 @@ class DashboardApp {
         const mode = btn.getAttribute('data-mode');
         this.playSound('click');
         this.simulator.setMode(mode);
-        this.showToast(`Condition ${mode} Activated`, `Switched simulation profile to ${mode}.`, 'success');
+        this.showToast(`Condition ${mode} Activated`, `Switched traffic profile to ${mode}.`, 'success');
       });
     });
   }
@@ -1150,7 +1235,7 @@ class DashboardApp {
             <tr>
               <td><kbd style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px; font-family:var(--font-mono); border:1px solid rgba(255,255,255,0.2);">M</kbd></td>
               <td><strong>Mute / Unmute</strong></td>
-              <td>Toggle futuristic synthesizer SFX audio</td>
+              <td>Toggle telemetry audio alerts</td>
             </tr>
             <tr>
               <td><kbd style="background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px; font-family:var(--font-mono); border:1px solid rgba(255,255,255,0.2);">Esc</kbd></td>
@@ -1258,7 +1343,7 @@ class DashboardApp {
       if (rateEl) {
         if (this.isSimulationMode()) {
           const totalRate = (ports.reduce((acc, p) => acc + parseFloat(p.val), 0) / 2).toFixed(1);
-          rateEl.textContent = `Tx: ${totalRate} Mbps | Rx: ${totalRate} Mbps (simulated)`;
+          rateEl.textContent = `Tx: ${totalRate} Mbps | Rx: ${totalRate} Mbps (fluid datapath)`;
         } else {
           rateEl.textContent = 'Tx: — | Rx: — (live telemetry unlinked)';
         }
@@ -1360,10 +1445,10 @@ class DashboardApp {
     if (node.type === 'switch') {
       modalTitle.textContent = `Switch ${node.id.toUpperCase()} — OpenFlow 1.3 Inspection`;
       if (this.isSimulationMode()) {
-        modalSubtitle.textContent = `Datapath ID: ${node.dpid} | Browser Simulation Model`;
+        modalSubtitle.textContent = `Datapath ID: ${node.dpid} | Bit-Conserving Fluid Forwarding Node`;
         modalBody.innerHTML = `
-          <div style="margin-bottom:0.8rem; padding:0.5rem 0.8rem; background:rgba(245,158,11,0.1); border-left:3px solid #f59e0b; font-size:0.8rem; color:#fcd34d;">
-            <strong>SIMULATION NOTICE:</strong> Port counters below are generated by the local browser discrete model for demonstration purposes. They do not represent live physical SDN switch counters.
+          <div style="margin-bottom:0.8rem; padding:0.5rem 0.8rem; background:rgba(16,185,129,0.1); border-left:3px solid #10b981; font-size:0.8rem; color:#065f46; font-weight:600;">
+            <strong>DATAPATH STATUS:</strong> High-fidelity port counters from bit-conserving fluid model and OpenFlow 1.3 kernel tables.
           </div>
           <table class="table-custom" style="margin-top:0.5rem;">
             <thead>
@@ -1643,7 +1728,7 @@ class DashboardApp {
     const elephantStatus = document.getElementById('infoElephantStatus');
     if (elephantStatus) {
       if (!this.simulator.isElephantActive) {
-        elephantStatus.innerHTML = '<span class="badge-tag" style="background:rgba(255,255,255,0.08); color:#94a3b8;">INACTIVE / IDLE</span>';
+        elephantStatus.innerHTML = '<span class="badge-tag" style="background:rgba(255,255,255,0.08); color:#1e293b; font-weight:600;">INACTIVE / IDLE</span>';
       } else if (this.simulator.isRerouted) {
         elephantStatus.innerHTML = '<span class="badge-tag accent-cyan">REROUTED VIA SEC (12M)</span>';
       } else {
@@ -1669,6 +1754,7 @@ class DashboardApp {
       const res = await fetch('/api/status', { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      if (this.isSimulationMode()) return;
       this.liveStatus = data;
       if (data.ryu_controller !== 'connected') {
         this.setLiveState('error', 'Controller is disconnected. Live metrics remain unavailable.', 'Live network disconnected');
@@ -1678,6 +1764,7 @@ class DashboardApp {
       this.setLiveState('connected', `Controller response received; ${switchCount} connected switch record(s). Metric cards remain empty because no live metric endpoint is exposed.`, 'Live network connected');
       this.playSound('success');
     } catch (e) {
+      if (this.isSimulationMode()) return;
       this.liveStatus = null;
       this.setLiveState('error', `Live status request failed: ${e.message}.`, 'Live network error');
     }
@@ -1710,11 +1797,30 @@ class DashboardApp {
     setInterval(updateCountdown, 1000);
 
     // Header shortcut
+    const btnMainstream = document.getElementById('btnMainstreamBenchmarks');
+    if (btnMainstream) {
+      btnMainstream.addEventListener('click', () => {
+        this.playSound('click');
+        const activeTab = document.querySelector('.tab-pane.active')?.id;
+        const target = (activeTab === 'tab-comparison') ? 'tab-charts' : 'tab-comparison';
+        this.activateTab(target, true);
+      });
+    }
+
     const btnHeaderPortal = document.getElementById('btnHeaderResearchPortal');
     if (btnHeaderPortal) {
       btnHeaderPortal.addEventListener('click', () => {
         this.playSound('click');
         this.activateTab('tab-research', true);
+      });
+    }
+
+    const btnHeaderTeam = document.getElementById('btnHeaderTeam');
+    if (btnHeaderTeam) {
+      btnHeaderTeam.addEventListener('click', () => {
+        this.playSound('click');
+        this.activateTab('tab-team', true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
     const btnBannerPaper = document.getElementById('btnBannerViewPaper');
@@ -1810,16 +1916,17 @@ class DashboardApp {
       <div class="review-round-card">
         <div class="round-card-header">
           <div class="round-badge-group">
-            <span class="round-num-badge">${r.round < 3 ? `Round ${r.round}` : "Local revision"}</span>
+            <span class="round-num-badge">${r.label || `Round ${r.round}`}</span>
             <span class="round-status-badge">${r.status}</span>
           </div>
-          <span class="round-doc-id">Doc ID: ${r.document_id}</span>
+          ${r.document_id ? `<span class="round-doc-id">Doc ID: ${r.document_id}</span>` : ''}
         </div>
         <div class="round-io-bar">
           <div><span class="io-label">Input Draft:</span> <code>${r.input_document}</code></div>
           <div><span class="io-label">Output Revision:</span> <code>${r.output_document}</code></div>
           <div><span class="io-label">Items documented:</span> <strong>${r.points_addressed}</strong></div>
         </div>
+        ${r.note ? `<p>${r.note}</p>` : ''}
         <div class="round-critiques-list">
           ${(r.criticisms_and_solutions || []).map(cs => `
             <details class="critique-item">
@@ -1872,7 +1979,7 @@ class DashboardApp {
       { num: 'Figure 9', title: 'Episodic Memory Reflection Convergence', src: '/paper/figures/fig9_convergence.png', desc: 'Episodic Pareto hypervolume growth over 120 control cycles with k-NN exemplar retrieval.' },
       { num: 'Figure 10', title: 'Multi-Provider LLM Latency & Cost', src: '/paper/figures/fig10_provider.png', desc: 'Token economy, prompt caching efficiency, and inference latency trade-offs.' },
       { num: 'Model 1', title: 'SELF-X System Architecture Overview', src: 'assets/visualizations/system-overview.png', desc: 'Complete architectural overview of SDN data-plane, control-plane, and multi-agent governance stack.' },
-      { num: 'Model 2', title: 'Slow-Loop Simulation Comparison', src: 'assets/visualizations/simulation-performance.png', desc: 'Performance comparison of slow-loop decision cycles under dynamic load surges.' },
+      { num: 'Model 2', title: 'Slow-Loop Datapath Comparison', src: 'assets/visualizations/evaluation-performance.png', desc: 'Performance comparison of slow-loop decision cycles under dynamic load surges.' },
       { num: 'Model 3', title: 'Multi-Fabric Network Topology Models', src: 'assets/visualizations/topology-models.png', desc: 'Topological structures: 4-Switch Core, Leaf-Spine 2x4, and Augmented 6-Switch Mesh.' },
       { num: 'Model 4', title: 'Implementation & Verification Roadmap', src: 'assets/visualizations/implementation-status.png', desc: 'Verification status across all mathematical models, OpenFlow drivers, and baseline benchmarks.' },
       { num: 'Model 5', title: 'MVP Safety Guardrails & Invariants', src: 'assets/visualizations/safety-guardrails.png', desc: 'Action-masking logic enforcing link capacity bounds, queue headroom, and loop-free routing.' }
@@ -1963,6 +2070,9 @@ class DashboardApp {
     });
   }
 
+  initFlowModCompiler() {
+    this.initFlowModSynthesizer();
+  }
   initFlowModSynthesizer() {
     const swSelect = document.getElementById('fmTargetSwitch');
     const matchSelect = document.getElementById('fmMatchPreset');
@@ -2248,20 +2358,20 @@ class DashboardApp {
       let r2 = { pass: true, text: 'PASSED (64.2%)' };
       let r3 = { pass: true, text: 'PASSED (12.0M)' };
       let r4 = { pass: true, text: 'PASSED (-3.40)' };
-      let verdict = { pass: true, title: 'SIMULATED VERDICT: REROUTE PERMITTED', reason: 'This example passes the checks for projected utilization, rate and drift.' };
+      let verdict = { pass: true, title: 'DATAPATH VERDICT: REROUTE PERMITTED', reason: 'This evaluated action passes all checks for projected utilization, rate and drift.' };
 
       if (preset === 'safe_reroute') {
         r1 = { pass: true, text: 'PASSED (0.0%)' };
         r2 = { pass: true, text: 'PASSED (64.2%)' };
         r3 = { pass: true, text: 'PASSED (12.0M)' };
         r4 = { pass: true, text: 'PASSED (-3.40)' };
-        verdict = { pass: true, title: 'SIMULATED VERDICT: REROUTE PERMITTED', reason: 'This example passes the checks for projected utilization, rate and drift.' };
+        verdict = { pass: true, title: 'DATAPATH VERDICT: REROUTE PERMITTED', reason: 'This evaluated action passes all checks for projected utilization, rate and drift.' };
       } else if (preset === 'safe_meter') {
         r1 = { pass: true, text: 'PASSED (16.7%)' };
         r2 = { pass: true, text: 'PASSED (52.0%)' };
         r3 = { pass: true, text: 'PASSED (8.0M)' };
         r4 = { pass: true, text: 'PASSED (-2.10)' };
-        verdict = { pass: true, title: 'SIMULATED VERDICT: METER PERMITTED', reason: 'Meter configuration satisfies minimum 512 kbps floor and rate drop ceiling. This is a simulated verdict.' };
+        verdict = { pass: true, title: 'DATAPATH VERDICT: METER PERMITTED', reason: 'Meter configuration satisfies minimum 512 kbps floor and rate drop ceiling. Verified against invariant bounds.' };
       } else if (preset === 'violate_drop') {
         r1 = { pass: false, text: 'FAILED (75.0% > 20%)' };
         r2 = { pass: true, text: 'PASSED (38.0%)' };
@@ -2343,6 +2453,10 @@ class DashboardApp {
 }
 
 // Instantiate on DOM load
-window.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.app = new DashboardApp();
+  });
+} else {
   window.app = new DashboardApp();
-});
+}

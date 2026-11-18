@@ -15,6 +15,7 @@ python selfx/scripts/package_ieee_submission.py
 Upload `output/submission/current/Overleaf_Source.zip` as a new Overleaf project.
 Select `main.tex` as the main document and use pdfLaTeX. The archive already
 contains the evidence-derived files required to compile the paper.
+The source uses the [official IEEE Conference Template](https://www.overleaf.com/latex/templates/ieee-conference-template/grfzhhncsfqn).
 
 For a different output directory, pass `--destination DIR`. Pass
 `--materials DIR` to include prepared review documents and presentation files
@@ -38,8 +39,8 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-Copy the resulting `main.pdf` to `SELF_X_IEEE_Paper.pdf` at the repository root
-before rebuilding the course archive.
+From the repository root, pass the resulting PDF to
+`python selfx/scripts/package_ieee_submission.py --paper paper/main.pdf --materials submission`.
 
 ## Rebuild the paper evidence
 

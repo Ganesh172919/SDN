@@ -10,8 +10,10 @@ import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 try:
     from dotenv import load_dotenv
+    load_dotenv(WORKSPACE_ROOT / ".env", encoding="utf-8-sig")
     load_dotenv(PROJECT_ROOT / ".env", encoding="utf-8-sig")
 except ImportError:
     pass  # Offline core does not require dotenv.

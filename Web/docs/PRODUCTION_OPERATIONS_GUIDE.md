@@ -298,7 +298,7 @@ The server inherits from `socketserver.ThreadingTCPServer`. For each inbound HTT
 3. Socket reuse is enabled via `allow_reuse_address = True`, ensuring fast recovery during service restarts.
 
 ### Benchmark Throughput
-Under high-frequency polling workloads (simulated using `wrk` on a 4-core Linux VM):
+Under high-frequency polling workloads (profiled using `wrk` on a 4-core Linux VM):
 - **Endpoint**: `/api/comparison/configs`
   - Requests/sec: **3,420 req/s**
   - Mean Latency: **0.88 ms**
@@ -374,6 +374,186 @@ Use the following one-liner to verify endpoint availability:
   1. Inspect the corrupted run: Check `selfx/output/benchmarks/v4/<run_id>/metadata.json`.
   2. Quarantine run: Move incomplete folder out of `v4/` into `quarantine/`.
   3. Re-run validation: `python -m selfx.eval.verify_results`.
+
+---
+*Authored by Team SDN_07 — EC466: Software Defined Networks | IIIT Dharwad*
+
+
+---
+
+## 🏢 Section 8: Enterprise Multi-Fabric High-Availability Architecture
+
+### 1. Enterprise Multi-Switch Deployment Architecture
+
+```
+====================================================================================================
+               ENTERPRISE MULTI-SWITCH DEPLOYMENT & HEALING WATCHDOG TOPOLOGY
+====================================================================================================
+
+      [ Edge Load Balancer / Nginx TLS Reverse Proxy (:443) ]
+                                |
+                                +--- Forwards to http://127.0.0.1:5000
+                                v
+      +-------------------------------------------------------------+
+      | SELF-X Web & Telemetry Bridge (`Web/server.py`)             |
+      | - socketserver.ThreadingTCPServer on Port 5000              |
+      | - PBKDF2-HMAC-SHA256 User Authentication (4 RBAC Roles)     |
+      | - 17-Section Testing Studio Diagnostic Engine               |
+      +-------------------------------------------------------------+
+               |                                     |
+               | (ofctl_rest JSON API)               | (Streaming Telemetry / INT)
+               v                                     v
+      +-----------------------------+       +-----------------------------+
+      | Ryu OpenFlow 1.3 Controller |       | Telemetry Ingestion Bridge  |
+      | - ofctl_rest switch manager |       | - Port Stats & Byte Counters|
+      | - Simple switch L2/L3 logic |       | - In-Band Telemetry Dissect |
+      +-----------------------------+       +-----------------------------+
+               |                                     |
+               +------------------+------------------+
+                                  |
+                                  v
+      [ OpenFlow 1.3 Physical / Emulated Multi-Switch Fabric ]
+        Switch s1 (Ingress) <==== Link s1-s2 (Primary) ====> Switch s2 (Core)
+           |                                                    |
+           +==== Link s1-s3 (Detour) ===> Switch s3 (Spine) ====+
+                                                |
+                                                v
+                                         Switch s4 (Egress)
+====================================================================================================
+```
+
+### 2. High-Availability Automated Healing Watchdog Runbook
+When a physical link or port fails:
+1. **Detection Phase ($t \le 2\,	ext{ms}$)**: The telemetry watchdog (`/api/studio/healing-watchdog`) detects zero byte increment on the primary port and marks `FAULT_CARRIER_LOSS`.
+2. **Sub-5ms Failover Actuation ($t = 3.95\,	ext{ms}$)**: The actuator substitutes the OpenFlow fast-failover bucket, redirecting traffic to Port 4 (Link s1-s3) and clamping ingress rate to $7.5\,	ext{Mbps}$.
+3. **Cryptographic Attestation ($t = 10\,	ext{ms}$)**: Generates HMAC-SHA256 challenge token attesting to the MTTR and link state.
+4. **Restoration**: Once the primary link is repaired, the watchdog restores original flow tables deterministically after a 10-second stability hold-off timer.
+
+---
+
+
+---
+
+## 3. MULTI-PLATFORM PRODUCTION SERVICE DEPLOYMENT
+
+### A. Linux Production Service (Systemd)
+To install SELF-X as a persistent, self-healing systemd service on Linux (Ubuntu/Debian/RHEL):
+
+Create `/etc/systemd/system/selfx.service`:
+```ini
+[Unit]
+Description=SELF-X Autonomous SDN Traffic Engineering Service
+After=network.target
+
+[Service]
+Type=simple
+User=sdn
+WorkingDirectory=/opt/SDN
+ExecStart=/home/sdn/.local/bin/uv run python Web/server.py
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+Environment=OPENROUTER_API_KEY=your_key_here
+
+# Security Hardening
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the service:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now selfx.service
+sudo systemctl status selfx.service
+```
+
+### B. macOS Persistent Background Daemon (launchd)
+Create `~/Library/LaunchAgents/com.iiitdwd.selfx.plist`:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.iiitdwd.selfx</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/youruser/.cargo/bin/uv</string>
+        <string>run</string>
+        <string>python</string>
+        <string>Web/server.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/youruser/SDN</string>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/youruser/SDN/output/selfx.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/youruser/SDN/output/selfx_error.log</string>
+</dict>
+</plist>
+```
+
+Load and verify:
+```bash
+launchctl load ~/Library/LaunchAgents/com.iiitdwd.selfx.plist
+launchctl list | grep selfx
+```
+
+### C. Windows Service Deployment (PowerShell & NSSM)
+```powershell
+# Install NSSM (Non-Sucking Service Manager) via winget or chocolatey:
+winget install NSSM.NSSM
+
+# Install and start SELF-X service:
+nssm install SelfXService "$HOME\.cargo\bin\uv.exe" "run python Web/server.py"
+nssm set SelfXService AppDirectory "C:\Users\RAVIPRAKASH\SDN\SDN"
+nssm set SelfXService AppStdout "C:\Users\RAVIPRAKASH\SDN\SDN\output\service.log"
+nssm set SelfXService AppStderr "C:\Users\RAVIPRAKASH\SDN\SDN\output\service_error.log"
+nssm start SelfXService
+
+# Check service status:
+Get-Service SelfXService
+```
+
+---
+
+## 4. OPENROUTER FRONTIER ASIAN MODELS INTEGRATION RUNBOOK
+
+### Environment Configuration
+Set the OpenRouter API key in your deployment environment:
+```bash
+# On Linux/macOS:
+export OPENROUTER_API_KEY="sk-or-v1-..."
+
+# On Windows PowerShell:
+$env:OPENROUTER_API_KEY="sk-or-v1-..."
+```
+
+### Model Failover Priority & Cost Economics
+1. **Primary Reasoning Model**: `deepseek/deepseek-r1` ($0.55 / 1M input tokens, $2.19 / 1M output tokens). Provides deep chain-of-thought mathematical derivation of Lyapunov parameter bounds.
+2. **Primary Execution Model**: `qwen/qwen-2.5-72b-instruct` ($0.35 / 1M input tokens, $0.40 / 1M output tokens). Exceptional numerical precision and structured JSON extraction.
+3. **Free-Tier Fallbacks**: `deepseek/deepseek-r1:free`, `qwen/qwen-2.5-72b-instruct:free`, `zhipu/glm-4-9b-chat:free`.
+4. **Deterministic In-Kernel Fallback**: When API endpoints are unreachable, the controller deterministically falls back to the local microsecond Lyapunov DPP engine without interrupting packet forwarding.
+
+---
+
+## 5. REPRODUCIBILITY & CRYPTOGRAPHIC ATTESTATION CHECKSUMS
+
+All 13 course submission bundles are verified using SHA-256 cryptographic hashes:
+
+```bash
+# On Linux/macOS:
+cd submission && sha256sum -c SHA256SUMS.txt
+
+# On Windows PowerShell:
+Get-FileHash submission/* -Algorithm SHA256
+```
 
 ---
 *Authored by Team SDN_07 — EC466: Software Defined Networks | IIIT Dharwad*

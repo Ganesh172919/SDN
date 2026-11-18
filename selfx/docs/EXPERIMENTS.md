@@ -557,3 +557,100 @@ test_engine_conservation()
 - **Low-Level Architecture**: [`selfx/docs/ARCHITECTURE.md`](ARCHITECTURE.md)
 - **Operational Flows**: [`PROJECT_FLOW.md`](../../PROJECT_FLOW.md)
 - **Benchmark Specification**: [`selfx/docs/BENCHMARKS_V4.md`](BENCHMARKS.md)
+
+
+---
+
+# 🔬 Deep Mathematical Formulation & Physical Conservation Invariant Verification
+
+> **Rigorous Proof of Bit-Volume Conservation, Non-Linear Capacity Integration, and Continuous Fluid Queue Dynamics**  
+> *Course Project — EC466: Software Defined Networks | Team ID: SDN_07*
+
+---
+
+## 📐 Formal Proof: Bit-Volume Conservation Identity
+
+Let $A_i(t) \ge 0$ denote the instantaneous offered arrival rate (in Mbps) entering switch queue $i \in \{1, \dots, N\}$, and let $\mu_i(t) \ge 0$ denote the departure service rate allocated to drain queue $i$. Let $d_i(t) \ge 0$ denote the packet discard rate imposed by ingress token bucket rate-limiting meters.
+
+### 1. Continuous-Time Fluid Continuity Equation
+The instantaneous rate of change of the buffer backlog $Q_i(t)$ obeys the first-order differential fluid continuity equation:
+$$rac{d Q_i(t)}{dt} = A_i(t) - \mu_i(t) - d_i(t), \quad orall t \ge 0$$
+subject to the physical non-negativity constraint $Q_i(t) \ge 0$.
+
+### 2. Definite Integration Over Control Horizon $[0, T]$
+Integrating both sides of the continuity equation over the interval $t \in [0, T]$:
+$$\int_0^T rac{d Q_i(t)}{dt} \, dt = \int_0^T A_i(t) \, dt - \int_0^T \mu_i(t) \, dt - \int_0^T d_i(t) \, dt$$
+
+By the Fundamental Theorem of Calculus:
+$$Q_i(T) - Q_i(0) = \int_0^T A_i(t) \, dt - \int_0^T \mu_i(t) \, dt - \int_0^T d_i(t) \, dt$$
+
+Summing across all $N$ queues in the network fabric:
+$$\sum_{i=1}^N \left( Q_i(T) - Q_i(0) ight) = \sum_{i=1}^N \int_0^T A_i(t) \, dt - \sum_{i=1}^N \int_0^T \mu_i(t) \, dt - \sum_{i=1}^N \int_0^T d_i(t) \, dt$$
+
+Rearranging yields the **Exact Bit-Volume Conservation Identity**:
+$$\sum_{i=1}^N \int_0^T A_i(t) \, dt = \sum_{i=1}^N \int_0^T \mu_i(t) \, dt + \sum_{i=1}^N d_i(t) \, dt + \sum_{i=1}^N Q_i(T) - \sum_{i=1}^N Q_i(0)$$
+
+$$lacksquare \quad 	ext{Q.E.D.}$$
+
+---
+
+## 💻 Developer Implementation Reference: Bit-Conserving Fluid Integrator
+
+```python
+class BitConservingIntegrator:
+    """
+    Discrete-time fluid queue numerical integrator.
+    Guarantees exact bit conservation across discrete control slots.
+    """
+    def __init__(self, capacity_mbps: float = 10.0, buffer_max_mbit: float = 2.50):
+        self.C = capacity_mbps
+        self.B_max = buffer_max_mbit
+        self.backlog_mbit = 0.0
+
+    def step(self, arrival_mbps: float, meter_cap_mbps: float, slot_sec: float = 0.1) -> dict:
+        # Step 1: Ingress Metering
+        effective_arrival = min(arrival_mbps, meter_cap_mbps)
+        discard_mbps = max(0.0, arrival_mbps - meter_cap_mbps)
+
+        # Step 2: Ingress Volume in Slot
+        arrival_mbit = effective_arrival * slot_sec
+        discard_mbit = discard_mbps * slot_sec
+
+        # Step 3: Potential Service Volume
+        service_potential_mbit = self.C * slot_sec
+
+        # Step 4: Queue Update via Lindley Recurrence
+        backlog_before = self.backlog_mbit
+        net_addition = arrival_mbit - service_potential_mbit
+
+        if self.backlog_mbit + net_addition < 0.0:
+            # Underflow: Service was idle part of slot
+            actual_served_mbit = backlog_before + arrival_mbit
+            self.backlog_mbit = 0.0
+            overflow_drop_mbit = 0.0
+        elif self.backlog_mbit + net_addition > self.B_max:
+            # Overflow: Tail drop occurs
+            actual_served_mbit = service_potential_mbit
+            overflow_drop_mbit = (self.backlog_mbit + net_addition) - self.B_max
+            self.backlog_mbit = self.B_max
+        else:
+            # Stable Queueing
+            actual_served_mbit = service_potential_mbit
+            self.backlog_mbit += net_addition
+            overflow_drop_mbit = 0.0
+
+        # Verification of Exact Invariant: Inflow == Outflow + Delta Queue + Drops
+        total_inflow = arrival_mbps * slot_sec
+        total_outflow = actual_served_mbit + discard_mbit + overflow_drop_mbit + (self.backlog_mbit - backlog_before)
+        assert abs(total_inflow - total_outflow) < 1e-9, "Conservation violation!"
+
+        return {
+            'backlog_mbit': self.backlog_mbit,
+            'served_mbit': actual_served_mbit,
+            'discard_mbit': discard_mbit,
+            'overflow_drop_mbit': overflow_drop_mbit
+        }
+```
+
+---
+*Authored by Team SDN_07 — EC466: Software Defined Networks | IIIT Dharwad*

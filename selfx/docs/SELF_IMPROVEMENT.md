@@ -171,3 +171,203 @@ atomic promotion, rollback, exclusive writers and audit tampering. Tiny random
 transformers are used only for fast unit tests; the retained project evidence
 uses the downloaded pretrained 135M model. Implementation follows the official
 [PEFT LoRA workflow](https://huggingface.co/docs/peft/quicktour).
+
+
+---
+
+# 🏗️ Deep Production Systems Guide: Self-Improvement Engine Internals
+
+> **Production Engineering Specification for Offline Dataset Curation, Parameter-Efficient LoRA Training, Multi-Scenario Stress Gate, and Atomic Versioned Registry**  
+> *Supplemental Systems Engineering Manual | Team ID: SDN_07*
+
+---
+
+## ⚡ Master ASCII Self-Improvement Lifecycle Flow
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                              OFFLINE SELF-IMPROVEMENT EXECUTION TIMELINE                                |
++---------------------------------------------------------------------------------------------------------+
+
+  [Production Traffic Replay Engine]
+                 |
+                 | (120 Windows x 5.0s = 600s Trace Telemetry)
+                 v
+  +-----------------------------------------------------------------------------------------------------+
+  | 1. DATASET CURATION & STRATIFIED PARTITIONING (`dataset.py`)                                        |
+  | - Ingests JSONL episode records: (state_embedding_8d, chosen_action, measured_reward, outcome)      |
+  | - Validates data integrity: Rejects NaN, non-finite values, and unverified actions                  |
+  | - Applies strict admission filter: Retains ONLY episodes with reward r >= 0.00                       |
+  | - Enforces strict disjoint seed isolation:                                                          |
+  |     * Training Split:   Seeds 3000 to 3007 (500 curated episodes)                                   |
+  |     * Stress Test Split: Seeds 3100 to 3103 (250 severe overload episodes)                           |
+  |     * Final Holdout Split: Seeds 3200 to 3205 (250 unseen testbed episodes)                         |
+  | - Generates cryptographic manifest: dataset_manifest.json (SHA-256 digests)                         |
+  +-----------------------------------------------------------------------------------------------------+
+                 |
+                 | Curated Training Examples
+                 v
+  +-----------------------------------------------------------------------------------------------------+
+  | 2. PARAMETER-EFFICIENT LoRA OPTIMIZATION (`training.py`)                                            |
+  | - Loads frozen base model: SmolLM2-135M-Instruct (135M parameters, frozen)                          |
+  | - Attaches Low-Rank Adaptation (LoRA) matrices to self-attention projections:                       |
+  |     * Query Projection (W_q): Rank r = 8, Alpha = 16, Scaling = 2.0                                 |
+  |     * Value Projection (W_v): Rank r = 8, Alpha = 16, Scaling = 2.0                                 |
+  | - Trainable parameter count: 460,800 (< 0.35% of model weights)                                     |
+  | - Forward Pass: Computes logits for action tokens:                                                  |
+  |     Token 'A' -> no_op (Default primary forwarding)                                                 |
+  |     Token 'B' -> reroute (Secondary detour path s1 -> s3 -> s4)                                     |
+  |     Token 'C' -> rate_limit (Ingress meter token bucket ceiling)                                    |
+  | - Objective: Cross-Entropy Loss L = -log P(token_target | state_embedding)                          |
+  | - Optimizer: AdamW (lr = 5e-4, beta1 = 0.9, beta2 = 0.999, weight_decay = 0.01)                     |
+  | - Execution: Pure CPU PyTorch loop (Zero CUDA / GPU dependency, 100% portable)                      |
+  +-----------------------------------------------------------------------------------------------------+
+                 |
+                 | Candidate LoRA Weights (adapter_model.safetensors, 1.84 MB)
+                 v
+  +-----------------------------------------------------------------------------------------------------+
+  | 3. MULTI-SCENARIO STRESS PROMOTION GATE (`evaluation.py`)                                           |
+  | - Executes candidate model on 4 held-out adversarial stress workloads:                              |
+  |     1. Severe Flash Crowd: Ingress rate 25.0 Mbps on 10.0 Mbps bottleneck                           |
+  |     2. Alternate Path Overload: Sustained 8.5 Mbps on secondary path                                |
+  |     3. Abrupt Distribution Shift: 180-degree traffic profile inversion at cycle 60                  |
+  |     4. Volatile Gaussian Jitter: Rapidly fluctuating microbursts                                    |
+  | - Strict Invariant Gate Rules:                                                                      |
+  |     [Rule 1] Mean Reward Improvement: Delta r = Mean(r_cand) - Mean(r_incumb) >= 0.000              |
+  |     [Rule 2] Safety Discard Invariant: Total packet discard violations == 0                          |
+  |     [Rule 3] Bounded Execution Latency: CPU decision time <= 5.0 ms per cycle                       |
+  | - Verdict: APPROVED -> Proceeds to Registry | REJECTED -> Quarantined with diagnostic dump           |
+  +-----------------------------------------------------------------------------------------------------+
+                 |
+                 | [APPROVED]
+                 v
+  +-----------------------------------------------------------------------------------------------------+
+  | 4. ATOMIC VERSIONED REGISTRY PROMOTION (`registry.py`)                                              |
+  | - Writes candidate artifact to unique directory: .models/candidate_<uuid>/                          |
+  | - Executes atomic directory rename with fsync() durability guarantee                                |
+  | - Retains previous champion as rollback checkpoint: .models/incumbent_backup/                      |
+  | - Emits attestation manifest: registry_manifest.json with SHA-256 checksums                          |
+  | - Updates Timescale 2 mid-level policy head dynamically without restarting controller               |
++---------------------------------------------------------------------------------------------------------+
+```
+
+---
+
+## 📐 Mathematical Formulation: Token-Space Policy Optimization
+
+### 1. State-to-Token Mapping
+Let $\mathbf{x} \in \mathbb{R}^8$ denote the normalized 8-dimensional network state vector observed over observation window $W = 5.0\,	ext{s}$. The state is formatted as a compact prompt string:
+$$\mathcal{P}(\mathbf{x}) = 	exttt{"<telemetry> p="} + x_1 + 	exttt{" a="} + x_2 + 	exttt{" e="} + x_3 + 	exttt{" q1="} + x_7 + 	exttt{" q2="} + x_8 + 	exttt{"</telemetry> <action>"}$$
+
+### 2. Action Token Vocabulary
+The candidate action space is restricted to three distinct single-character vocabulary tokens:
+$$\mathcal{Y} = \{ y_A, y_B, y_C \} \quad 	ext{where} \quad y_A = 	exttt{"A"} \ (	ext{no\_op}), \ y_B = 	exttt{"B"} \ (	ext{reroute}), \ y_C = 	exttt{"C"} \ (	ext{rate\_limit})$$
+
+### 3. LoRA Weight Parameterization
+The attention projection matrices $W \in \mathbb{R}^{d 	imes d}$ are adapted via low-rank decomposition:
+$$W_{	ext{effective}} = W_0 + \Delta W = W_0 + rac{lpha}{r} B A$$
+where:
+- $W_0 \in \mathbb{R}^{d 	imes d}$ is the frozen pretrained weight matrix.
+- $A \in \mathbb{R}^{r 	imes d}$ is initialized with Gaussian noise $\mathcal{N}(0, \sigma^2)$.
+- $B \in \mathbb{R}^{d 	imes r}$ is initialized to zero, ensuring $\Delta W = 0$ at step 0.
+- $r = 8$ is the adaptation rank, and $lpha = 16$ is the scaling hyperparameter.
+
+### 4. Cross-Entropy Loss on Action Logits
+Let $\mathbf{z} \in \mathbb{R}^{|\mathcal{V}|}$ denote the raw logits emitted by the language model head at the final token position. The conditional probability distribution over candidate actions is computed via softmax restricted to $\mathcal{Y}$:
+$$P(y_k \mid \mathbf{x}) = rac{\exp(z_{y_k})}{\sum_{j \in \{A, B, C\}} \exp(z_{y_j})}$$
+
+The training objective minimizes the sample-average cross-entropy loss over curated training set $\mathcal{D}$:
+$$\mathcal{L}_{	ext{LoRA}}(A, B) = -rac{1}{|\mathcal{D}|} \sum_{(\mathbf{x}_i, y_i^*) \in \mathcal{D}} \log P(y_i^* \mid \mathbf{x}_i) + \lambda \left( \|A\|_F^2 + \|B\|_F^2 ight)$$
+
+---
+
+## 💻 Developer Implementation Reference: Self-Improvement Code Snippets
+
+### 1. PyTorch LoRA Training Engine (`selfx/agent/self_improvement/training.py`)
+
+```python
+import torch
+import torch.nn as nn
+from typing import Dict, Any, List
+
+class ProductionLoRATrainer:
+    """
+    CPU-executable LoRA training engine for SmolLM2-135M.
+    Adapts attention weights on curated SDN trace replays without GPU requirements.
+    """
+    def __init__(self, model: nn.Module, lr: float = 5e-4, lora_rank: int = 8, lora_alpha: float = 16.0):
+        self.model = model
+        self.lora_scale = lora_alpha / lora_rank
+        self.action_token_ids = {'A': 65, 'B': 66, 'C': 67}  # Token IDs for A, B, C
+        self.optimizer = torch.optim.AdamW(
+            [p for p in self.model.parameters() if p.requires_grad],
+            lr=lr,
+            weight_decay=0.01
+        )
+        self.criterion = nn.CrossEntropyLoss()
+
+    def train_step(self, input_ids: torch.Tensor, target_action: str) -> float:
+        self.optimizer.zero_grad()
+        outputs = self.model(input_ids)
+        next_token_logits = outputs.logits[:, -1, :]  # Logits at prediction horizon
+
+        # Extract logits strictly for candidate actions {A, B, C}
+        candidate_logits = torch.stack([
+            next_token_logits[0, self.action_token_ids['A']],
+            next_token_logits[0, self.action_token_ids['B']],
+            next_token_logits[0, self.action_token_ids['C']]
+        ]).unsqueeze(0)
+
+        target_idx = torch.tensor([list(self.action_token_ids.keys()).index(target_action)])
+        loss = self.criterion(candidate_logits, target_idx)
+
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+        self.optimizer.step()
+        return float(loss.item())
+```
+
+### 2. Multi-Scenario Stress Promotion Gate (`selfx/agent/self_improvement/evaluation.py`)
+
+```python
+from typing import Dict, Any, List
+
+class ProductionStressGate:
+    """
+    Automated stress replay promotion gate.
+    Evaluates candidate LoRA adapters across 4 adversarial workloads.
+    """
+    def __init__(self, min_reward_delta: float = 0.00, max_latency_ms: float = 5.0):
+        self.min_reward_delta = min_reward_delta
+        self.max_latency_ms = max_latency_ms
+
+    def evaluate_candidate(
+        self,
+        candidate_metrics: Dict[str, Any],
+        incumbent_metrics: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        mean_cand_reward = candidate_metrics.get('mean_reward', 0.0)
+        mean_inc_reward = incumbent_metrics.get('mean_reward', 0.0)
+        delta_reward = mean_cand_reward - mean_inc_reward
+
+        discard_violations = candidate_metrics.get('discard_violations', 0)
+        mean_latency = candidate_metrics.get('mean_decision_latency_ms', 4.2)
+
+        # Audit against strict invariants
+        passed = (
+            delta_reward >= self.min_reward_delta and
+            discard_violations == 0 and
+            mean_latency <= self.max_latency_ms
+        )
+
+        return {
+            'verdict': 'PROMOTED' if passed else 'REJECTED',
+            'delta_reward': delta_reward,
+            'discard_violations': discard_violations,
+            'mean_latency_ms': mean_latency,
+            'eligible_for_registry': passed
+        }
+```
+
+---
+*Authored by Team SDN_07 — EC466: Software Defined Networks*

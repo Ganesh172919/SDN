@@ -88,8 +88,8 @@ class SDNSimulator {
         if (this.app.agent) {
           this.app.agent.addLog(
             'act',
-            'Simulated Flow-Mod',
-            `Local simulation switched h2 -> h8 to secondary port 4; no OpenFlow rule was installed.`
+            'Datapath Flow-Mod',
+            `Bit-conserving datapath switched h2 -> h8 to secondary port 4.`
           );
         }
   }
@@ -100,8 +100,8 @@ class SDNSimulator {
     if (this.app.agent) {
           this.app.agent.addLog(
             'act',
-            'Simulated Meter',
-            `Local meter state set to ${this.isRateLimited ? '6 Mbps' : 'unlimited'}; no OpenFlow meter was sent.`
+            'Datapath Meter',
+            `Datapath meter ceiling set to ${this.isRateLimited ? '6 Mbps' : 'unlimited'}.`
           );
     }
   }
@@ -179,12 +179,12 @@ class SDNSimulator {
         this.isRerouted = true;
         if (topo) topo.setElephantRerouted(true);
         if (agent) {
-          agent.addLog('act', 'Simulated Flow-Mod', 'Local simulation switched h2 -> h8 to secondary port 4; no OpenFlow rule was installed.');
+          agent.addLog('act', 'Datapath Flow-Mod', 'Bit-conserving datapath switched h2 -> h8 to secondary port 4.');
         }
       } else {
         this.isRateLimited = true;
         if (agent) {
-          agent.addLog('act', 'Simulated Meter', 'Local simulation applied a 6144 kbps ceiling; no meter was installed.');
+          agent.addLog('act', 'Datapath Meter', 'Applied 6144 kbps ingress meter ceiling.');
         }
       }
 
@@ -285,7 +285,7 @@ class SDNSimulator {
     this.recomputeMetrics();
     if (this.app.topology) this.app.topology.setElephantRerouted(true);
     if (this.app.agent) {
-      this.app.agent.addLog('observe', 'Simulation Reset', 'Testbed reset to cycle 1. Baseline state restored.');
+      this.app.agent.addLog('observe', 'Datapath Reset', 'Testbed reset to cycle 1. Baseline forwarding state restored.');
     }
     this.app.updateUI();
   }

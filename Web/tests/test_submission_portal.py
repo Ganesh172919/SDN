@@ -100,6 +100,19 @@ class SubmissionPortalTests(unittest.TestCase):
             self.assertEqual(body, (self.release / name).read_bytes())
         self.assertEqual(self.get("/downloads/local-only.txt")[0], 404)
 
+    def test_static_site_serves_only_public_pages_and_assets(self):
+        with TemporaryDirectory() as directory, patch.object(server, "WEB_DIR", directory):
+            root = Path(directory)
+            (root / "index.html").write_text("Home", encoding="utf-8")
+            (root / "js").mkdir()
+            (root / "js" / "app.js").write_text("'Public asset';", encoding="utf-8")
+            (root / "data").mkdir()
+            (root / "data" / "fixture.json").write_text("{}", encoding="utf-8")
+            self.assertEqual(self.get("/")[0], 200)
+            self.assertEqual(self.get("/js/app.js")[0], 200)
+            self.assertEqual(self.get("/js/")[0], 404)
+            self.assertEqual(self.get("/data/fixture.json")[0], 404)
+
 
 if __name__ == "__main__":
     unittest.main()

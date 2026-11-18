@@ -500,12 +500,10 @@
     setupDPI() {
       if (!this.canvas) return;
       const dpr = window.devicePixelRatio || 1;
-      const rect = this.canvas.getBoundingClientRect();
-      let w = rect.width || (this.canvas.parentElement ? this.canvas.parentElement.clientWidth : 280);
-      let h = rect.height || 280;
-      if (w <= 0) w = 280;
-      if (h <= 0) h = 280;
-
+      const w = 280;
+      const h = 280;
+      this.canvas.style.width = '280px';
+      this.canvas.style.height = '280px';
       this.width = w;
       this.height = h;
       this.canvas.width = Math.floor(w * dpr);
@@ -570,9 +568,9 @@
 
       ctx.clearRect(0, 0, this.width, this.height);
 
-      // Row / Col Headers
-      ctx.fillStyle = isLight ? '#64748b' : '#94a3b8';
-      ctx.font = '10px "JetBrains Mono", sans-serif';
+      // Row / Col Headers (Dark High-Contrast)
+      ctx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
+      ctx.font = 'bold 11px "JetBrains Mono", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -583,33 +581,38 @@
         ctx.fillText(`h${i+1}`, pad / 2, pad + i * cellSize + cellSize / 2);
       }
 
-      // Matrix Cells
+      // Matrix Cells with Crisp Grid Borders
       for (let i = 0; i < this.numHosts; i++) {
         for (let j = 0; j < this.numHosts; j++) {
           const val = this.matrix[i][j];
           const x = pad + j * cellSize;
           const y = pad + i * cellSize;
 
+          // Draw Cell Border
+          ctx.strokeStyle = isLight ? '#e2e8f0' : '#334155';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, cellSize, cellSize);
+
           if (i === j) {
-            ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)';
+            ctx.fillStyle = isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.05)';
           } else if (val === 0) {
-            ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.02)';
+            ctx.fillStyle = isLight ? '#f8fafc' : 'rgba(255, 255, 255, 0.02)';
           } else {
-            // Color ramp: Cyan for < 5 Mbps, Amber for 5-10, Coral for > 10
+            // High-Contrast Color Ramp: Red for >10, Amber for >4, Sky-Blue for <=4
             if (val > 10.0) {
-              ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
+              ctx.fillStyle = '#ef4444';
             } else if (val > 4.0) {
-              ctx.fillStyle = 'rgba(245, 158, 11, 0.75)';
+              ctx.fillStyle = '#f59e0b';
             } else {
-              ctx.fillStyle = `rgba(0, 242, 254, ${Math.min(0.8, val / 4.0)})`;
+              ctx.fillStyle = '#bae6fd';
             }
           }
 
           ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
 
           if (val > 0) {
-            ctx.fillStyle = val > 4.0 ? '#ffffff' : (isLight ? '#0f172a' : '#ffffff');
-            ctx.font = '9px "JetBrains Mono", sans-serif';
+            ctx.fillStyle = val > 4.0 ? '#ffffff' : '#0369a1';
+            ctx.font = 'bold 10px "JetBrains Mono", sans-serif';
             ctx.fillText(val.toFixed(1), x + cellSize / 2, y + cellSize / 2);
           }
         }
@@ -633,16 +636,17 @@
         const used = sw.tcamUsed || Math.floor(Math.random() * 200) + 80;
         const max = sw.tcamMax || 1024;
         const pct = Math.round((used / max) * 100);
-        const color = pct > 80 ? '#ef4444' : (pct > 50 ? '#f59e0b' : '#00f2fe');
+        const barColor = pct > 80 ? '#dc2626' : (pct > 50 ? '#d97706' : '#0284c7');
+        const textColor = pct > 80 ? '#991b1b' : (pct > 50 ? '#92400e' : '#0369a1');
 
         html += `
           <div class="tcam-item" style="margin-bottom: 10px;">
             <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
               <span><strong>${sw.id.toUpperCase()}</strong> TCAM</span>
-              <span style="color:${color}; font-family:var(--font-mono);">${used} / ${max} (${pct}%)</span>
+              <span style="color:${textColor}; font-weight:700; font-family:var(--font-mono);">${used} / ${max} (${pct}%)</span>
             </div>
-            <div style="background:var(--surface-active); height:6px; border-radius:3px; overflow:hidden;">
-              <div style="width:${pct}%; height:100%; background:${color}; transition:width 0.4s ease;"></div>
+            <div style="background:#e2e8f0; height:6px; border-radius:3px; overflow:hidden;">
+              <div style="width:${pct}%; height:100%; background:${barColor}; transition:width 0.4s ease;"></div>
             </div>
           </div>
         `;

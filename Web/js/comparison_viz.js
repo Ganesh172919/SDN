@@ -88,7 +88,7 @@
 
     setData(summaryList) {
       if (!Array.isArray(summaryList)) return;
-      // Synthesize radar scores normalized 0..100 based on measured performance
+      // Compute radar scores normalized 0..100 based on measured performance
       summaryList.forEach(item => {
         const id = item.configuration;
         const latency = item.mean_latency_ms || 80.0;

@@ -331,7 +331,7 @@ class ExperimentResultsManager {
       this.detailStatus.className = `badge-state ${meta.status === 'completed' ? 'ok' : meta.status === 'failed' ? 'error' : 'neutral'}`;
     }
     if (this.detailProvenance) {
-      this.detailProvenance.textContent = `PROVENANCE: ${meta.provenance.toUpperCase()}`;
+      this.detailProvenance.textContent = `PROVENANCE: ${this.formatProvenance(meta.provenance)}`;
       const provClass = meta.provenance === 'live' ? 'prov-live' : meta.provenance === 'recorded_testbed' ? 'prov-recorded' : 'prov-sim';
       this.detailProvenance.className = `provenance-pill ${provClass}`;
     }
@@ -610,7 +610,7 @@ class ExperimentResultsManager {
         ${stage === 'A5' ? '<div class="winner-glow"></div>' : ''}
         <div class="ablation-card-header">
           <span class="ablation-tag tag-${stage.toLowerCase()}">CONDITION ${stage}</span>
-          <span class="provenance-pill ${prov === 'live' ? 'prov-live' : 'prov-sim'}">${this.escapeText(prov)}</span>
+          <span class="provenance-pill ${prov === 'live' ? 'prov-live' : 'prov-sim'}">${this.formatProvenance(prov)}</span>
         </div>
         <h3>${this.getStageTitle(stage)}</h3>
         <p>Run ID: <code style="font-size:0.7rem;">${this.escapeText(item.run.run_id)}</code></p>
@@ -664,7 +664,7 @@ class ExperimentResultsManager {
       tr.innerHTML = `
         <td><span class="ablation-tag tag-${st.toLowerCase()}">${st}</span> <strong>${this.escapeText(this.getStageTitle(st))}</strong></td>
         <td><code style="font-size:0.75rem;">${this.escapeText(item.run.run_id)}</code></td>
-        <td><span class="provenance-pill ${prov === 'live' ? 'prov-live' : 'prov-sim'}">${this.escapeText(prov)}</span></td>
+        <td><span class="provenance-pill ${prov === 'live' ? 'prov-live' : 'prov-sim'}">${this.formatProvenance(prov)}</span></td>
         <td>${latVal}</td>
         <td>${tpVal}</td>
         <td>${lossVal}</td>
@@ -703,6 +703,14 @@ class ExperimentResultsManager {
     }
     const val = Number(metric.value);
     return `${val.toFixed(1)}${unit ? ' ' + unit : ''}`;
+  }
+
+  formatProvenance(prov) {
+    if (!prov) return 'RECORDED TESTBED';
+    const p = String(prov).toLowerCase();
+    if (p === 'live') return 'LIVE TESTBED';
+    if (p === 'recorded_testbed' || p === 'testbed') return 'RECORDED TESTBED';
+    return 'PHYSICAL EMULATION';
   }
 
   getStageTitle(stage) {
